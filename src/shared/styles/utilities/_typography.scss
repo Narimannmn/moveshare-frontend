@@ -1,0 +1,86 @@
+@use '../mixins/typography' as *;
+
+// Typography utility classes
+// Usage: <div className="text-bold_24">Heading</div>
+
+.text-regular_16 {
+  @include regular_16;
+}
+
+.text-regular_14 {
+  @include regular_14;
+}
+
+.text-regular_12 {
+  @include regular_12;
+}
+
+.text-regular_10 {
+  @include regular_10;
+}
+
+.text-medium_16 {
+  @include medium_16;
+}
+
+.text-bold_24 {
+  @include bold_24;
+}
+
+.text-bold_20 {
+  @include bold_20;
+}
+
+.text-bold_16 {
+  @include bold_16;
+}
+
+.text-bold_14 {
+  @include bold_14;
+}
+
+.text-bold_12 {
+  @include bold_12;
+}
+
+// Font weight utilities
+.font-regular {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+// Font size utilities
+.text-10 {
+  font-size: 10px;
+}
+
+.text-12 {
+  font-size: 12px;
+}
+
+.text-14 {
+  font-size: 14px;
+}
+
+.text-16 {
+  font-size: 16px;
+}
+
+.text-20 {
+  font-size: 20px;
+}
+
+.text-24 {
+  font-size: 24px;
+}
