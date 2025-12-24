@@ -1,0 +1,200 @@
+// Design tokens from Figma button.svg
+$button-height: 44px;
+$button-border-radius: 8px;
+$button-padding-horizontal: 24px;
+$button-font-size: 14px;
+$button-font-weight: 500;
+
+// Size variants
+$button-height-sm: 36px;
+$button-height-lg: 52px;
+$button-padding-sm: 16px;
+$button-padding-lg: 32px;
+
+// Colors
+$primary-bg: #60a5fa;
+$primary-hover: #3b82f6;
+$primary-active: #2563eb;
+
+$danger-bg: #ff0000;
+$danger-hover: #dc2626;
+$danger-active: #b91c1c;
+
+$secondary-bg: #f5f5f5;
+$secondary-text: #a6a6a6;
+$secondary-hover: #e5e5e5;
+
+$ghost-bg: #eceff1;
+$ghost-text: #202224;
+$ghost-hover: #d5dce1;
+
+$outline-border: #a6a6a6;
+$outline-text: #202224;
+$outline-hover-bg: #f5f5f5;
+
+$disabled-opacity: 0.6;
+
+// Icon spacing
+$icon-spacing: 8px;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $icon-spacing;
+  height: $button-height;
+  padding: 0 $button-padding-horizontal;
+  border: none;
+  border-radius: $button-border-radius;
+  font-size: $button-font-size;
+  font-weight: $button-font-weight;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+  user-select: none;
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: $disabled-opacity;
+    cursor: not-allowed;
+  }
+}
+
+// Variant: Primary
+.primary {
+  background-color: $primary-bg;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background-color: $primary-hover;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $primary-active;
+  }
+}
+
+// Variant: Danger
+.danger {
+  background-color: $danger-bg;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background-color: $danger-hover;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $danger-active;
+  }
+}
+
+// Variant: Secondary
+.secondary {
+  background-color: $secondary-bg;
+  color: $secondary-text;
+
+  &:hover:not(:disabled) {
+    background-color: $secondary-hover;
+  }
+
+  &:active:not(:disabled) {
+    background-color: darken($secondary-hover, 5%);
+  }
+}
+
+// Variant: Ghost
+.ghost {
+  background-color: $ghost-bg;
+  color: $ghost-text;
+
+  &:hover:not(:disabled) {
+    background-color: $ghost-hover;
+  }
+
+  &:active:not(:disabled) {
+    background-color: darken($ghost-hover, 5%);
+  }
+}
+
+// Variant: Outline
+.outline {
+  background-color: transparent;
+  color: $outline-text;
+  border: 1px solid $outline-border;
+
+  &:hover:not(:disabled) {
+    background-color: $outline-hover-bg;
+  }
+
+  &:active:not(:disabled) {
+    background-color: darken($outline-hover-bg, 5%);
+  }
+}
+
+// Size variants
+.sizeDefault {
+  height: $button-height;
+  padding: 0 $button-padding-horizontal;
+  font-size: $button-font-size;
+}
+
+.sizeSm {
+  height: $button-height-sm;
+  padding: 0 $button-padding-sm;
+  font-size: 13px;
+}
+
+.sizeLg {
+  height: $button-height-lg;
+  padding: 0 $button-padding-lg;
+  font-size: 16px;
+}
+
+// Full width
+.fullWidth {
+  width: 100%;
+}
+
+// Content wrapper
+.content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Prefix and postfix
+.prefix,
+.postfix {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Loading spinner
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

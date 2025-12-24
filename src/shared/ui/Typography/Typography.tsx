@@ -12,7 +12,13 @@ interface TypographyProps {
 }
 
 export const Typography = memo(
-  ({ variant = "regular_16", as: Component = "span", className, children, color }: TypographyProps) => {
+  ({
+    variant = "regular_16",
+    as: Component = "span",
+    className,
+    children,
+    color,
+  }: TypographyProps) => {
     const variantClass = styles[variant];
 
     return (
