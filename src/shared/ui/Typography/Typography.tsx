@@ -1,7 +1,7 @@
 import { memo, type ElementType, type ReactNode } from "react";
-import cn from "classnames";
-import { typographyConfig, type TypographyVariant } from "@/shared/config";
+import { type TypographyVariant } from "@/shared/config";
 import styles from "./Typography.module.scss";
+import { cn } from "@/shared/lib";
 
 interface TypographyProps {
   variant?: TypographyVariant;

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/(app)")({
       <Header />
       <div className="h-full overflow-hidden flex">
         <Sidebar />
-        <div className="bg-[#F5F6FA] flex-1 h-full p-4">
+        <div className="bg-[#F5F6FA] flex-1 h-full p-4 overflow-auto">
           <Outlet />
         </div>
       </div>

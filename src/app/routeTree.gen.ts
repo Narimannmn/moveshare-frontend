@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './../pages/index'
 import { Route as authRegisterIndexRouteImport } from './../pages/(auth)/register/index'
 import { Route as authLoginIndexRouteImport } from './../pages/(auth)/login/index'
 import { Route as authForgotIndexRouteImport } from './../pages/(auth)/forgot/index'
+import { Route as appUiKitDemoIndexRouteImport } from './../pages/(app)/ui-kit-demo/index'
 import { Route as appMyIndexRouteImport } from './../pages/(app)/my/index'
 import { Route as appJobsIndexRouteImport } from './../pages/(app)/jobs/index'
 import { Route as appDashboardIndexRouteImport } from './../pages/(app)/dashboard/index'
@@ -50,6 +51,11 @@ const authForgotIndexRoute = authForgotIndexRouteImport.update({
   id: '/forgot/',
   path: '/forgot/',
   getParentRoute: () => authRouteRoute,
+} as any)
+const appUiKitDemoIndexRoute = appUiKitDemoIndexRouteImport.update({
+  id: '/ui-kit-demo/',
+  path: '/ui-kit-demo/',
+  getParentRoute: () => appRouteRoute,
 } as any)
 const appMyIndexRoute = appMyIndexRouteImport.update({
   id: '/my/',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof appDashboardIndexRoute
   '/jobs': typeof appJobsIndexRoute
   '/my': typeof appMyIndexRoute
+  '/ui-kit-demo': typeof appUiKitDemoIndexRoute
   '/forgot': typeof authForgotIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof appDashboardIndexRoute
   '/jobs': typeof appJobsIndexRoute
   '/my': typeof appMyIndexRoute
+  '/ui-kit-demo': typeof appUiKitDemoIndexRoute
   '/forgot': typeof authForgotIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/(app)/dashboard/': typeof appDashboardIndexRoute
   '/(app)/jobs/': typeof appJobsIndexRoute
   '/(app)/my/': typeof appMyIndexRoute
+  '/(app)/ui-kit-demo/': typeof appUiKitDemoIndexRoute
   '/(auth)/forgot/': typeof authForgotIndexRoute
   '/(auth)/login/': typeof authLoginIndexRoute
   '/(auth)/register/': typeof authRegisterIndexRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/jobs'
     | '/my'
+    | '/ui-kit-demo'
     | '/forgot'
     | '/login'
     | '/register'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/jobs'
     | '/my'
+    | '/ui-kit-demo'
     | '/forgot'
     | '/login'
     | '/register'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/(app)/dashboard/'
     | '/(app)/jobs/'
     | '/(app)/my/'
+    | '/(app)/ui-kit-demo/'
     | '/(auth)/forgot/'
     | '/(auth)/login/'
     | '/(auth)/register/'
@@ -222,6 +234,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/forgot'
       preLoaderRoute: typeof authForgotIndexRouteImport
       parentRoute: typeof authRouteRoute
+    }
+    '/(app)/ui-kit-demo/': {
+      id: '/(app)/ui-kit-demo/'
+      path: '/ui-kit-demo'
+      fullPath: '/ui-kit-demo'
+      preLoaderRoute: typeof appUiKitDemoIndexRouteImport
+      parentRoute: typeof appRouteRoute
     }
     '/(app)/my/': {
       id: '/(app)/my/'
@@ -283,6 +302,7 @@ interface appRouteRouteChildren {
   appDashboardIndexRoute: typeof appDashboardIndexRoute
   appJobsIndexRoute: typeof appJobsIndexRoute
   appMyIndexRoute: typeof appMyIndexRoute
+  appUiKitDemoIndexRoute: typeof appUiKitDemoIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
@@ -293,6 +313,7 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appDashboardIndexRoute: appDashboardIndexRoute,
   appJobsIndexRoute: appJobsIndexRoute,
   appMyIndexRoute: appMyIndexRoute,
+  appUiKitDemoIndexRoute: appUiKitDemoIndexRoute,
 }
 
 const appRouteRouteWithChildren = appRouteRoute._addFileChildren(
