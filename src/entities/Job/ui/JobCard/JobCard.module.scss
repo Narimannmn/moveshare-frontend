@@ -1,0 +1,220 @@
+.card {
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 16px;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+  height: fit-content;
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+}
+
+// Header
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.headerLeft {
+  flex: 1;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #202224;
+  margin: 0 0 6px 0;
+}
+
+.metadata {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.distance {
+  font-size: 14px;
+  color: #666c72;
+}
+
+.hotDeal {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ff6b6b;
+  background-color: #ffe5e5;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.newListing {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #60a5fa;
+  padding: 6px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+// Route
+.route {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.location {
+  flex: 1;
+  min-width: 0;
+}
+
+.locationText {
+  font-size: 16px;
+  font-weight: 600;
+  color: #202224;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.arrow {
+  font-size: 20px;
+  color: #202224;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+// Map
+.mapContainer {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.map {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mapPin {
+  position: absolute;
+  font-size: 24px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  transform: translate(-50%, -50%);
+}
+
+.mapRoute {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+}
+
+// Details Grid
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detailLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666c72;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detailValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: #202224;
+  line-height: 1.4;
+}
+
+// Badges
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 500;
+  color: #202224;
+  background-color: #e8f4fd;
+  padding: 6px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+// Footer
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #60a5fa;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.viewDetailsButton {
+  min-width: 120px;
+
+  @media (max-width: 768px) {
+    flex: 1;
+  }
+}
+
+.claimButton {
+  min-width: 120px;
+
+  @media (max-width: 768px) {
+    flex: 1;
+  }
+}

@@ -1,0 +1,95 @@
+.container {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gradient {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+}
+
+.initials {
+  color: white;
+  font-weight: 600;
+  font-family: "Onest", sans-serif;
+}
+
+/* Size variants */
+.sm {
+  width: 32px;
+  height: 32px;
+
+  .initials {
+    font-size: 14px;
+  }
+}
+
+.md {
+  width: 48px;
+  height: 48px;
+
+  .initials {
+    font-size: 18px;
+  }
+}
+
+.lg {
+  width: 64px;
+  height: 64px;
+
+  .initials {
+    font-size: 24px;
+  }
+}
+
+.xl {
+  width: 120px;
+  height: 120px;
+
+  .initials {
+    font-size: 48px;
+    line-height: 1;
+  }
+}
+
+/* Change button */
+.changeButton {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Onest", sans-serif;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}

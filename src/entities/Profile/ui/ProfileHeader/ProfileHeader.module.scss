@@ -1,0 +1,44 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.companyName {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+  color: #202224;
+  text-align: center;
+  font-family: "Onest", sans-serif;
+  margin: 0;
+}
+
+.email {
+  font-size: 14px;
+  line-height: 18px;
+  color: #9ca3af;
+  text-align: center;
+  font-family: "Onest", sans-serif;
+  margin: 0;
+}
+
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #d1fae5;
+  color: #10b981;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  font-family: "Onest", sans-serif;
+  margin-top: 4px;
+
+  svg {
+    flex-shrink: 0;
+  }
+}

@@ -2,6 +2,8 @@ export * from "./Button/Button";
 export * from "./Checkbox/Checkbox";
 export * from "./Input/Input";
 export * from "./OTPInput/OTPInput";
+export * from "./PageHeader/PageHeader";
 export * from "./RadioButton/RadioButton";
+export * from "./TabNavigation";
 export * from "./Textarea/Textarea";
 export * from "./Typography/Typography";

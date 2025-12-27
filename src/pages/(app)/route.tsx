@@ -5,18 +5,17 @@ import { appLocalStorageKey } from "@/shared/config";
 
 export const Route = createFileRoute("/(app)")({
   beforeLoad: () => {
-    const accessToken = localStorage.getItem(appLocalStorageKey.accessToken);
-
-    if (!accessToken) {
-      throw redirect({ to: "/login" });
-    }
+    // const accessToken = localStorage.getItem(appLocalStorageKey.accessToken);
+    // if (!accessToken) {
+    //   throw redirect({ to: "/login" });
+    // }
   },
   component: () => (
-    <div className="h-screen overflow-hidden">
+    <div className="h-screen overflow-hidden flex flex-col">
       <Header />
-      <div className="h-full overflow-hidden flex">
+      <div className="flex-1 overflow-hidden flex">
         <Sidebar />
-        <div className="bg-[#F5F6FA] flex-1 h-full p-4 overflow-auto">
+        <div className="bg-[#F5F6FA] flex-1 p-4 overflow-auto">
           <Outlet />
         </div>
       </div>

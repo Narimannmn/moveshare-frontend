@@ -1,9 +1,10 @@
 import { forwardRef, memo } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/shared/lib/utils";
+import { Typography } from "../Typography/Typography";
 
 const inputVariants = cva(
-  "w-full rounded-[7.5px] px-4 py-2.5 text-base text-[#202224] border transition-colors placeholder:text-[#A6A6A6] focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-60",
+  "w-full rounded-[7.5px] px-4 py-3 h-[44px] text-[16px] font-normal leading-[20px] text-[#202224] border transition-colors placeholder:text-[#A6A6A6] placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-60",
   {
     variants: {
       state: {
@@ -35,7 +36,8 @@ const inputVariants = cva(
 );
 
 export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "prefix">,
+  extends
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "prefix">,
     VariantProps<typeof inputVariants> {
   label?: string;
   error?: string;
@@ -69,11 +71,8 @@ export const Input = memo(
       return (
         <div className={cn("flex flex-col gap-1.5", containerClassName)}>
           {label && (
-            <label
-              className="text-sm font-medium text-[#202224]"
-              htmlFor={props.id}
-            >
-              {label}
+            <label htmlFor={props.id}>
+              <Typography variant="bold_16">{label}</Typography>
             </label>
           )}
 
@@ -124,10 +123,7 @@ export const Input = memo(
           )}
 
           {helperText && !error && (
-            <span
-              id={`${props.id}-helper`}
-              className="text-xs text-[#666C72]"
-            >
+            <span id={`${props.id}-helper`} className="text-xs text-[#666C72]">
               {helperText}
             </span>
           )}
