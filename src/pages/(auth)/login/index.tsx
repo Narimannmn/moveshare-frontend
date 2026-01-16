@@ -1,76 +1,93 @@
-// import { useState } from "react";
-// import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 
-// import { EmailLoginForm } from "@/features/auth/login-with-email/ui/EmailLoginForm";
-// import { VerificationForm } from "@/features/auth/verify-email/ui/VerificationForm";
-// import { GoogleLoginButton } from "@/features/auth/login-with-google/ui/GoogleLoginButton";
-// import { AppleLoginButton } from "@/features/auth/login-with-apple/ui/AppleLoginButton";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
-// import {
-//   Card,
-//   CardContent,
-//   CardFooter,
-//   CardHeader,
-//   CardTitle,
-// } from "@/shared/ui/card";
+import { Typography } from "@shared/ui";
 
-// export const Route = createFileRoute("/(auth)/login/")({
-//   component: LoginPage,
-// });
+import { AppleLoginButton } from "@features/auth/loginWithApple/ui/AppleLoginButton";
+import { EmailLoginForm } from "@features/auth/loginWithEmail/ui/EmailLoginForm";
+import { GoogleLoginButton } from "@features/auth/loginWithGoogle/ui/GoogleLoginButton";
+import { VerificationForm } from "@features/auth/verifyEmail/ui/VerificationForm";
 
-// function LoginPage() {
-//   const [step, setStep] = useState<"login" | "verify">("login");
+export const Route = createFileRoute("/(auth)/login/")({
+  component: LoginPage,
+});
 
-//   return (
-//     <Card className="w-full max-w-[480px] bg-white p-10 border-none shadow-none sm:border sm:rounded-[16px] sm:shadow-lg">
-//       <CardHeader className="p-0 space-y-1 text-center sm:text-left">
-//         <CardTitle className="text-2xl font-bold text-[#202224]">
-//           {step === "login" ? "Log In" : "Enter the verification code"}
-//         </CardTitle>
+type LoginStep = "login" | "otp";
 
-//         {step === "verify" && (
-//           <p className="text-sm text-[#666C72]">
-//             Enter the 6-digit code we sent to your email
-//           </p>
-//         )}
-//       </CardHeader>
+function LoginPage() {
+  const [currentStep, setCurrentStep] = useState<LoginStep>("login");
 
-//       <CardContent className="p-0 mt-0 space-y-5">
-//         {step === "login" ? (
-//           <>
-//             <EmailLoginForm onSuccess={() => setStep("verify")} />
+  const handleLoginSuccess = (requiresOtp?: boolean) => {
+    if (requiresOtp) {
+      setCurrentStep("otp");
+    }
+    // If no OTP required, the useLogin mutation will handle navigation to dashboard
+  };
 
-//             <div className="relative opacity-80">
-//               <div className="absolute inset-0 flex items-center">
-//                 <span className="w-full border-t border-gray-200" />
-//               </div>
-//               <div className="relative flex justify-center text-sm">
-//                 <span className="bg-white px-2 text-[#666C72]">or</span>
-//               </div>
-//             </div>
+  const handleBackToLogin = () => {
+    setCurrentStep("login");
+  };
 
-//             <div className="space-y-3">
-//               <GoogleLoginButton />
-//               <AppleLoginButton />
-//             </div>
-//           </>
-//         ) : (
-//           <VerificationForm />
-//         )}
-//       </CardContent>
+  return (
+    <div className="min-h-screen bg-[#60A5FA] flex items-center justify-center">
+      {currentStep === "login" ? (
+        <div className="w-full max-w-[480px] bg-white p-10 rounded-2xl flex flex-col gap-6">
+          {/* Header */}
+          <div className="flex flex-col items-start w-full">
+            <Typography variant="bold_24">Log In</Typography>
+          </div>
 
-//       {/* Footer */}
-//       {step === "login" && (
-//         <CardFooter className="p-0 mt-4 justify-center text-sm text-[#202224] gap-1">
-//           <span>Don&apos;t have an account?</span>
-//           <Link
-//             to="/register"
-//             className="font-bold text-[#60A5FA] hover:underline"
-//           >
-//             Register
-//           </Link>
-//         </CardFooter>
-//       )}
-//     </Card>
-//   );
-// }
+          {/* Form Content */}
+          <div className="flex flex-col gap-6 items-center">
+            <div className="flex flex-col gap-4 items-center w-full">
+              {/* Login Form */}
+              <EmailLoginForm onSuccess={handleLoginSuccess} />
+
+              {/* Divider */}
+              <div className="flex gap-4 items-center w-full">
+                <div className="flex-1 h-px bg-[#E2E2E2]" />
+                <Typography variant="regular_16" className="text-[#0C2340]">
+                  or
+                </Typography>
+                <div className="flex-1 h-px bg-[#E2E2E2]" />
+              </div>
+
+              {/* OAuth Buttons */}
+              <GoogleLoginButton />
+              <AppleLoginButton />
+            </div>
+
+            {/* Register Link */}
+            <div className="flex gap-2 items-center text-base">
+              <span className="text-[#202224] opacity-65">Don't have an account?</span>
+              <Link to="/register" className="text-[#60A5FA] font-bold hover:underline">
+                Register
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="w-full max-w-[480px] bg-white p-10 rounded-2xl flex flex-col gap-6">
+          {/* Header */}
+          <div className="flex flex-col items-start w-full">
+            <Typography variant="bold_24">Enter verification code</Typography>
+          </div>
+
+          {/* OTP Form */}
+          <div className="flex flex-col gap-6">
+            <VerificationForm />
+
+            <button
+              type="button"
+              onClick={handleBackToLogin}
+              className="w-full text-base text-[#60A5FA] hover:underline font-medium"
+            >
+              Back to login
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

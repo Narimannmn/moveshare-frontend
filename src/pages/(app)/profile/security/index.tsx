@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+
+import { createFileRoute } from "@tanstack/react-router";
+
 import { Button } from "@/shared/ui/Button/Button";
 
 export const Route = createFileRoute("/(app)/profile/security/")({
@@ -25,17 +27,13 @@ function SecurityPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-[#202224] mb-6">
-        Security Settings
-      </h2>
+      <h2 className="text-2xl font-bold text-[#202224] mb-6">Security Settings</h2>
 
       <div className="border-t border-gray-200">
         {/* Password Section */}
         <div className="flex items-center justify-between py-5 border-b border-gray-200">
           <div className="flex-1">
-            <h3 className="text-base font-semibold text-[#202224] mb-1">
-              Password
-            </h3>
+            <h3 className="text-base font-semibold text-[#202224] mb-1">Password</h3>
             <p className="text-sm text-gray-500">Last changed: 3 months ago</p>
           </div>
           <Button variant="secondary" onClick={handleChangePassword}>
@@ -50,9 +48,7 @@ function SecurityPage() {
               Two-Factor Authentication
             </h3>
             <p className="text-sm text-blue-500 mb-1">Active</p>
-            <p className="text-sm text-gray-500">
-              Add an extra layer of security to your account
-            </p>
+            <p className="text-sm text-gray-500">Add an extra layer of security to your account</p>
           </div>
 
           {/* Toggle Switch */}
@@ -75,12 +71,8 @@ function SecurityPage() {
         {/* Active Sessions Section */}
         <div className="flex items-center justify-between py-5">
           <div className="flex-1">
-            <h3 className="text-base font-semibold text-[#202224] mb-1">
-              Active Sessions
-            </h3>
-            <p className="text-sm text-gray-500">
-              When you receive new messages
-            </p>
+            <h3 className="text-base font-semibold text-[#202224] mb-1">Active Sessions</h3>
+            <p className="text-sm text-gray-500">When you receive new messages</p>
           </div>
           <Button variant="secondary" onClick={handleViewAllSessions}>
             View All

@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { ChatUserSchema } from "./user";
 
 export const LastMessageSchema = z.object({

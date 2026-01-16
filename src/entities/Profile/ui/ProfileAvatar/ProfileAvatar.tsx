@@ -1,6 +1,9 @@
 import { memo } from "react";
+
 import { Camera } from "lucide-react";
+
 import { cn } from "@/shared/lib/utils";
+
 import styles from "./ProfileAvatar.module.scss";
 
 export interface ProfileAvatarProps {

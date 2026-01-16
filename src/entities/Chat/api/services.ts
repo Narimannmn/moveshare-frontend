@@ -1,9 +1,9 @@
 import {
-  ConversationListSchema,
-  MessageListSchema,
-  type Conversation,
-  type Message,
   type ChatUser,
+  type Conversation,
+  ConversationListSchema,
+  type Message,
+  MessageListSchema,
 } from "../schemas";
 import { mockConversations, mockMessages, mockUsers } from "./mockData";
 
@@ -23,9 +23,7 @@ export const getConversations = async (): Promise<Conversation[]> => {
   }
 };
 
-export const getConversationById = async (
-  id: string
-): Promise<Conversation | null> => {
+export const getConversationById = async (id: string): Promise<Conversation | null> => {
   try {
     await delay(200);
 
@@ -37,9 +35,7 @@ export const getConversationById = async (
   }
 };
 
-export const getMessages = async (
-  conversationId: string
-): Promise<Message[]> => {
+export const getMessages = async (conversationId: string): Promise<Message[]> => {
   try {
     await delay(400);
 
@@ -77,10 +73,7 @@ export const searchUsers = async (query: string): Promise<ChatUser[]> => {
 };
 
 // Mock send message (will be replaced with WebSocket)
-export const sendMessage = async (
-  conversationId: string,
-  content: string
-): Promise<Message> => {
+export const sendMessage = async (conversationId: string, content: string): Promise<Message> => {
   try {
     await delay(300);
 

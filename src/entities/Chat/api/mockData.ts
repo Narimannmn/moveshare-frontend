@@ -1,4 +1,4 @@
-import type { Conversation, Message, ChatUser } from "../schemas";
+import type { ChatUser, Conversation, Message } from "../schemas";
 
 // Mock users for search and conversations
 export const mockUsers: ChatUser[] = [

@@ -19,7 +19,9 @@
   line-height: 20px;
   font-weight: 500;
   border-bottom: 1px solid #e5e5e5;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 
   &:last-child {
     border-bottom: none;

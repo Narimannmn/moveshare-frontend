@@ -1,8 +1,11 @@
+import { appLocalStorageKey } from "@/shared/config";
+
 import { useAuthStore } from "@/entities/User/model/store/authStore";
+
+import { queryClient } from "@/app/providers/query";
+
 import { appLocalStorage } from "../appLocalStorage/appLocalStorage";
 import { appSessionStorage } from "../appSessionStorage/appSessionStorage";
-import { appLocalStorageKey } from "@/shared/config";
-import { queryClient } from "@/app/providers/query";
 
 export const logoutUser = () => {
   useAuthStore.getState().logout();

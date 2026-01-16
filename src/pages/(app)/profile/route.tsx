@@ -1,7 +1,9 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { ProfileCard } from "@/entities/Profile";
-import { TabNavigation } from "@/shared/ui/TabNavigation";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
+
 import { profileTabs } from "@/shared/config/profile/profileTabs";
+import { TabNavigation } from "@/shared/ui/TabNavigation";
+
+import { ProfileCard } from "@/entities/Profile";
 
 export const Route = createFileRoute("/(app)/profile")({
   component: ProfileLayout,

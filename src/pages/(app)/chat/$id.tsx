@@ -1,7 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
+
+import { createFileRoute } from "@tanstack/react-router";
+
 import { useChatStore } from "@/entities/Chat";
-import { ConversationList, MessageThread, MessageInput } from "@/widgets/Chat";
+
+import { ConversationList, MessageInput, MessageThread } from "@/widgets/Chat";
 
 export const Route = createFileRoute("/(app)/chat/$id")({
   component: ChatDetailPage,

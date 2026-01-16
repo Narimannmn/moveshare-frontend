@@ -1,6 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Eye, Edit, Trash2 } from "lucide-react";
+
+import { createFileRoute } from "@tanstack/react-router";
+
+import { Edit, Eye, Trash2 } from "lucide-react";
+
 import { Button } from "@/shared/ui/Button/Button";
 
 export const Route = createFileRoute("/(app)/my/")({
@@ -157,17 +160,13 @@ function MyJobsPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
-                activeTab === tab.id
-                  ? "text-blue-500"
-                  : "text-gray-500 hover:text-gray-700"
+                activeTab === tab.id ? "text-blue-500" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               {tab.label}{" "}
               <span
                 className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
-                  activeTab === tab.id
-                    ? "bg-blue-100 text-blue-600"
-                    : "bg-gray-100 text-gray-600"
+                  activeTab === tab.id ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
                 }`}
               >
                 {tab.count}
@@ -194,24 +193,14 @@ function MyJobsPage() {
                     className="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">
-                  Job ID
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">
-                  Route
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">
-                  Dates
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">Job ID</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">Route</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">Dates</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">
                   Truck Size
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">
-                  Payout
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">
-                  Status
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">Payout</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">Status</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-[#202224]">
                   Actions
                 </th>
@@ -228,21 +217,11 @@ function MyJobsPage() {
                       className="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
                     />
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium text-[#202224]">
-                    {job.jobId}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {job.route}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {job.dates}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {job.truckSize}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-[#202224]">
-                    {job.payout}
-                  </td>
+                  <td className="px-6 py-4 text-sm font-medium text-[#202224]">{job.jobId}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{job.route}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{job.dates}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{job.truckSize}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-[#202224]">{job.payout}</td>
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(

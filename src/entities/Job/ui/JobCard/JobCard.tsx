@@ -1,6 +1,9 @@
 import { memo } from "react";
-import { Button } from "@shared/ui";
+
 import { cn } from "@/shared/lib/utils";
+
+import { Button } from "@shared/ui";
+
 import styles from "./JobCard.module.scss";
 
 export interface JobCardProps {
@@ -104,11 +107,7 @@ export const JobCard = memo(
             <div className={styles.mapPin} style={{ left: "75%", top: "55%" }}>
               📍
             </div>
-            <svg
-              className={styles.mapRoute}
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-            >
+            <svg className={styles.mapRoute} viewBox="0 0 100 100" preserveAspectRatio="none">
               <path
                 d="M 25 40 Q 50 20, 75 55"
                 stroke="white"
@@ -151,12 +150,8 @@ export const JobCard = memo(
         {/* Badges */}
         {(badges.verifiedMover || badges.paymentProtected || badges.escrow) && (
           <div className={styles.badges}>
-            {badges.verifiedMover && (
-              <span className={styles.badge}>Verified Mover</span>
-            )}
-            {badges.paymentProtected && (
-              <span className={styles.badge}>Payment Protected</span>
-            )}
+            {badges.verifiedMover && <span className={styles.badge}>Verified Mover</span>}
+            {badges.paymentProtected && <span className={styles.badge}>Payment Protected</span>}
             {badges.escrow && <span className={styles.badge}>Escrow</span>}
           </div>
         )}

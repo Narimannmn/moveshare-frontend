@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+
 import { appLocalStorageKey } from "@/shared/config";
 
 export const Route = createFileRoute("/")({

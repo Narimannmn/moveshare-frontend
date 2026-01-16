@@ -1,6 +1,9 @@
 import { forwardRef, memo } from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+
+import { type VariantProps, cva } from "class-variance-authority";
+
 import { cn } from "@/shared/lib/utils";
+
 import { Typography } from "../Typography/Typography";
 
 const inputVariants = cva(
@@ -72,7 +75,7 @@ export const Input = memo(
         <div className={cn("flex flex-col gap-1.5", containerClassName)}>
           {label && (
             <label htmlFor={props.id}>
-              <Typography variant="bold_16">{label}</Typography>
+              <Typography variant="regular_16">{label}</Typography>
             </label>
           )}
 
@@ -97,27 +100,20 @@ export const Input = memo(
               )}
               aria-invalid={!!error}
               aria-describedby={
-                error
-                  ? `${props.id}-error`
-                  : helperText
-                    ? `${props.id}-helper`
-                    : undefined
+                error ? `${props.id}-error` : helperText ? `${props.id}-helper` : undefined
               }
               {...props}
             />
 
             {postfix && (
-              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-[#666C72]">
+              <div className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#666C72] z-10">
                 {postfix}
               </div>
             )}
           </div>
 
           {error && (
-            <span
-              id={`${props.id}-error`}
-              className="text-xs text-[#FF0000] font-medium"
-            >
+            <span id={`${props.id}-error`} className="text-xs text-[#FF0000] font-medium">
               {error}
             </span>
           )}

@@ -1,7 +1,9 @@
+import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+
+import { appLocalStorageKey } from "@/shared/config";
+
 import { Header } from "@/widgets/Header";
 import { Sidebar } from "@/widgets/Sidebar";
-import { redirect, createFileRoute, Outlet } from "@tanstack/react-router";
-import { appLocalStorageKey } from "@/shared/config";
 
 export const Route = createFileRoute("/(app)")({
   beforeLoad: () => {

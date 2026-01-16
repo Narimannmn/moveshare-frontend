@@ -1,4 +1,5 @@
 import { sidebarItems } from "@/shared/config";
+
 import { SidebarItem } from "./SidebarItem/SidebarItem";
 
 export const Sidebar = () => {

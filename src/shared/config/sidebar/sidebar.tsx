@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+
 import { AiOutlineLineChart } from "react-icons/ai";
-import { BsClipboardCheck, BsChatDots } from "react-icons/bs";
+import { BsChatDots, BsClipboardCheck } from "react-icons/bs";
+
 import type { FileRouteTypes } from "@/app/routeTree.gen";
 
 export type AppRoutePaths = FileRouteTypes["to"];

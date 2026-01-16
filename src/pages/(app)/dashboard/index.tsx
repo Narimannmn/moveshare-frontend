@@ -1,18 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Briefcase, DollarSign, Truck, Star } from "lucide-react";
+
+import { createFileRoute } from "@tanstack/react-router";
+
+import { Briefcase, DollarSign, Star, Truck } from "lucide-react";
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
+  BarChart,
   CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
   Cell,
   Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 
 export const Route = createFileRoute("/(app)/dashboard/")({
@@ -165,9 +167,7 @@ function MonthlyEarningsChart({ timeRange }: { timeRange: TimeRange }) {
 function JobStatusChart() {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-[#202224] mb-6">
-        Job Status Distribution
-      </h2>
+      <h2 className="text-xl font-bold text-[#202224] mb-6">Job Status Distribution</h2>
 
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
@@ -198,20 +198,12 @@ function JobStatusChart() {
   );
 }
 
-function EmptyStateCard({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
+function EmptyStateCard({ title, description }: { title: string; description: string }) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <h2 className="text-xl font-bold text-[#202224] mb-6">{title}</h2>
       <div className="flex flex-col items-center justify-center py-12">
-        <h3 className="text-lg font-semibold text-[#202224] mb-2">
-          No {title.toLowerCase()}
-        </h3>
+        <h3 className="text-lg font-semibold text-[#202224] mb-2">No {title.toLowerCase()}</h3>
         <p className="text-sm text-gray-500 text-center">{description}</p>
       </div>
     </div>
@@ -225,12 +217,8 @@ function DashboardPage() {
     <div>
       {/* Welcome Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#202224] mb-2">
-          Welcome back, John!
-        </h1>
-        <p className="text-gray-500">
-          Here's your logistics dashboard for today
-        </p>
+        <h1 className="text-3xl font-bold text-[#202224] mb-2">Welcome back, John!</h1>
+        <p className="text-gray-500">Here's your logistics dashboard for today</p>
       </div>
 
       {/* Stats Grid */}
@@ -252,10 +240,7 @@ function DashboardPage() {
           title="Upcoming Schedule"
           description="You don't have any scheduled events yet."
         />
-        <EmptyStateCard
-          title="Messages"
-          description="You don't have any messages yet."
-        />
+        <EmptyStateCard title="Messages" description="You don't have any messages yet." />
       </div>
     </div>
   );

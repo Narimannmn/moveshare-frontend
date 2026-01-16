@@ -13,6 +13,8 @@ import { Route as authRouteRouteImport } from './../pages/(auth)/route'
 import { Route as appRouteRouteImport } from './../pages/(app)/route'
 import { Route as IndexRouteImport } from './../pages/index'
 import { Route as appProfileRouteRouteImport } from './../pages/(app)/profile/route'
+import { Route as authRegisterIndexRouteImport } from './../pages/(auth)/register/index'
+import { Route as authLoginIndexRouteImport } from './../pages/(auth)/login/index'
 import { Route as authForgotIndexRouteImport } from './../pages/(auth)/forgot/index'
 import { Route as appProfileIndexRouteImport } from './../pages/(app)/profile/index'
 import { Route as appMyIndexRouteImport } from './../pages/(app)/my/index'
@@ -20,6 +22,11 @@ import { Route as appJobsIndexRouteImport } from './../pages/(app)/jobs/index'
 import { Route as appDashboardIndexRouteImport } from './../pages/(app)/dashboard/index'
 import { Route as appClaimedIndexRouteImport } from './../pages/(app)/claimed/index'
 import { Route as appChatIndexRouteImport } from './../pages/(app)/chat/index'
+import { Route as authRegisterVerifyRouteImport } from './../pages/(auth)/register/verify'
+import { Route as authRegisterVerificationRouteImport } from './../pages/(auth)/register/verification'
+import { Route as authRegisterReviewRouteImport } from './../pages/(auth)/register/review'
+import { Route as authRegisterPasswordRouteImport } from './../pages/(auth)/register/password'
+import { Route as authRegisterCompanyRouteImport } from './../pages/(auth)/register/company'
 import { Route as appChatIdRouteImport } from './../pages/(app)/chat/$id'
 import { Route as appProfileVerificationIndexRouteImport } from './../pages/(app)/profile/verification/index'
 import { Route as appProfileSecurityIndexRouteImport } from './../pages/(app)/profile/security/index'
@@ -45,6 +52,16 @@ const appProfileRouteRoute = appProfileRouteRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => appRouteRoute,
+} as any)
+const authRegisterIndexRoute = authRegisterIndexRouteImport.update({
+  id: '/register/',
+  path: '/register/',
+  getParentRoute: () => authRouteRoute,
+} as any)
+const authLoginIndexRoute = authLoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => authRouteRoute,
 } as any)
 const authForgotIndexRoute = authForgotIndexRouteImport.update({
   id: '/forgot/',
@@ -80,6 +97,32 @@ const appChatIndexRoute = appChatIndexRouteImport.update({
   id: '/chat/',
   path: '/chat/',
   getParentRoute: () => appRouteRoute,
+} as any)
+const authRegisterVerifyRoute = authRegisterVerifyRouteImport.update({
+  id: '/register/verify',
+  path: '/register/verify',
+  getParentRoute: () => authRouteRoute,
+} as any)
+const authRegisterVerificationRoute =
+  authRegisterVerificationRouteImport.update({
+    id: '/register/verification',
+    path: '/register/verification',
+    getParentRoute: () => authRouteRoute,
+  } as any)
+const authRegisterReviewRoute = authRegisterReviewRouteImport.update({
+  id: '/register/review',
+  path: '/register/review',
+  getParentRoute: () => authRouteRoute,
+} as any)
+const authRegisterPasswordRoute = authRegisterPasswordRouteImport.update({
+  id: '/register/password',
+  path: '/register/password',
+  getParentRoute: () => authRouteRoute,
+} as any)
+const authRegisterCompanyRoute = authRegisterCompanyRouteImport.update({
+  id: '/register/company',
+  path: '/register/company',
+  getParentRoute: () => authRouteRoute,
 } as any)
 const appChatIdRoute = appChatIdRouteImport.update({
   id: '/chat/$id',
@@ -123,6 +166,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/profile': typeof appProfileRouteRouteWithChildren
   '/chat/$id': typeof appChatIdRoute
+  '/register/company': typeof authRegisterCompanyRoute
+  '/register/password': typeof authRegisterPasswordRoute
+  '/register/review': typeof authRegisterReviewRoute
+  '/register/verification': typeof authRegisterVerificationRoute
+  '/register/verify': typeof authRegisterVerifyRoute
   '/chat': typeof appChatIndexRoute
   '/claimed': typeof appClaimedIndexRoute
   '/dashboard': typeof appDashboardIndexRoute
@@ -130,6 +178,8 @@ export interface FileRoutesByFullPath {
   '/my': typeof appMyIndexRoute
   '/profile/': typeof appProfileIndexRoute
   '/forgot': typeof authForgotIndexRoute
+  '/login': typeof authLoginIndexRoute
+  '/register': typeof authRegisterIndexRoute
   '/profile/company': typeof appProfileCompanyIndexRoute
   '/profile/fleet': typeof appProfileFleetIndexRoute
   '/profile/notifications': typeof appProfileNotificationsIndexRoute
@@ -140,6 +190,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chat/$id': typeof appChatIdRoute
+  '/register/company': typeof authRegisterCompanyRoute
+  '/register/password': typeof authRegisterPasswordRoute
+  '/register/review': typeof authRegisterReviewRoute
+  '/register/verification': typeof authRegisterVerificationRoute
+  '/register/verify': typeof authRegisterVerifyRoute
   '/chat': typeof appChatIndexRoute
   '/claimed': typeof appClaimedIndexRoute
   '/dashboard': typeof appDashboardIndexRoute
@@ -147,6 +202,8 @@ export interface FileRoutesByTo {
   '/my': typeof appMyIndexRoute
   '/profile': typeof appProfileIndexRoute
   '/forgot': typeof authForgotIndexRoute
+  '/login': typeof authLoginIndexRoute
+  '/register': typeof authRegisterIndexRoute
   '/profile/company': typeof appProfileCompanyIndexRoute
   '/profile/fleet': typeof appProfileFleetIndexRoute
   '/profile/notifications': typeof appProfileNotificationsIndexRoute
@@ -161,6 +218,11 @@ export interface FileRoutesById {
   '/(auth)': typeof authRouteRouteWithChildren
   '/(app)/profile': typeof appProfileRouteRouteWithChildren
   '/(app)/chat/$id': typeof appChatIdRoute
+  '/(auth)/register/company': typeof authRegisterCompanyRoute
+  '/(auth)/register/password': typeof authRegisterPasswordRoute
+  '/(auth)/register/review': typeof authRegisterReviewRoute
+  '/(auth)/register/verification': typeof authRegisterVerificationRoute
+  '/(auth)/register/verify': typeof authRegisterVerifyRoute
   '/(app)/chat/': typeof appChatIndexRoute
   '/(app)/claimed/': typeof appClaimedIndexRoute
   '/(app)/dashboard/': typeof appDashboardIndexRoute
@@ -168,6 +230,8 @@ export interface FileRoutesById {
   '/(app)/my/': typeof appMyIndexRoute
   '/(app)/profile/': typeof appProfileIndexRoute
   '/(auth)/forgot/': typeof authForgotIndexRoute
+  '/(auth)/login/': typeof authLoginIndexRoute
+  '/(auth)/register/': typeof authRegisterIndexRoute
   '/(app)/profile/company/': typeof appProfileCompanyIndexRoute
   '/(app)/profile/fleet/': typeof appProfileFleetIndexRoute
   '/(app)/profile/notifications/': typeof appProfileNotificationsIndexRoute
@@ -181,6 +245,11 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/chat/$id'
+    | '/register/company'
+    | '/register/password'
+    | '/register/review'
+    | '/register/verification'
+    | '/register/verify'
     | '/chat'
     | '/claimed'
     | '/dashboard'
@@ -188,6 +257,8 @@ export interface FileRouteTypes {
     | '/my'
     | '/profile/'
     | '/forgot'
+    | '/login'
+    | '/register'
     | '/profile/company'
     | '/profile/fleet'
     | '/profile/notifications'
@@ -198,6 +269,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/chat/$id'
+    | '/register/company'
+    | '/register/password'
+    | '/register/review'
+    | '/register/verification'
+    | '/register/verify'
     | '/chat'
     | '/claimed'
     | '/dashboard'
@@ -205,6 +281,8 @@ export interface FileRouteTypes {
     | '/my'
     | '/profile'
     | '/forgot'
+    | '/login'
+    | '/register'
     | '/profile/company'
     | '/profile/fleet'
     | '/profile/notifications'
@@ -218,6 +296,11 @@ export interface FileRouteTypes {
     | '/(auth)'
     | '/(app)/profile'
     | '/(app)/chat/$id'
+    | '/(auth)/register/company'
+    | '/(auth)/register/password'
+    | '/(auth)/register/review'
+    | '/(auth)/register/verification'
+    | '/(auth)/register/verify'
     | '/(app)/chat/'
     | '/(app)/claimed/'
     | '/(app)/dashboard/'
@@ -225,6 +308,8 @@ export interface FileRouteTypes {
     | '/(app)/my/'
     | '/(app)/profile/'
     | '/(auth)/forgot/'
+    | '/(auth)/login/'
+    | '/(auth)/register/'
     | '/(app)/profile/company/'
     | '/(app)/profile/fleet/'
     | '/(app)/profile/notifications/'
@@ -268,6 +353,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile'
       preLoaderRoute: typeof appProfileRouteRouteImport
       parentRoute: typeof appRouteRoute
+    }
+    '/(auth)/register/': {
+      id: '/(auth)/register/'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof authRegisterIndexRouteImport
+      parentRoute: typeof authRouteRoute
+    }
+    '/(auth)/login/': {
+      id: '/(auth)/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof authLoginIndexRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(auth)/forgot/': {
       id: '/(auth)/forgot/'
@@ -317,6 +416,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/chat'
       preLoaderRoute: typeof appChatIndexRouteImport
       parentRoute: typeof appRouteRoute
+    }
+    '/(auth)/register/verify': {
+      id: '/(auth)/register/verify'
+      path: '/register/verify'
+      fullPath: '/register/verify'
+      preLoaderRoute: typeof authRegisterVerifyRouteImport
+      parentRoute: typeof authRouteRoute
+    }
+    '/(auth)/register/verification': {
+      id: '/(auth)/register/verification'
+      path: '/register/verification'
+      fullPath: '/register/verification'
+      preLoaderRoute: typeof authRegisterVerificationRouteImport
+      parentRoute: typeof authRouteRoute
+    }
+    '/(auth)/register/review': {
+      id: '/(auth)/register/review'
+      path: '/register/review'
+      fullPath: '/register/review'
+      preLoaderRoute: typeof authRegisterReviewRouteImport
+      parentRoute: typeof authRouteRoute
+    }
+    '/(auth)/register/password': {
+      id: '/(auth)/register/password'
+      path: '/register/password'
+      fullPath: '/register/password'
+      preLoaderRoute: typeof authRegisterPasswordRouteImport
+      parentRoute: typeof authRouteRoute
+    }
+    '/(auth)/register/company': {
+      id: '/(auth)/register/company'
+      path: '/register/company'
+      fullPath: '/register/company'
+      preLoaderRoute: typeof authRegisterCompanyRouteImport
+      parentRoute: typeof authRouteRoute
     }
     '/(app)/chat/$id': {
       id: '/(app)/chat/$id'
@@ -419,11 +553,25 @@ const appRouteRouteWithChildren = appRouteRoute._addFileChildren(
 )
 
 interface authRouteRouteChildren {
+  authRegisterCompanyRoute: typeof authRegisterCompanyRoute
+  authRegisterPasswordRoute: typeof authRegisterPasswordRoute
+  authRegisterReviewRoute: typeof authRegisterReviewRoute
+  authRegisterVerificationRoute: typeof authRegisterVerificationRoute
+  authRegisterVerifyRoute: typeof authRegisterVerifyRoute
   authForgotIndexRoute: typeof authForgotIndexRoute
+  authLoginIndexRoute: typeof authLoginIndexRoute
+  authRegisterIndexRoute: typeof authRegisterIndexRoute
 }
 
 const authRouteRouteChildren: authRouteRouteChildren = {
+  authRegisterCompanyRoute: authRegisterCompanyRoute,
+  authRegisterPasswordRoute: authRegisterPasswordRoute,
+  authRegisterReviewRoute: authRegisterReviewRoute,
+  authRegisterVerificationRoute: authRegisterVerificationRoute,
+  authRegisterVerifyRoute: authRegisterVerifyRoute,
   authForgotIndexRoute: authForgotIndexRoute,
+  authLoginIndexRoute: authLoginIndexRoute,
+  authRegisterIndexRoute: authRegisterIndexRoute,
 }
 
 const authRouteRouteWithChildren = authRouteRoute._addFileChildren(

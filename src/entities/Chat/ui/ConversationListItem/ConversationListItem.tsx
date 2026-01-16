@@ -1,5 +1,7 @@
 import { memo, useMemo } from "react";
+
 import { cn } from "@/shared/lib/utils";
+
 import type { Conversation } from "../../schemas";
 import { UserAvatar } from "../UserAvatar/UserAvatar";
 import styles from "./ConversationListItem.module.scss";
@@ -13,13 +15,7 @@ export interface ConversationListItemProps {
 }
 
 export const ConversationListItem = memo(
-  ({
-    conversation,
-    isSelected,
-    currentUserId,
-    onClick,
-    className,
-  }: ConversationListItemProps) => {
+  ({ conversation, isSelected, currentUserId, onClick, className }: ConversationListItemProps) => {
     const otherUser = useMemo(() => {
       return conversation.participants.find((p) => p.id !== currentUserId);
     }, [conversation.participants, currentUserId]);
@@ -44,11 +40,7 @@ export const ConversationListItem = memo(
 
     return (
       <div
-        className={cn(
-          styles.item,
-          isSelected && styles.selected,
-          className
-        )}
+        className={cn(styles.item, isSelected && styles.selected, className)}
         onClick={() => onClick(conversation.id)}
         role="button"
         tabIndex={0}
@@ -79,14 +71,10 @@ export const ConversationListItem = memo(
 
           <div className={styles.footer}>
             {conversation.lastMessage && (
-              <span className={styles.lastMessage}>
-                {conversation.lastMessage.content}
-              </span>
+              <span className={styles.lastMessage}>{conversation.lastMessage.content}</span>
             )}
             {conversation.unreadCount > 0 && (
-              <span className={styles.unreadBadge}>
-                {conversation.unreadCount}
-              </span>
+              <span className={styles.unreadBadge}>{conversation.unreadCount}</span>
             )}
           </div>
         </div>

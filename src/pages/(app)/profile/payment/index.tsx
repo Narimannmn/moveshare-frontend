@@ -1,6 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+
+import { createFileRoute } from "@tanstack/react-router";
+
 import { Landmark, Plus } from "lucide-react";
+
 import { Button } from "@/shared/ui/Button/Button";
 
 export const Route = createFileRoute("/(app)/profile/payment/")({
@@ -61,9 +64,7 @@ function BankAccountCard({ account }: { account: BankAccount }) {
           <Landmark className="w-6 h-6 text-blue-500" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-[#202224]">
-            Bank Account
-          </h3>
+          <h3 className="text-lg font-semibold text-[#202224]">Bank Account</h3>
           <p className="text-sm text-gray-500">{account.accountNumber}</p>
         </div>
       </div>
@@ -72,21 +73,15 @@ function BankAccountCard({ account }: { account: BankAccount }) {
       <div className="space-y-3 mb-6">
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">Bank Name:</span>
-          <span className="text-sm font-medium text-[#202224]">
-            {account.bankName}
-          </span>
+          <span className="text-sm font-medium text-[#202224]">{account.bankName}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">Account Type:</span>
-          <span className="text-sm font-medium text-[#202224]">
-            {account.accountType}
-          </span>
+          <span className="text-sm font-medium text-[#202224]">{account.accountType}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">Routing Number:</span>
-          <span className="text-sm font-medium text-[#202224]">
-            {account.routingNumber}
-          </span>
+          <span className="text-sm font-medium text-[#202224]">{account.routingNumber}</span>
         </div>
       </div>
 
@@ -115,14 +110,8 @@ function PaymentSettingsPage() {
     <div>
       {/* Header with title and Add button */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-[#202224]">
-          Payment Management
-        </h2>
-        <Button
-          variant="primary"
-          onClick={handleAddPaymentMethod}
-          className="gap-2"
-        >
+        <h2 className="text-2xl font-bold text-[#202224]">Payment Management</h2>
+        <Button variant="primary" onClick={handleAddPaymentMethod} className="gap-2">
           <Plus size={20} />
           Add Payment Method
         </Button>

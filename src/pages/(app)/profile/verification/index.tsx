@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import { FileText, IdCard } from "lucide-react";
 
 export const Route = createFileRoute("/(app)/profile/verification/")({
@@ -52,9 +53,7 @@ function DocumentCard({ document }: { document: DocumentData }) {
       </div>
 
       {/* Document name */}
-      <h3 className="text-base font-semibold text-[#202224] mb-2 text-center">
-        {document.name}
-      </h3>
+      <h3 className="text-base font-semibold text-[#202224] mb-2 text-center">{document.name}</h3>
 
       {/* Status badge */}
       <span className="text-sm font-medium text-green-600 bg-green-50 px-3 py-1 rounded">
@@ -67,31 +66,25 @@ function DocumentCard({ document }: { document: DocumentData }) {
 function VerificationPage() {
   return (
     <div>
-      <h2 className="text-2xl font-bold text-[#202224] mb-6">
-        Account Verification
-      </h2>
+      <h2 className="text-2xl font-bold text-[#202224] mb-6">Account Verification</h2>
 
       <div className="border-t border-gray-200 pt-6">
         {/* Verified Account Badge */}
         <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-6 inline-block">
-          <span className="text-green-700 font-medium text-sm">
-            Verified Account
-          </span>
+          <span className="text-green-700 font-medium text-sm">Verified Account</span>
         </div>
 
         {/* Description */}
         <p className="text-sm text-gray-600 mb-8">
-          Your account has been fully verified. This helps build trust with
-          other companies on MoveShare.
+          Your account has been fully verified. This helps build trust with other companies on
+          MoveShare.
         </p>
 
         {/* Required Documents Section */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-1 h-6 bg-blue-500 rounded"></div>
-            <h3 className="text-lg font-semibold text-[#202224]">
-              Required Documents
-            </h3>
+            <h3 className="text-lg font-semibold text-[#202224]">Required Documents</h3>
           </div>
 
           {/* Documents grid - 3 columns */}

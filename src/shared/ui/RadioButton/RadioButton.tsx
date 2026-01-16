@@ -1,6 +1,8 @@
 import { forwardRef, memo } from "react";
+
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { cva, type VariantProps } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
+
 import { cn } from "@/shared/lib/utils";
 
 const radioGroupVariants = cva("", {
@@ -43,7 +45,8 @@ const indicatorSizeMap = {
 };
 
 export interface RadioGroupProps
-  extends Omit<RadioGroupPrimitive.RadioGroupProps, "orientation">,
+  extends
+    Omit<RadioGroupPrimitive.RadioGroupProps, "orientation">,
     VariantProps<typeof radioGroupVariants> {
   label?: string;
   error?: string;
@@ -52,7 +55,8 @@ export interface RadioGroupProps
 }
 
 export interface RadioItemProps
-  extends Omit<RadioGroupPrimitive.RadioGroupItemProps, "size">,
+  extends
+    Omit<RadioGroupPrimitive.RadioGroupItemProps, "size">,
     VariantProps<typeof radioItemVariants> {
   label?: string;
   description?: string;
@@ -63,24 +67,12 @@ export interface RadioItemProps
 export const RadioGroup = memo(
   forwardRef<HTMLDivElement, RadioGroupProps>(
     (
-      {
-        label,
-        error,
-        orientation = "vertical",
-        className,
-        containerClassName,
-        children,
-        ...props
-      },
+      { label, error, orientation = "vertical", className, containerClassName, children, ...props },
       ref
     ) => {
       return (
         <div className={cn("flex flex-col gap-1.5", containerClassName)}>
-          {label && (
-            <label className="text-sm font-medium text-[#202224] mb-3">
-              {label}
-            </label>
-          )}
+          {label && <label className="text-sm font-medium text-[#202224] mb-3">{label}</label>}
 
           <RadioGroupPrimitive.Root
             ref={ref}
@@ -90,9 +82,7 @@ export const RadioGroup = memo(
             {children}
           </RadioGroupPrimitive.Root>
 
-          {error && (
-            <span className="text-xs text-[#FF0000] font-medium">{error}</span>
-          )}
+          {error && <span className="text-xs text-[#FF0000] font-medium">{error}</span>}
         </div>
       );
     }
@@ -104,15 +94,7 @@ RadioGroup.displayName = "RadioGroup";
 export const RadioItem = memo(
   forwardRef<HTMLButtonElement, RadioItemProps>(
     (
-      {
-        label,
-        description,
-        size = "default",
-        disabled,
-        className,
-        itemClassName,
-        ...props
-      },
+      { label, description, size = "default", disabled, className, itemClassName, ...props },
       ref
     ) => {
       const state = "default";
@@ -127,12 +109,7 @@ export const RadioItem = memo(
               {...props}
             >
               <RadioGroupPrimitive.Indicator className="flex items-center justify-center size-full">
-                <div
-                  className={cn(
-                    "rounded-full bg-[#60A5FA]",
-                    indicatorSizeMap[size]
-                  )}
-                />
+                <div className={cn("rounded-full bg-[#60A5FA]", indicatorSizeMap[size])} />
               </RadioGroupPrimitive.Indicator>
             </RadioGroupPrimitive.Item>
 
@@ -146,10 +123,9 @@ export const RadioItem = memo(
                     )}
                     onClick={(e) => {
                       if (!disabled) {
-                        const radio =
-                          e.currentTarget.parentElement?.parentElement?.querySelector(
-                            '[role="radio"]'
-                          ) as HTMLButtonElement;
+                        const radio = e.currentTarget.parentElement?.parentElement?.querySelector(
+                          '[role="radio"]'
+                        ) as HTMLButtonElement;
                         radio?.click();
                       }
                     }}
@@ -158,12 +134,7 @@ export const RadioItem = memo(
                   </label>
                 )}
                 {description && (
-                  <span
-                    className={cn(
-                      "text-xs text-[#A6A6A6]",
-                      disabled && "text-[#A6A6A6]"
-                    )}
-                  >
+                  <span className={cn("text-xs text-[#A6A6A6]", disabled && "text-[#A6A6A6]")}>
                     {description}
                   </span>
                 )}

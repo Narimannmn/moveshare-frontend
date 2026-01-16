@@ -1,8 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+
+import { createFileRoute } from "@tanstack/react-router";
+
+import { Button } from "@/shared/ui/Button/Button";
 import { Input } from "@/shared/ui/Input/Input";
 import { Textarea } from "@/shared/ui/Textarea/Textarea";
-import { Button } from "@/shared/ui/Button/Button";
 
 export const Route = createFileRoute("/(app)/profile/company/")({
   component: CompanyInformationPage,
@@ -24,9 +26,7 @@ function CompanyInformationPage() {
       "We specialize in long-distance furniture transportation with over 10 years of experience. Our team of professionals ensures safe and timely delivery of your precious items.",
   });
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -43,18 +43,14 @@ function CompanyInformationPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-[#202224] mb-6">
-        Company Information
-      </h2>
+      <h2 className="text-2xl font-bold text-[#202224] mb-6">Company Information</h2>
 
       <div className="border-t border-gray-200 pt-6">
         {/* Two-column grid layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
           {/* Company Name */}
           <div>
-            <label className="block text-sm font-medium text-[#202224] mb-2">
-              Company Name
-            </label>
+            <label className="block text-sm font-medium text-[#202224] mb-2">Company Name</label>
             <Input
               name="companyName"
               value={formData.companyName}
@@ -65,9 +61,7 @@ function CompanyInformationPage() {
 
           {/* Contact Person */}
           <div>
-            <label className="block text-sm font-medium text-[#202224] mb-2">
-              Contact Person
-            </label>
+            <label className="block text-sm font-medium text-[#202224] mb-2">Contact Person</label>
             <Input
               name="contactPerson"
               value={formData.contactPerson}
@@ -78,9 +72,7 @@ function CompanyInformationPage() {
 
           {/* Email Address */}
           <div>
-            <label className="block text-sm font-medium text-[#202224] mb-2">
-              Email Address
-            </label>
+            <label className="block text-sm font-medium text-[#202224] mb-2">Email Address</label>
             <Input
               name="emailAddress"
               type="email"
@@ -92,9 +84,7 @@ function CompanyInformationPage() {
 
           {/* Phone Number */}
           <div>
-            <label className="block text-sm font-medium text-[#202224] mb-2">
-              Phone Number
-            </label>
+            <label className="block text-sm font-medium text-[#202224] mb-2">Phone Number</label>
             <Input
               name="phoneNumber"
               type="tel"
@@ -106,9 +96,7 @@ function CompanyInformationPage() {
 
           {/* Address */}
           <div>
-            <label className="block text-sm font-medium text-[#202224] mb-2">
-              Address
-            </label>
+            <label className="block text-sm font-medium text-[#202224] mb-2">Address</label>
             <Input
               name="address"
               value={formData.address}
@@ -119,9 +107,7 @@ function CompanyInformationPage() {
 
           {/* City */}
           <div>
-            <label className="block text-sm font-medium text-[#202224] mb-2">
-              City
-            </label>
+            <label className="block text-sm font-medium text-[#202224] mb-2">City</label>
             <Input
               name="city"
               value={formData.city}
@@ -132,9 +118,7 @@ function CompanyInformationPage() {
 
           {/* State */}
           <div>
-            <label className="block text-sm font-medium text-[#202224] mb-2">
-              State
-            </label>
+            <label className="block text-sm font-medium text-[#202224] mb-2">State</label>
             <Input
               name="state"
               value={formData.state}
@@ -145,9 +129,7 @@ function CompanyInformationPage() {
 
           {/* ZIP Code */}
           <div>
-            <label className="block text-sm font-medium text-[#202224] mb-2">
-              ZIP Code
-            </label>
+            <label className="block text-sm font-medium text-[#202224] mb-2">ZIP Code</label>
             <Input
               name="zipCode"
               value={formData.zipCode}
@@ -171,9 +153,7 @@ function CompanyInformationPage() {
 
           {/* DOT Number */}
           <div>
-            <label className="block text-sm font-medium text-[#202224] mb-2">
-              DOT Number
-            </label>
+            <label className="block text-sm font-medium text-[#202224] mb-2">DOT Number</label>
             <Input
               name="dotNumber"
               value={formData.dotNumber}

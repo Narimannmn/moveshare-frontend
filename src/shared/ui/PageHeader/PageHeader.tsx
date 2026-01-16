@@ -1,5 +1,8 @@
 import { memo } from "react";
+
 import { cn } from "@/shared/lib/utils";
+
+import { Typography } from "../Typography/Typography";
 
 export interface PageHeaderProps {
   title: string;
@@ -10,7 +13,7 @@ export interface PageHeaderProps {
 export const PageHeader = memo(({ title, actions, className }: PageHeaderProps) => {
   return (
     <div className={cn("flex items-center justify-between mb-6", className)}>
-      <h1 className="text-2xl font-bold text-[#202224]">{title}</h1>
+      <Typography variant="bold_24">{title}</Typography>
       {actions && <div className="flex items-center gap-3">{actions}</div>}
     </div>
   );

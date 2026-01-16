@@ -1,4 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
+
 import { chatKeys } from "./keys";
 import { getConversations, getMessages } from "./services";
 
@@ -12,9 +13,7 @@ export const conversationsQueryOptions = () =>
 
 export const messagesQueryOptions = (conversationId: string | null) =>
   queryOptions({
-    queryKey: conversationId
-      ? chatKeys.messageList(conversationId)
-      : chatKeys.messages(),
+    queryKey: conversationId ? chatKeys.messageList(conversationId) : chatKeys.messages(),
     queryFn: () => {
       if (!conversationId) {
         return Promise.resolve([]);

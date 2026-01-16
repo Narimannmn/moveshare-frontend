@@ -1,6 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { MessageCircle, FileText, X, Star } from "lucide-react";
+
+import { createFileRoute } from "@tanstack/react-router";
+
+import { FileText, MessageCircle, Star, X } from "lucide-react";
+
 import { Button } from "@/shared/ui/Button/Button";
 
 export const Route = createFileRoute("/(app)/claimed/")({
@@ -211,9 +214,7 @@ function ProgressTracker({ steps }: { steps: ClaimedJob["progress"]["steps"] }) 
           {/* Line */}
           {index < steps.length - 1 && (
             <div
-              className={`h-0.5 flex-1 mx-2 ${
-                step.completed ? "bg-blue-500" : "bg-gray-300"
-              }`}
+              className={`h-0.5 flex-1 mx-2 ${step.completed ? "bg-blue-500" : "bg-gray-300"}`}
             />
           )}
         </div>
@@ -276,33 +277,23 @@ function JobCard({ job }: { job: ClaimedJob }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         {/* Route Details */}
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="text-sm font-semibold text-[#202224] mb-3">
-            Route Details
-          </h4>
+          <h4 className="text-sm font-semibold text-[#202224] mb-3">Route Details</h4>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Origin:</span>
-              <span className="text-[#202224] font-medium">
-                {job.routeDetails.origin}
-              </span>
+              <span className="text-[#202224] font-medium">{job.routeDetails.origin}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Destination:</span>
-              <span className="text-[#202224] font-medium">
-                {job.routeDetails.destination}
-              </span>
+              <span className="text-[#202224] font-medium">{job.routeDetails.destination}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Distance:</span>
-              <span className="text-[#202224] font-medium">
-                {job.routeDetails.distance}
-              </span>
+              <span className="text-[#202224] font-medium">{job.routeDetails.distance}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Est. Duration:</span>
-              <span className="text-[#202224] font-medium">
-                {job.routeDetails.duration}
-              </span>
+              <span className="text-[#202224] font-medium">{job.routeDetails.duration}</span>
             </div>
           </div>
         </div>
@@ -313,27 +304,19 @@ function JobCard({ job }: { job: ClaimedJob }) {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Origin:</span>
-              <span className="text-[#202224] font-medium">
-                {job.schedule.origin}
-              </span>
+              <span className="text-[#202224] font-medium">{job.schedule.origin}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Destination:</span>
-              <span className="text-[#202224] font-medium">
-                {job.schedule.destination}
-              </span>
+              <span className="text-[#202224] font-medium">{job.schedule.destination}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Distance:</span>
-              <span className="text-[#202224] font-medium">
-                {job.schedule.distance}
-              </span>
+              <span className="text-[#202224] font-medium">{job.schedule.distance}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Est. Duration:</span>
-              <span className="text-[#202224] font-medium">
-                {job.schedule.duration}
-              </span>
+              <span className="text-[#202224] font-medium">{job.schedule.duration}</span>
             </div>
           </div>
         </div>
@@ -341,33 +324,23 @@ function JobCard({ job }: { job: ClaimedJob }) {
         {/* Route Details (Company) */}
         {job.companyDetails && (
           <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-[#202224] mb-3">
-              Route Details
-            </h4>
+            <h4 className="text-sm font-semibold text-[#202224] mb-3">Route Details</h4>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Company:</span>
-                <span className="text-[#202224] font-medium">
-                  {job.companyDetails.company}
-                </span>
+                <span className="text-[#202224] font-medium">{job.companyDetails.company}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Contact:</span>
-                <span className="text-[#202224] font-medium">
-                  {job.companyDetails.contact}
-                </span>
+                <span className="text-[#202224] font-medium">{job.companyDetails.contact}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Phone:</span>
-                <span className="text-[#202224] font-medium">
-                  {job.companyDetails.phone}
-                </span>
+                <span className="text-[#202224] font-medium">{job.companyDetails.phone}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Email:</span>
-                <span className="text-[#202224] font-medium">
-                  {job.companyDetails.email}
-                </span>
+                <span className="text-[#202224] font-medium">{job.companyDetails.email}</span>
               </div>
             </div>
           </div>
@@ -392,9 +365,7 @@ function JobCard({ job }: { job: ClaimedJob }) {
                 </button>
                 <div className="flex flex-col items-center">
                   <FileText className="w-8 h-8 text-gray-400 mb-2" />
-                  <span className="text-xs text-center text-gray-600 line-clamp-2">
-                    {doc.name}
-                  </span>
+                  <span className="text-xs text-center text-gray-600 line-clamp-2">{doc.name}</span>
                 </div>
               </div>
             ))}
@@ -402,12 +373,8 @@ function JobCard({ job }: { job: ClaimedJob }) {
               onClick={handleUploadDocument}
               className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 w-32 h-full flex flex-col items-center justify-center hover:bg-gray-100 transition-colors"
             >
-              <span className="text-sm text-gray-500 text-center">
-                Upload Document
-              </span>
-              <span className="text-xs text-gray-400 mt-1">
-                Click to upload or drag & drop
-              </span>
+              <span className="text-sm text-gray-500 text-center">Upload Document</span>
+              <span className="text-xs text-gray-400 mt-1">Click to upload or drag & drop</span>
             </button>
           </div>
         </div>
@@ -416,25 +383,17 @@ function JobCard({ job }: { job: ClaimedJob }) {
       {/* Review Section */}
       {job.showReview && (
         <div className="border-t border-gray-200 pt-6">
-          <h4 className="text-base font-semibold text-[#202224] mb-2">
-            Leave a Review
-          </h4>
+          <h4 className="text-base font-semibold text-[#202224] mb-2">Leave a Review</h4>
           <p className="text-sm text-gray-500 mb-4">
             How was your experience with {job.reviewCompany}?
           </p>
           {/* Star Rating */}
           <div className="flex gap-2 mb-4">
             {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                onClick={() => setRating(star)}
-                className="focus:outline-none"
-              >
+              <button key={star} onClick={() => setRating(star)} className="focus:outline-none">
                 <Star
                   className={`w-8 h-8 ${
-                    star <= rating
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-gray-300"
+                    star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
                   }`}
                 />
               </button>
@@ -463,9 +422,7 @@ function JobCard({ job }: { job: ClaimedJob }) {
       {/* Dispute Section */}
       {job.dispute && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <h4 className="text-base font-semibold text-[#202224] mb-2">
-            Dispute Details
-          </h4>
+          <h4 className="text-base font-semibold text-[#202224] mb-2">Dispute Details</h4>
           <p className="text-sm text-gray-700">{job.dispute.description}</p>
           <div className="flex gap-3 mt-4">
             <Button variant="secondary" onClick={handleViewEvidence}>
@@ -511,17 +468,11 @@ function ClaimedJobsPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
-                activeTab === tab.id
-                  ? "text-blue-500"
-                  : "text-gray-500 hover:text-gray-700"
+                activeTab === tab.id ? "text-blue-500" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               {tab.label}{" "}
-              <span
-                className={`ml-1 ${
-                  activeTab === tab.id ? "text-blue-500" : "text-gray-400"
-                }`}
-              >
+              <span className={`ml-1 ${activeTab === tab.id ? "text-blue-500" : "text-gray-400"}`}>
                 {tab.count}
               </span>
               {activeTab === tab.id && (

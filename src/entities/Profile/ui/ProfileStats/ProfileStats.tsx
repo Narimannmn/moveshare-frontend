@@ -1,5 +1,7 @@
 import { memo } from "react";
+
 import { cn } from "@/shared/lib/utils";
+
 import styles from "./ProfileStats.module.scss";
 
 export interface ProfileStatsProps {

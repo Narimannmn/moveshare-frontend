@@ -1,5 +1,7 @@
 import { memo } from "react";
+
 import { cn } from "@/shared/lib/utils";
+
 import styles from "./UserAvatar.module.scss";
 
 export interface UserAvatarProps {
@@ -21,13 +23,7 @@ export const UserAvatar = memo(
     };
 
     return (
-      <div
-        className={cn(
-          styles.avatar,
-          styles[size],
-          className
-        )}
-      >
+      <div className={cn(styles.avatar, styles[size], className)}>
         {avatar ? (
           <img src={avatar} alt={name} className={styles.image} />
         ) : (

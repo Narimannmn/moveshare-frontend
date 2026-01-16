@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader, Button } from "@shared/ui";
-import { JobsFilter } from "@/widgets/JobsFilter";
+
 import { JobCard } from "@/entities/Job";
 import type { Job } from "@/entities/Job";
+
+import { JobsFilter } from "@/widgets/JobsFilter";
+
+import { Button, PageHeader } from "@shared/ui";
 
 export const Route = createFileRoute("/(app)/jobs/")({
   component: JobsPage,

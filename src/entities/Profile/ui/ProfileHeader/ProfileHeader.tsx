@@ -1,6 +1,9 @@
 import { memo } from "react";
+
 import { CheckCircle } from "lucide-react";
+
 import { cn } from "@/shared/lib/utils";
+
 import styles from "./ProfileHeader.module.scss";
 
 export interface ProfileHeaderProps {

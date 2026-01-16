@@ -1,4 +1,4 @@
-import { Building2, Truck, CreditCard, Bell, Shield, FileCheck } from "lucide-react";
+import { Bell, Building2, CreditCard, FileCheck, Shield, Truck } from "lucide-react";
 
 export interface TabNavigationItem {
   id: string;

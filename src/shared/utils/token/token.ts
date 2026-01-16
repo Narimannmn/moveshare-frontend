@@ -1,11 +1,8 @@
 import { appLocalStorageKey } from "@/shared/config/appLocalStorage/appLocalStorage";
+
 import { appLocalStorage } from "../appLocalStorage/appLocalStorage";
 
-export const isTokenValid = (token: {
-  accessToken: string;
-  refreshToken: string;
-  exp: number;
-}) => {
+export const isTokenValid = (token: { accessToken: string; refreshToken: string; exp: number }) => {
   return token.exp * 1000 > new Date().getTime();
 };
 

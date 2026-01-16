@@ -1,5 +1,6 @@
-import type { SidebarItem as SidebarItemType } from "@/shared/config";
 import { Link } from "@tanstack/react-router";
+
+import type { SidebarItem as SidebarItemType } from "@/shared/config";
 
 export const SidebarItem = ({ item }: { item: SidebarItemType }) => {
   return (

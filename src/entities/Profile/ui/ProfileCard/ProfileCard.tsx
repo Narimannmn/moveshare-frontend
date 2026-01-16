@@ -1,5 +1,7 @@
 import { memo } from "react";
+
 import { cn } from "@/shared/lib/utils";
+
 import { ProfileAvatar } from "../ProfileAvatar";
 import { ProfileHeader } from "../ProfileHeader";
 import { ProfileStats } from "../ProfileStats";

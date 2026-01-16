@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/profile/notifications/")({
   component: NotificationsPage,
@@ -21,9 +22,7 @@ function NotificationToggle({ setting, onToggle }: NotificationToggleProps) {
   return (
     <div className="flex items-center justify-between py-5 border-b border-gray-200">
       <div className="flex-1">
-        <h3 className="text-base font-semibold text-[#202224] mb-1">
-          {setting.title}
-        </h3>
+        <h3 className="text-base font-semibold text-[#202224] mb-1">{setting.title}</h3>
         <p className="text-sm text-gray-500">{setting.description}</p>
       </div>
 
@@ -90,31 +89,22 @@ function NotificationsPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-[#202224] mb-6">
-        Notification Preferences
-      </h2>
+      <h2 className="text-2xl font-bold text-[#202224] mb-6">Notification Preferences</h2>
 
       <div className="border-t border-gray-200">
         {/* Notification toggles */}
         <div>
           {settings.map((setting) => (
-            <NotificationToggle
-              key={setting.id}
-              setting={setting}
-              onToggle={handleToggle}
-            />
+            <NotificationToggle key={setting.id} setting={setting} onToggle={handleToggle} />
           ))}
         </div>
 
         {/* Email for notifications section */}
         <div className="flex items-center justify-between py-5">
           <div className="flex-1">
-            <h3 className="text-base font-semibold text-[#202224] mb-1">
-              Email for notifications
-            </h3>
+            <h3 className="text-base font-semibold text-[#202224] mb-1">Email for notifications</h3>
             <p className="text-sm text-gray-500">
-              Link your personal email to receive notifications from the
-              MoveShare platform.
+              Link your personal email to receive notifications from the MoveShare platform.
             </p>
           </div>
           <button className="text-blue-500 font-medium text-sm hover:text-blue-600 transition-colors">

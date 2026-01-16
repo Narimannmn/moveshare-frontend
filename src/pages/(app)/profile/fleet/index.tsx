@@ -1,6 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Truck, Plus } from "lucide-react";
+
+import { createFileRoute } from "@tanstack/react-router";
+
+import { Plus, Truck } from "lucide-react";
+
 import { Button } from "@/shared/ui/Button/Button";
 
 export const Route = createFileRoute("/(app)/profile/fleet/")({
@@ -66,27 +69,19 @@ function TruckCard({ truck }: { truck: TruckData }) {
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">Type:</span>
-          <span className="text-sm font-medium text-[#202224]">
-            {truck.type}
-          </span>
+          <span className="text-sm font-medium text-[#202224]">{truck.type}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">Size:</span>
-          <span className="text-sm font-medium text-[#202224]">
-            {truck.size}
-          </span>
+          <span className="text-sm font-medium text-[#202224]">{truck.size}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">Capacity:</span>
-          <span className="text-sm font-medium text-[#202224]">
-            {truck.capacity}
-          </span>
+          <span className="text-sm font-medium text-[#202224]">{truck.capacity}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">Features:</span>
-          <span className="text-sm font-medium text-[#202224]">
-            {truck.features}
-          </span>
+          <span className="text-sm font-medium text-[#202224]">{truck.features}</span>
         </div>
       </div>
     </div>

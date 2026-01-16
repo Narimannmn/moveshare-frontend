@@ -1,5 +1,7 @@
 import { forwardRef, memo } from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+
+import { type VariantProps, cva } from "class-variance-authority";
+
 import { cn } from "@/shared/lib/utils";
 
 const textareaVariants = cva(
@@ -25,7 +27,8 @@ const textareaVariants = cva(
 );
 
 export interface TextareaProps
-  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size">,
+  extends
+    Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size">,
     VariantProps<typeof textareaVariants> {
   label?: string;
   error?: string;
@@ -55,10 +58,7 @@ export const Textarea = memo(
       return (
         <div className={cn("flex flex-col gap-1.5", containerClassName)}>
           {label && (
-            <label
-              className="text-sm font-medium text-[#202224]"
-              htmlFor={props.id}
-            >
+            <label className="text-sm font-medium text-[#202224]" htmlFor={props.id}>
               {label}
             </label>
           )}
@@ -75,29 +75,19 @@ export const Textarea = memo(
             )}
             aria-invalid={!!error}
             aria-describedby={
-              error
-                ? `${props.id}-error`
-                : helperText
-                  ? `${props.id}-helper`
-                  : undefined
+              error ? `${props.id}-error` : helperText ? `${props.id}-helper` : undefined
             }
             {...props}
           />
 
           {error && (
-            <span
-              id={`${props.id}-error`}
-              className="text-xs text-[#FF0000] font-medium"
-            >
+            <span id={`${props.id}-error`} className="text-xs text-[#FF0000] font-medium">
               {error}
             </span>
           )}
 
           {helperText && !error && (
-            <span
-              id={`${props.id}-helper`}
-              className="text-xs text-[#666C72]"
-            >
+            <span id={`${props.id}-helper`} className="text-xs text-[#666C72]">
               {helperText}
             </span>
           )}

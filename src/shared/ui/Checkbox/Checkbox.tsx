@@ -1,7 +1,9 @@
 import { forwardRef, memo } from "react";
+
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { type VariantProps, cva } from "class-variance-authority";
 import { Check } from "lucide-react";
-import { cva, type VariantProps } from "class-variance-authority";
+
 import { cn } from "@/shared/lib/utils";
 
 const checkboxVariants = cva(
@@ -32,8 +34,7 @@ const iconSizeMap = {
 };
 
 export interface CheckboxProps
-  extends Omit<CheckboxPrimitive.CheckboxProps, "size">,
-    VariantProps<typeof checkboxVariants> {
+  extends Omit<CheckboxPrimitive.CheckboxProps, "size">, VariantProps<typeof checkboxVariants> {
   label?: string;
   description?: string;
   error?: string;
@@ -94,12 +95,7 @@ export const Checkbox = memo(
                   </label>
                 )}
                 {description && (
-                  <span
-                    className={cn(
-                      "text-xs text-[#A6A6A6]",
-                      disabled && "text-[#A6A6A6]"
-                    )}
-                  >
+                  <span className={cn("text-xs text-[#A6A6A6]", disabled && "text-[#A6A6A6]")}>
                     {description}
                   </span>
                 )}
@@ -107,9 +103,7 @@ export const Checkbox = memo(
             )}
           </div>
 
-          {error && (
-            <span className="text-xs text-[#FF0000] font-medium">{error}</span>
-          )}
+          {error && <span className="text-xs text-[#FF0000] font-medium">{error}</span>}
         </div>
       );
     }

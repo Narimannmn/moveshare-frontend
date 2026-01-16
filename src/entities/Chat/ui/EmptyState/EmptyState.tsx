@@ -1,5 +1,7 @@
 import { memo } from "react";
+
 import { cn } from "@/shared/lib/utils";
+
 import styles from "./EmptyState.module.scss";
 
 export interface EmptyStateProps {

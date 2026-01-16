@@ -4,7 +4,11 @@
 @mixin typography-base {
   margin: 0;
   padding: 0;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 // Regular variants
@@ -82,25 +86,25 @@
 
 // Generic mixin that accepts variant name
 @mixin typography-variant($variant) {
-  @if $variant == 'regular_16' {
+  @if $variant == "regular_16" {
     @include regular_16;
-  } @else if $variant == 'regular_14' {
+  } @else if $variant == "regular_14" {
     @include regular_14;
-  } @else if $variant == 'regular_12' {
+  } @else if $variant == "regular_12" {
     @include regular_12;
-  } @else if $variant == 'regular_10' {
+  } @else if $variant == "regular_10" {
     @include regular_10;
-  } @else if $variant == 'medium_16' {
+  } @else if $variant == "medium_16" {
     @include medium_16;
-  } @else if $variant == 'bold_24' {
+  } @else if $variant == "bold_24" {
     @include bold_24;
-  } @else if $variant == 'bold_20' {
+  } @else if $variant == "bold_20" {
     @include bold_20;
-  } @else if $variant == 'bold_16' {
+  } @else if $variant == "bold_16" {
     @include bold_16;
-  } @else if $variant == 'bold_14' {
+  } @else if $variant == "bold_14" {
     @include bold_14;
-  } @else if $variant == 'bold_12' {
+  } @else if $variant == "bold_12" {
     @include bold_12;
   }
 }
