@@ -1,6 +1,4 @@
-import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
-
-import { appLocalStorageKey } from "@/shared/config";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 import { Header } from "@/widgets/Header";
 import { Sidebar } from "@/widgets/Sidebar";

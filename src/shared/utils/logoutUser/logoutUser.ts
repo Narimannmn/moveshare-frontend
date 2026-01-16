@@ -8,7 +8,7 @@ import { appLocalStorage } from "../appLocalStorage/appLocalStorage";
 import { appSessionStorage } from "../appSessionStorage/appSessionStorage";
 
 export const logoutUser = () => {
-  useAuthStore.getState().logout();
+  useAuthStore.getState().actions.logout();
 
   appSessionStorage.unvalidateToken();
   appLocalStorage.removeItem(appLocalStorageKey.accessToken);

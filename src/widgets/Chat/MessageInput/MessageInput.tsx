@@ -1,10 +1,6 @@
-import { KeyboardEvent, memo, useCallback, useState } from "react";
-
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { type KeyboardEvent, memo, useCallback, useState } from "react";
 
 import { cn } from "@/shared/lib/utils";
-
-import { chatKeys, sendMessage } from "@/entities/Chat";
 
 import styles from "./MessageInput.module.scss";
 
@@ -13,36 +9,18 @@ export interface MessageInputProps {
   className?: string;
 }
 
-const CURRENT_USER_ID = "1";
-
 export const MessageInput = memo(({ conversationId, className }: MessageInputProps) => {
   const [message, setMessage] = useState("");
-  const queryClient = useQueryClient();
-
-  const { mutate: sendMsg, isPending } = useMutation({
-    mutationFn: sendMessage,
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: chatKeys.messageList(conversationId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: chatKeys.conversations(),
-      });
-    },
-  });
 
   const handleSend = useCallback(() => {
     const trimmedMessage = message.trim();
-    if (!trimmedMessage || isPending) return;
+    if (!trimmedMessage) return;
 
-    sendMsg({
-      conversationId,
-      senderId: CURRENT_USER_ID,
-      content: trimmedMessage,
-    });
+    // TODO: Implement send message functionality
+    console.log("Send message:", { conversationId, content: trimmedMessage });
 
     setMessage("");
-  }, [message, conversationId, sendMsg, isPending]);
+  }, [message, conversationId]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -62,12 +40,12 @@ export const MessageInput = memo(({ conversationId, className }: MessageInputPro
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
         className={styles.textarea}
-        disabled={isPending}
+        disabled={false}
         rows={1}
       />
       <button
         onClick={handleSend}
-        disabled={!message.trim() || isPending}
+        disabled={!message.trim()}
         className={styles.sendButton}
         aria-label="Send message"
       >

@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { JobCard } from "@/entities/Job";
-import type { Job } from "@/entities/Job";
+import { JobCard, type JobCardProps } from "@/entities/Job";
 
 import { JobsFilter } from "@/widgets/JobsFilter";
 
@@ -12,7 +11,7 @@ export const Route = createFileRoute("/(app)/jobs/")({
 });
 
 // Mock data for demonstration
-const mockJobs: Job[] = [
+const mockJobs: JobCardProps[] = [
   {
     id: "1",
     title: "2 Bedroom Delivery",

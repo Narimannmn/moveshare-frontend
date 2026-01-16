@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { useAuthStore } from "@entities/User/model/store/authStore";
 
+import type { CompleteProfileRequest, SetPasswordRequest } from "../schemas";
 import { authKeys } from "./keys";
 import * as services from "./services";
 
@@ -35,7 +36,7 @@ export const useSetPassword = () => {
 
   return useMutation({
     mutationKey: authKeys.setPassword(),
-    mutationFn: (data: services.SetPasswordRequest) => {
+    mutationFn: (data: SetPasswordRequest) => {
       const tempToken = authStore.tempToken;
       if (!tempToken) {
         throw new Error("No temp token available");
@@ -53,7 +54,7 @@ export const useCompleteProfile = () => {
 
   return useMutation({
     mutationKey: authKeys.completeProfile(),
-    mutationFn: (data: services.CompleteProfileRequest) => {
+    mutationFn: (data: CompleteProfileRequest) => {
       const tempToken = authStore.tempToken;
       if (!tempToken) {
         throw new Error("No temp token available");

@@ -155,7 +155,7 @@ function MonthlyEarningsChart({ timeRange }: { timeRange: TimeRange }) {
               borderRadius: "8px",
               fontSize: "12px",
             }}
-            formatter={(value: number) => [`$${value.toLocaleString()}`, "Earnings"]}
+            formatter={(value) => [`$${(value as number).toLocaleString()}`, "Earnings"]}
           />
           <Bar dataKey="earnings" fill="#60A5FA" radius={[4, 4, 0, 0]} />
         </BarChart>
@@ -188,7 +188,7 @@ function JobStatusChart() {
             verticalAlign="bottom"
             height={36}
             iconType="circle"
-            formatter={(value, entry: any) => (
+            formatter={(value) => (
               <span className="text-sm text-gray-700">{value}</span>
             )}
           />
@@ -211,7 +211,7 @@ function EmptyStateCard({ title, description }: { title: string; description: st
 }
 
 function DashboardPage() {
-  const [timeRange, setTimeRange] = useState<TimeRange>("monthly");
+  const [timeRange] = useState<TimeRange>("monthly");
 
   return (
     <div>

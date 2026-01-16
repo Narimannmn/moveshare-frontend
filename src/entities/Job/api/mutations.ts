@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
-import type { CreateJobRequest, UpdateJobRequest } from "../schemas";
+import type { UpdateJobRequest } from "../schemas";
 import { jobKeys } from "./keys";
 import * as services from "./services";
 
@@ -11,7 +11,7 @@ export const useCreateJob = () => {
 
   return useMutation({
     mutationFn: services.createJob,
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Invalidate job lists
       queryClient.invalidateQueries({ queryKey: jobKeys.myJobs() });
       queryClient.invalidateQueries({ queryKey: jobKeys.availableJobs() });

@@ -23,7 +23,7 @@ export interface JobsFilterState {
   truckSizeSelected?: string[];
 }
 
-export const JobsFilter = memo(({ onFilterChange, className }: JobsFilterProps) => {
+export const JobsFilter = memo(({ onFilterChange: _onFilterChange, className }: JobsFilterProps) => {
   const handleApplyFilters = useCallback(() => {
     // TODO: Implement filter application logic
     console.log("Apply filters");
