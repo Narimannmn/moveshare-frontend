@@ -7,7 +7,6 @@ import { z } from "zod";
 import { Button, ErrorMessage, OTPInput } from "@shared/ui";
 
 import { useVerifyLoginOTP } from "@entities/Auth";
-import { useAuthStore } from "@entities/User/model/store/authStore";
 
 const formSchema = z.object({
   otp: z.string().min(6, {
@@ -18,7 +17,6 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export const VerificationForm = () => {
-  const tempToken = useAuthStore((state) => state.tempToken);
   const verifyLoginOTP = useVerifyLoginOTP();
 
   const {
@@ -33,15 +31,7 @@ export const VerificationForm = () => {
   });
 
   const onSubmit = (values: FormData) => {
-    if (!tempToken) {
-      console.error("No temp token available");
-      return;
-    }
-
-    verifyLoginOTP.mutate({
-      temp_token: tempToken,
-      code: values.otp,
-    });
+    verifyLoginOTP.mutate(values.otp);
   };
 
   const [timeLeft, setTimeLeft] = useState(120);

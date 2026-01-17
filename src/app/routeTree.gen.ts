@@ -27,6 +27,7 @@ import { Route as authRegisterVerificationRouteImport } from './../pages/(auth)/
 import { Route as authRegisterReviewRouteImport } from './../pages/(auth)/register/review'
 import { Route as authRegisterPasswordRouteImport } from './../pages/(auth)/register/password'
 import { Route as authRegisterCompanyRouteImport } from './../pages/(auth)/register/company'
+import { Route as authLoginVerifyRouteImport } from './../pages/(auth)/login/verify'
 import { Route as appChatIdRouteImport } from './../pages/(app)/chat/$id'
 import { Route as appProfileVerificationIndexRouteImport } from './../pages/(app)/profile/verification/index'
 import { Route as appProfileSecurityIndexRouteImport } from './../pages/(app)/profile/security/index'
@@ -124,6 +125,11 @@ const authRegisterCompanyRoute = authRegisterCompanyRouteImport.update({
   path: '/register/company',
   getParentRoute: () => authRouteRoute,
 } as any)
+const authLoginVerifyRoute = authLoginVerifyRouteImport.update({
+  id: '/login/verify',
+  path: '/login/verify',
+  getParentRoute: () => authRouteRoute,
+} as any)
 const appChatIdRoute = appChatIdRouteImport.update({
   id: '/chat/$id',
   path: '/chat/$id',
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/profile': typeof appProfileRouteRouteWithChildren
   '/chat/$id': typeof appChatIdRoute
+  '/login/verify': typeof authLoginVerifyRoute
   '/register/company': typeof authRegisterCompanyRoute
   '/register/password': typeof authRegisterPasswordRoute
   '/register/review': typeof authRegisterReviewRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chat/$id': typeof appChatIdRoute
+  '/login/verify': typeof authLoginVerifyRoute
   '/register/company': typeof authRegisterCompanyRoute
   '/register/password': typeof authRegisterPasswordRoute
   '/register/review': typeof authRegisterReviewRoute
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/(auth)': typeof authRouteRouteWithChildren
   '/(app)/profile': typeof appProfileRouteRouteWithChildren
   '/(app)/chat/$id': typeof appChatIdRoute
+  '/(auth)/login/verify': typeof authLoginVerifyRoute
   '/(auth)/register/company': typeof authRegisterCompanyRoute
   '/(auth)/register/password': typeof authRegisterPasswordRoute
   '/(auth)/register/review': typeof authRegisterReviewRoute
@@ -245,6 +254,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/chat/$id'
+    | '/login/verify'
     | '/register/company'
     | '/register/password'
     | '/register/review'
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/chat/$id'
+    | '/login/verify'
     | '/register/company'
     | '/register/password'
     | '/register/review'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/(auth)'
     | '/(app)/profile'
     | '/(app)/chat/$id'
+    | '/(auth)/login/verify'
     | '/(auth)/register/company'
     | '/(auth)/register/password'
     | '/(auth)/register/review'
@@ -452,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRegisterCompanyRouteImport
       parentRoute: typeof authRouteRoute
     }
+    '/(auth)/login/verify': {
+      id: '/(auth)/login/verify'
+      path: '/login/verify'
+      fullPath: '/login/verify'
+      preLoaderRoute: typeof authLoginVerifyRouteImport
+      parentRoute: typeof authRouteRoute
+    }
     '/(app)/chat/$id': {
       id: '/(app)/chat/$id'
       path: '/chat/$id'
@@ -553,6 +572,7 @@ const appRouteRouteWithChildren = appRouteRoute._addFileChildren(
 )
 
 interface authRouteRouteChildren {
+  authLoginVerifyRoute: typeof authLoginVerifyRoute
   authRegisterCompanyRoute: typeof authRegisterCompanyRoute
   authRegisterPasswordRoute: typeof authRegisterPasswordRoute
   authRegisterReviewRoute: typeof authRegisterReviewRoute
@@ -564,6 +584,7 @@ interface authRouteRouteChildren {
 }
 
 const authRouteRouteChildren: authRouteRouteChildren = {
+  authLoginVerifyRoute: authLoginVerifyRoute,
   authRegisterCompanyRoute: authRegisterCompanyRoute,
   authRegisterPasswordRoute: authRegisterPasswordRoute,
   authRegisterReviewRoute: authRegisterReviewRoute,

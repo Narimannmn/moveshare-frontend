@@ -102,7 +102,13 @@ export const useVerifyLoginOTP = () => {
 
   return useMutation({
     mutationKey: authKeys.verifyLoginOtp(),
-    mutationFn: services.verifyLoginOTP,
+    mutationFn: (code: string) => {
+      const tempToken = authStore.tempToken;
+      if (!tempToken) {
+        throw new Error("No temp token available");
+      }
+      return services.verifyLoginOTP(code, tempToken);
+    },
     onSuccess: (data) => {
       // Store tokens and clear temp_token
       authStore.actions.updateTokens(data.access_token, data.refresh_token);

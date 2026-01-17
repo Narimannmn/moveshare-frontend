@@ -79,7 +79,17 @@ export const LoginResponseSchema = z.object({
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
 
-// Verify Login OTP
+// Verify Login OTP - Code only (temp_token sent as Authorization header)
+export const VerifyLoginOTPCodeSchema = z.object({
+  code: z
+    .string()
+    .length(6, "Code must be exactly 6 characters")
+    .regex(/^\d+$/, "Code must contain only digits"),
+});
+
+export type VerifyLoginOTPCode = z.infer<typeof VerifyLoginOTPCodeSchema>;
+
+// Legacy schema (kept for reference, not used in API calls)
 export const VerifyLoginOTPRequestSchema = z.object({
   temp_token: z.string(),
   code: z

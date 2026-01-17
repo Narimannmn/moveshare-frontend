@@ -16,8 +16,7 @@ import {
   SendRegistrationOTPRequestSchema,
   type SetPasswordRequest,
   SetPasswordRequestSchema,
-  type VerifyLoginOTPRequest,
-  VerifyLoginOTPRequestSchema,
+  VerifyLoginOTPCodeSchema,
   type VerifyLoginOTPResponse,
   VerifyLoginOTPResponseSchema,
   type VerifyRegistrationOTPRequest,
@@ -104,11 +103,16 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
 };
 
 export const verifyLoginOTP = async (
-  data: VerifyLoginOTPRequest
+  code: string,
+  tempToken: string
 ): Promise<VerifyLoginOTPResponse> => {
   try {
-    const validated = VerifyLoginOTPRequestSchema.parse(data);
-    const response = await apiClient.post("/api/v1/auth/login/verify-otp", validated);
+    const validated = VerifyLoginOTPCodeSchema.parse({ code });
+    const response = await apiClient.post("/api/v1/auth/login/verify-otp", validated, {
+      headers: {
+        Authorization: `Bearer ${tempToken}`,
+      },
+    });
     return VerifyLoginOTPResponseSchema.parse(response.data);
   } catch (error) {
     console.error("Error verifying login OTP:", error);
