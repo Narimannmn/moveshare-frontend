@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { Button, ErrorMessage, Input } from "@shared/ui";
 
-import { useSendRegistrationOTP } from "@entities/Auth";
+import { useSendOTP } from "@entities/Auth";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -17,7 +17,7 @@ interface EmailRegisterFormProps {
 }
 
 export const EmailRegisterForm: React.FC<EmailRegisterFormProps> = ({ onSuccess }) => {
-  const sendOTP = useSendRegistrationOTP();
+  const sendOTP = useSendOTP();
 
   const {
     control,

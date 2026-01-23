@@ -13,7 +13,6 @@ export interface SidebarItem {
 }
 
 export const sidebarItems: SidebarItem[] = [
-  { route: "/", name: "Welcome", icon: <AiOutlineLineChart /> },
   { route: "/dashboard", name: "Dashboard", icon: <AiOutlineLineChart /> },
   { route: "/jobs", name: "Available Jobs", icon: <BsClipboardCheck /> },
   { route: "/my", name: "My Jobs", icon: <BsClipboardCheck /> },

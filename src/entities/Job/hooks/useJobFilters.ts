@@ -1,10 +1,10 @@
-import { useState } from "react";
+import {useState} from "react";
 
-import type { JobType, RoomCount } from "../schemas";
+import type {BedroomCount, JobType} from "../schemas";
 
 interface JobFilters {
   jobType?: JobType;
-  roomCount?: RoomCount;
+  bedroomCount?: BedroomCount;
   minPrice?: number;
   maxPrice?: number;
 }
@@ -12,23 +12,23 @@ interface JobFilters {
 export const useJobFilters = () => {
   const [filters, setFilters] = useState<JobFilters>({
     jobType: undefined,
-    roomCount: undefined,
+    bedroomCount: undefined,
     minPrice: undefined,
     maxPrice: undefined,
   });
 
   const updateFilter = <K extends keyof JobFilters>(key: K, value: JobFilters[K]) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({...prev, [key]: value}));
   };
 
   const resetFilters = () => {
     setFilters({
       jobType: undefined,
-      roomCount: undefined,
+      bedroomCount: undefined,
       minPrice: undefined,
       maxPrice: undefined,
     });
   };
 
-  return { filters, updateFilter, resetFilters };
+  return {filters, updateFilter, resetFilters};
 };

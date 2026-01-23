@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import { CheckCircle2 } from "lucide-react";
 
-import { Button, Typography } from "@shared/ui";
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 
-import { useAuthStore } from "@entities/User/model/store/authStore";
+import { Button, Typography } from "@shared/ui";
 
 export const Route = createFileRoute("/(auth)/register/review")({
   component: RegisterReviewPage,
@@ -27,7 +28,9 @@ function RegisterReviewPage() {
         {/* Success Icon */}
         <div
           className="relative rounded-full w-[70px] h-[70px] flex items-center justify-center"
-          style={{ backgroundImage: "linear-gradient(135deg, rgb(0, 176, 155) 0%, rgb(150, 201, 61) 100%)" }}
+          style={{
+            backgroundImage: "linear-gradient(135deg, rgb(0, 176, 155) 0%, rgb(150, 201, 61) 100%)",
+          }}
         >
           <CheckCircle2 className="w-8 h-8 text-white" />
         </div>
@@ -41,7 +44,8 @@ function RegisterReviewPage() {
           </div>
           <div className="flex items-center justify-center w-full">
             <Typography variant="regular_16" className="text-center text-[#202224]">
-              Verification may take up to 3 days. We'll notify you once it's completed. If there are any issues with your documents, we'll contact you by email.
+              Verification may take up to 3 days. We'll notify you once it's completed. If there are
+              any issues with your documents, we'll contact you by email.
             </Typography>
           </div>
         </div>

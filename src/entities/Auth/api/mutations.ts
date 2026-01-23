@@ -1,9 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
-import { useAuthStore } from "@entities/User/model/store/authStore";
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 
-import type { CompleteProfileRequest, SetPasswordRequest } from "../schemas";
+import type {
+  DocumentType,
+  ForgotPasswordResetRequest,
+  ForgotPasswordVerifyOTPRequest,
+  RegisterCompanyRequest,
+  SetPasswordRequest,
+  VerifyOTPRequest,
+} from "../schemas";
 import { authKeys } from "./keys";
 import * as services from "./services";
 
@@ -11,21 +18,20 @@ import * as services from "./services";
 // Registration Flow Mutations
 // ============================================
 
-export const useSendRegistrationOTP = () => {
+export const useSendOTP = () => {
   return useMutation({
     mutationKey: authKeys.sendOtp(),
-    mutationFn: services.sendRegistrationOTP,
+    mutationFn: services.sendOTP,
   });
 };
 
-export const useVerifyRegistrationOTP = () => {
+export const useVerifyOTP = () => {
   const authStore = useAuthStore();
 
   return useMutation({
     mutationKey: authKeys.verifyOtp(),
-    mutationFn: services.verifyRegistrationOTP,
+    mutationFn: (data: VerifyOTPRequest) => services.verifyOTP(data),
     onSuccess: (data) => {
-      // Store temp_token for next registration steps
       authStore.actions.setTempToken(data.temp_token);
     },
   });
@@ -43,28 +49,20 @@ export const useSetPassword = () => {
       }
       return services.setPassword(data, tempToken);
     },
-    onSuccess: () => {
-      // Keep temp_token for next step (complete profile)
-    },
   });
 };
 
-export const useCompleteProfile = () => {
+export const useRegisterCompany = () => {
   const authStore = useAuthStore();
 
   return useMutation({
-    mutationKey: authKeys.completeProfile(),
-    mutationFn: (data: CompleteProfileRequest) => {
+    mutationKey: authKeys.registerCompany(),
+    mutationFn: (data: RegisterCompanyRequest) => {
       const tempToken = authStore.tempToken;
       if (!tempToken) {
         throw new Error("No temp token available");
       }
-      return services.completeProfile(data, tempToken);
-    },
-    onSuccess: () => {
-      // Keep temp_token for verification step
-      // It will be cleared after final review or when user completes the flow
-      // Let the calling page handle navigation
+      return services.registerCompany(data, tempToken);
     },
   });
 };
@@ -81,41 +79,27 @@ export const useLogin = () => {
     mutationKey: authKeys.login(),
     mutationFn: services.login,
     onSuccess: (data) => {
-      if (data.requires_otp) {
-        // Store temp_token and navigate to OTP verification
-        if (data.temp_token) {
-          authStore.actions.setTempToken(data.temp_token);
-        }
-        // UI will handle navigation to OTP verification step
-      } else if (data.access_token && data.refresh_token) {
-        // Direct login without OTP - store tokens and navigate
+      // Step 1: Set tokens based on registration status
+      if (data.user.has_uploaded_documents) {
+        // User completed registration - set access and refresh tokens
         authStore.actions.updateTokens(data.access_token, data.refresh_token);
-        navigate({ to: "/dashboard" });
+        navigate({ to: "/jobs" });
+        return;
       }
-    },
-  });
-};
+      console.log(data);
+      // User has incomplete registration - set temp token for registration flow
+      authStore.actions.setTempToken(data.access_token);
 
-export const useVerifyLoginOTP = () => {
-  const authStore = useAuthStore();
-  const navigate = useNavigate();
+      // Step 2: Redirect based on registration_step
+      const stepRoutes: Record<string, string> = {
+        pending_otp: "/register/verify",
+        otp_verified: "/register/password",
+        password_set: "/register/company",
+        profile_complete: "/register/verification",
+      };
 
-  return useMutation({
-    mutationKey: authKeys.verifyLoginOtp(),
-    mutationFn: (code: string) => {
-      const tempToken = authStore.tempToken;
-      if (!tempToken) {
-        throw new Error("No temp token available");
-      }
-      return services.verifyLoginOTP(code, tempToken);
-    },
-    onSuccess: (data) => {
-      // Store tokens and clear temp_token
-      authStore.actions.updateTokens(data.access_token, data.refresh_token);
-      authStore.actions.clearTempToken();
-
-      // Navigate to dashboard
-      navigate({ to: "/dashboard" });
+      const redirectTo = stepRoutes[data.user.registration_step] || "/register";
+      navigate({ to: redirectTo });
     },
   });
 };
@@ -131,7 +115,6 @@ export const useRefreshToken = () => {
     mutationKey: authKeys.refresh(),
     mutationFn: services.refreshToken,
     onSuccess: (data) => {
-      // Update tokens in store
       authStore.actions.updateTokens(data.access_token, data.refresh_token);
     },
   });
@@ -144,16 +127,88 @@ export const useLogout = () => {
 
   return useMutation({
     mutationKey: authKeys.logout(),
-    mutationFn: services.logout,
+    mutationFn: () => {
+      const refreshToken = authStore.refreshToken;
+      if (!refreshToken) {
+        throw new Error("No refresh token available");
+      }
+      return services.logout(refreshToken);
+    },
     onSettled: () => {
-      // Clear all queries
       queryClient.clear();
-
-      // Clear auth store
       authStore.actions.logout();
-
-      // Navigate to login
       navigate({ to: "/login" });
     },
+  });
+};
+
+export const useLogoutAll = () => {
+  const queryClient = useQueryClient();
+  const authStore = useAuthStore();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationKey: authKeys.logoutAll(),
+    mutationFn: services.logoutAll,
+    onSettled: () => {
+      queryClient.clear();
+      authStore.actions.logout();
+      navigate({ to: "/login" });
+    },
+  });
+};
+
+// ============================================
+// Forgot Password Flow Mutations
+// ============================================
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationKey: authKeys.forgotPasswordSendOtp(),
+    mutationFn: services.forgotPassword,
+  });
+};
+
+export const useForgotPasswordVerifyOTP = () => {
+  const authStore = useAuthStore();
+
+  return useMutation({
+    mutationKey: authKeys.forgotPasswordVerifyOtp(),
+    mutationFn: (data: ForgotPasswordVerifyOTPRequest) => services.forgotPasswordVerifyOTP(data),
+    onSuccess: (data) => {
+      authStore.actions.setTempToken(data.temp_token);
+    },
+  });
+};
+
+export const useForgotPasswordReset = () => {
+  const authStore = useAuthStore();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationKey: authKeys.forgotPasswordReset(),
+    mutationFn: (data: ForgotPasswordResetRequest) => {
+      const tempToken = authStore.tempToken;
+      if (!tempToken) {
+        throw new Error("No temp token available");
+      }
+      return services.forgotPasswordReset(data, tempToken);
+    },
+    onSuccess: () => {
+      authStore.actions.clearTempToken();
+      navigate({ to: "/login" });
+    },
+  });
+};
+
+// ============================================
+// Document Upload Mutation (Registration Flow)
+// ============================================
+
+export const useUploadCompanyDocument = () => {
+  return useMutation({
+    mutationKey: authKeys.uploadDocument(),
+    mutationFn: ({ documentType, file }: { documentType: DocumentType; file: File }) =>
+      services.uploadCompanyDocument(documentType, file),
   });
 };

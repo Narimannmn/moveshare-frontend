@@ -1,18 +1,16 @@
-import { appLocalStorageKey } from "@/shared/config";
-
-import { useAuthStore } from "@/entities/User/model/store/authStore";
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 
 import { queryClient } from "@/app/providers/query";
 
-import { appLocalStorage } from "../appLocalStorage/appLocalStorage";
 import { appSessionStorage } from "../appSessionStorage/appSessionStorage";
 
 export const logoutUser = () => {
+  // Clear auth store (includes persisted tokens and user data)
   useAuthStore.getState().actions.logout();
 
+  // Clear session storage
   appSessionStorage.unvalidateToken();
-  appLocalStorage.removeItem(appLocalStorageKey.accessToken);
-  appLocalStorage.removeItem(appLocalStorageKey.refreshToken);
 
+  // Clear all cached queries
   queryClient.clear();
 };

@@ -2,10 +2,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
+
 import { Button, ErrorMessage, Input, Textarea, Typography } from "@shared/ui";
 
-import { useCompleteProfile } from "@entities/Auth";
-import { useAuthStore } from "@entities/User/model/store/authStore";
+import { useRegisterCompany } from "@entities/Auth";
 
 const formSchema = z.object({
   name: z.string().min(1, "Company name is required"),
@@ -28,7 +29,7 @@ interface CompanyInfoFormProps {
 }
 
 export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) => {
-  const completeProfile = useCompleteProfile();
+  const registerCompany = useRegisterCompany();
   const tempToken = useAuthStore((state) => state.tempToken);
 
   const {
@@ -60,7 +61,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
     }
 
     // Map camelCase to snake_case for API
-    completeProfile.mutate(
+    registerCompany.mutate(
       {
         name: values.name,
         email: values.email,
@@ -102,7 +103,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 label="Company Name"
                 placeholder="Enter company name"
                 error={errors.name?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -116,7 +117,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 label="Contact Person"
                 placeholder="Enter contact person"
                 error={errors.contactPerson?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -134,7 +135,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 type="email"
                 placeholder="contact@company.com"
                 error={errors.email?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -149,7 +150,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 type="tel"
                 placeholder="Enter phone number"
                 error={errors.phoneNumber?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -166,7 +167,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 label="Address"
                 placeholder="Enter address company"
                 error={errors.address?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -180,7 +181,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 label="City"
                 placeholder="Enter city"
                 error={errors.city?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -197,7 +198,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 label="State"
                 placeholder="Enter state"
                 error={errors.state?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -211,7 +212,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 label="ZIP Code"
                 placeholder="Enter ZIP code"
                 error={errors.zipCode?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -228,7 +229,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 label="MC License Number"
                 placeholder="Enter MC license number"
                 error={errors.mcLicenseNumber?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -242,7 +243,7 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
                 label="DOT Number"
                 placeholder="Enteer DOT number"
                 error={errors.dotNumber?.message}
-                disabled={completeProfile.isPending}
+                disabled={registerCompany.isPending}
               />
             )}
           />
@@ -258,23 +259,23 @@ export const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onSuccess }) =
               label="Company Description"
               placeholder="Enter company description"
               error={errors.description?.message}
-              disabled={completeProfile.isPending}
+              disabled={registerCompany.isPending}
               className="min-h-[120px]"
             />
           )}
         />
       </div>
 
-      {completeProfile.error && <ErrorMessage error={completeProfile.error} />}
+      {registerCompany.error && <ErrorMessage error={registerCompany.error} />}
 
       {/* Button - right aligned */}
       <div className="flex justify-end">
         <Button
           type="submit"
-          disabled={!isValid || completeProfile.isPending}
+          disabled={!isValid || registerCompany.isPending}
           className="h-[44px] px-4 py-2.5 rounded-lg bg-[#60A5FA] hover:bg-[#60A5FA]/90 disabled:bg-[#60A5FA]/60"
         >
-          {completeProfile.isPending ? "Submitting..." : "Next"}
+          {registerCompany.isPending ? "Submitting..." : "Next"}
         </Button>
       </div>
     </form>

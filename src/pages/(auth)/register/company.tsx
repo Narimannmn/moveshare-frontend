@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { useAuthStore } from "@entities/User/model/store/authStore";
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 
 import { CompanyInfoForm } from "@features/auth/registerWithEmail/ui/CompanyInfoForm";
 

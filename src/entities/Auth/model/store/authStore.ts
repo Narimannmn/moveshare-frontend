@@ -1,18 +1,19 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
-import type { User } from "@/shared/types/app";
+import type { CompanyProfileResponse } from "@/entities/Auth/schemas";
 
 interface AuthState {
-  user: User | null;
+  companyProfile: CompanyProfileResponse | null;
   accessToken: string | null;
   refreshToken: string | null;
-  tempToken: string | null; // For OTP flows
-  registrationEmail: string | null; // For registration flow
+  tempToken: string | null;
+  registrationEmail: string | null;
 }
 
 interface AuthActions {
-  setUser: (user: User, accessToken: string, refreshToken: string) => void;
+  setCompanyProfile: (profile: CompanyProfileResponse) => void;
+  clearCompanyProfile: () => void;
   setTempToken: (token: string) => void;
   clearTempToken: () => void;
   setRegistrationEmail: (email: string) => void;
@@ -24,7 +25,7 @@ interface AuthActions {
 type AuthStore = AuthState & { actions: AuthActions };
 
 const initialState: AuthState = {
-  user: null,
+  companyProfile: null,
   accessToken: null,
   refreshToken: null,
   tempToken: null,
@@ -38,8 +39,9 @@ export const useAuthStore = create<AuthStore>()(
         ...initialState,
 
         actions: {
-          setUser: (user, accessToken, refreshToken) =>
-            set({ user, accessToken, refreshToken, tempToken: null }),
+          setCompanyProfile: (profile) => set({ companyProfile: profile }),
+
+          clearCompanyProfile: () => set({ companyProfile: null }),
 
           setTempToken: (token) => set({ tempToken: token }),
 
@@ -57,10 +59,10 @@ export const useAuthStore = create<AuthStore>()(
       {
         name: "auth-storage",
         partialize: (state) => ({
-          user: state.user,
+          companyProfile: state.companyProfile,
           accessToken: state.accessToken,
           refreshToken: state.refreshToken,
-          // Don't persist tempToken
+          tempToken: state.tempToken,
         }),
       }
     ),

@@ -1,9 +1,12 @@
-export interface User {
+export interface UserInfo {
   id: string;
-  name: string;
+  email: string;
+  role: string;
+  registration_step: string;
+  has_uploaded_documents: boolean;
 }
 
 export interface AppContext {
-  user: User | null;
+  user: UserInfo | null;
   accessToken?: string;
 }

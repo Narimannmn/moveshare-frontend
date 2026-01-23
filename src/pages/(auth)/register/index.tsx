@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { Typography } from "@/shared/ui";
 
-import { useAuthStore } from "@entities/User/model/store/authStore";
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 
 import { AppleLoginButton } from "@features/auth/loginWithApple/ui/AppleLoginButton";
 import { GoogleLoginButton } from "@features/auth/loginWithGoogle/ui/GoogleLoginButton";

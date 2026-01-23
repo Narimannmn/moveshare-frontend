@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
+
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 
 import { Typography } from "@shared/ui";
-
-import { useAuthStore } from "@entities/User/model/store/authStore";
 
 import { VerificationForm } from "@features/auth/verifyEmail/ui/VerificationForm";
 

@@ -1,7 +1,8 @@
 import axios from "axios";
 
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
+
 import { getDeviceFingerprint } from "../utils/deviceFingerprint";
-import { getLocalStorageTokens } from "../utils/token/token";
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -10,11 +11,36 @@ export const apiClient = axios.create({
   },
 });
 
-// Request interceptor - add auth token and device fingerprint
+// Separate auth client for registration/login flows (no automatic token)
+export const authClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Request interceptor - add access token and device fingerprint
 apiClient.interceptors.request.use((config) => {
-  const { accessToken } = getLocalStorageTokens();
+  const { accessToken } = useAuthStore.getState();
+
+  // Use only accessToken for authenticated requests
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  // Add device fingerprint header to all requests
+  config.headers["X-Device-Fingerprint"] = getDeviceFingerprint();
+
+  return config;
+});
+
+// Auth client interceptor - add temp token if exists, and device fingerprint
+authClient.interceptors.request.use((config) => {
+  const { tempToken } = useAuthStore.getState();
+  console.log(tempToken);
+  // Use tempToken for registration flow if it exists
+  if (tempToken) {
+    config.headers.Authorization = `Bearer ${tempToken}`;
   }
 
   // Add device fingerprint header to all requests

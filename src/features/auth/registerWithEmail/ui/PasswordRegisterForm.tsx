@@ -5,10 +5,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
+
 import { Button, ErrorMessage, Input } from "@shared/ui";
 
 import { useSetPassword } from "@entities/Auth";
-import { useAuthStore } from "@entities/User/model/store/authStore";
 
 const formSchema = z
   .object({

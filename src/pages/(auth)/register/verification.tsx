@@ -4,7 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { Typography } from "@/shared/ui";
 
-import { useAuthStore } from "@entities/User/model/store/authStore";
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 
 import { CompanyVerificationForm } from "@features/auth/registerWithEmail/ui/CompanyVerificationForm";
 

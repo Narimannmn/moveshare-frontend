@@ -1,23 +1,23 @@
-import { queryOptions } from "@tanstack/react-query";
+import {queryOptions} from "@tanstack/react-query";
 
-import { jobKeys } from "./keys";
+import {jobKeys} from "./keys";
 import * as services from "./services";
 
-export const myJobsQueryOptions = (params?: { limit?: number; offset?: number }) =>
+export const myJobsQueryOptions = (params?: {limit?: number; offset?: number}) =>
   queryOptions({
     queryKey: jobKeys.myJobs(params),
     queryFn: () => services.listMyJobs(params),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
-export const availableJobsQueryOptions = (params?: { limit?: number; offset?: number }) =>
+export const availableJobsQueryOptions = (params?: {limit?: number; offset?: number}) =>
   queryOptions({
     queryKey: jobKeys.availableJobs(params),
     queryFn: () => services.listAvailableJobs(params),
     staleTime: 5 * 60 * 1000,
   });
 
-export const jobQueryOptions = (jobId: number) =>
+export const jobQueryOptions = (jobId: string) =>
   queryOptions({
     queryKey: jobKeys.detail(jobId),
     queryFn: () => services.getJob(jobId),

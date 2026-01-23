@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { Button, OTPInput } from "@shared/ui";
 
-import { useVerifyRegistrationOTP } from "@entities/Auth";
+import { useVerifyOTP } from "@entities/Auth";
 
 const formSchema = z.object({
   otp: z.string().min(6, {
@@ -25,7 +25,7 @@ export const VerificationRegisterForm: React.FC<VerificationRegisterFormProps> =
   email,
   onSuccess,
 }) => {
-  const verifyOTP = useVerifyRegistrationOTP();
+  const verifyOTP = useVerifyOTP();
 
   const {
     control,
@@ -40,7 +40,7 @@ export const VerificationRegisterForm: React.FC<VerificationRegisterFormProps> =
 
   const onSubmit = (values: FormData) => {
     verifyOTP.mutate(
-      { email, code: values.otp },
+      { email, otp_code: values.otp },
       {
         onSuccess: () => {
           onSuccess?.();

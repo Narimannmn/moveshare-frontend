@@ -1,16 +1,16 @@
-import { useState } from "react";
+import {useState} from "react";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {Eye, EyeOff} from "lucide-react";
+import {Controller, useForm} from "react-hook-form";
+import {z} from "zod";
 
-import { Button, ErrorMessage, Input } from "@shared/ui";
+import {Button, ErrorMessage, Input} from "@shared/ui";
 
-import { useLogin } from "@entities/Auth";
+import {useLogin} from "@entities/Auth";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  email: z.string().email({message: "Invalid email address"}),
   password: z.string().min(6, {
     message: "Password must be at least 6 characters",
   }),
@@ -19,17 +19,17 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 interface EmailLoginFormProps {
-  onSuccess?: (requiresOtp?: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ onSuccess }) => {
+export const EmailLoginForm: React.FC<EmailLoginFormProps> = ({onSuccess}) => {
   const [showPassword, setShowPassword] = useState(false);
   const login = useLogin();
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: {errors, isValid},
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
@@ -41,12 +41,8 @@ export const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ onSuccess }) => 
 
   const onSubmit = (values: FormData) => {
     login.mutate(values, {
-      onSuccess: (data) => {
-        if (data.requires_otp) {
-          onSuccess?.(true);
-        } else {
-          onSuccess?.(false);
-        }
+      onSuccess: () => {
+        onSuccess?.();
       },
     });
   };
@@ -56,7 +52,7 @@ export const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ onSuccess }) => 
       <Controller
         name="email"
         control={control}
-        render={({ field }) => (
+        render={({field}) => (
           <Input
             {...field}
             type="email"
@@ -71,7 +67,7 @@ export const EmailLoginForm: React.FC<EmailLoginFormProps> = ({ onSuccess }) => 
       <Controller
         name="password"
         control={control}
-        render={({ field }) => (
+        render={({field}) => (
           <Input
             {...field}
             type={showPassword ? "text" : "password"}

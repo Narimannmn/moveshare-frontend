@@ -2,6 +2,8 @@ import { useRef, useState } from "react";
 
 import { FileText } from "lucide-react";
 
+import { useUploadCompanyDocument } from "@/entities/Auth/api/mutations";
+import type { DocumentType } from "@/entities/Auth/schemas";
 import { Button } from "@shared/ui";
 
 interface FileUploadSectionProps {
@@ -61,6 +63,8 @@ const FileUploadSection = ({ label, file, onFileChange }: FileUploadSectionProps
 };
 
 export const CompanyVerificationForm = ({ onSuccess }: { onSuccess?: () => void }) => {
+  const uploadMutation = useUploadCompanyDocument();
+  const [isUploading, setIsUploading] = useState(false);
   const [files, setFiles] = useState<Record<string, File | null>>({
     mcLicense: null,
     dotCertificate: null,
@@ -68,13 +72,39 @@ export const CompanyVerificationForm = ({ onSuccess }: { onSuccess?: () => void 
     businessLicense: null,
   });
 
+  const documentTypeMap: Record<string, DocumentType> = {
+    mcLicense: "mc_license",
+    dotCertificate: "dot_certificate",
+    insuranceCertificate: "insurance_certificate",
+    businessLicense: "business_license",
+  };
+
   const updateFile = (key: string, file: File) => {
     setFiles((prev) => ({ ...prev, [key]: file }));
   };
 
-  const handleSubmit = () => {
-    console.log("Submitting files:", files);
-    if (onSuccess) onSuccess();
+  const handleSubmit = async () => {
+    setIsUploading(true);
+
+    try {
+      // Upload each document in parallel
+      const uploadPromises = Object.entries(files).map(async ([key, file]) => {
+        if (!file) return null;
+
+        const documentType = documentTypeMap[key];
+        return uploadMutation.mutateAsync({ documentType, file });
+      });
+
+      await Promise.all(uploadPromises);
+
+      // All uploads successful
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      console.error("Failed to upload documents:", error);
+      // TODO: Show error toast/message to user
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const allFilesUploaded = Object.values(files).every((file) => file !== null);
@@ -107,10 +137,10 @@ export const CompanyVerificationForm = ({ onSuccess }: { onSuccess?: () => void 
       <Button
         type="button"
         onClick={handleSubmit}
-        disabled={!allFilesUploaded}
+        disabled={!allFilesUploaded || isUploading}
         className="w-full h-[44px] bg-[#60A5FA] hover:bg-[#60A5FA]/90 text-white font-medium text-base rounded-md disabled:bg-[rgba(96,165,250,0.6)] disabled:cursor-not-allowed"
       >
-        Submit
+        {isUploading ? "Uploading..." : "Submit"}
       </Button>
 
       <div className="flex justify-center">
