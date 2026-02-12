@@ -390,17 +390,78 @@
       }
     },
     "/api/v1/jobs": {
+      "get": {
+        "tags": ["Jobs"],
+        "summary": "Get Available Jobs",
+        "operationId": "get_available_jobs_api_v1_jobs_get",
+        "security": [{ "HTTPBearer": [] }],
+        "parameters": [
+          {
+            "name": "job_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "$ref": "#/components/schemas/JobType" }, { "type": "null" }],
+              "title": "Job Type"
+            }
+          },
+          {
+            "name": "bedroom_count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "$ref": "#/components/schemas/BedroomCount" }, { "type": "null" }],
+              "title": "Bedroom Count"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 0, "default": 0, "title": "Skip" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/JobListResponse" } }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": ["Jobs"],
         "summary": "Create Job",
         "operationId": "create_job_api_v1_jobs_post",
+        "security": [{ "HTTPBearer": [] }],
         "requestBody": {
+          "required": true,
           "content": {
             "multipart/form-data": {
               "schema": { "$ref": "#/components/schemas/Body_create_job_api_v1_jobs_post" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
@@ -417,8 +478,39 @@
               }
             }
           }
-        },
-        "security": [{ "HTTPBearer": [] }]
+        }
+      }
+    },
+    "/api/v1/jobs/{job_id}": {
+      "get": {
+        "tags": ["Jobs"],
+        "summary": "Get Job By Id",
+        "operationId": "get_job_by_id_api_v1_jobs__job_id__get",
+        "security": [{ "HTTPBearer": [] }],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid", "title": "Job Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/JobResponse" } }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -614,6 +706,21 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "JobListResponse": {
+        "properties": {
+          "jobs": {
+            "items": { "$ref": "#/components/schemas/JobResponse" },
+            "type": "array",
+            "title": "Jobs"
+          },
+          "total": { "type": "integer", "title": "Total" },
+          "skip": { "type": "integer", "title": "Skip" },
+          "limit": { "type": "integer", "title": "Limit" }
+        },
+        "type": "object",
+        "required": ["jobs", "total", "skip", "limit"],
+        "title": "JobListResponse"
       },
       "JobResponse": {
         "properties": {

@@ -101,12 +101,27 @@ export const UpdateJobRequestSchema = CreateJobRequestSchema.partial();
 export type UpdateJobRequest = z.infer<typeof UpdateJobRequestSchema>;
 
 // ============================================
-// List Jobs Response
+// Job List Response (paginated)
 // ============================================
 
-export const ListJobsResponseSchema = z.object({
+export const JobListResponseSchema = z.object({
   jobs: z.array(JobResponseSchema),
-  total: z.number(),
+  total: z.number().int(),
+  skip: z.number().int(),
+  limit: z.number().int(),
 });
 
-export type ListJobsResponse = z.infer<typeof ListJobsResponseSchema>;
+export type JobListResponse = z.infer<typeof JobListResponseSchema>;
+
+// ============================================
+// Job List Query Params
+// ============================================
+
+export const JobListParamsSchema = z.object({
+  job_type: JobTypeSchema.optional().nullable(),
+  bedroom_count: BedroomCountSchema.optional().nullable(),
+  skip: z.number().int().min(0).default(0),
+  limit: z.number().int().min(1).max(100).default(20),
+});
+
+export type JobListParams = z.infer<typeof JobListParamsSchema>;

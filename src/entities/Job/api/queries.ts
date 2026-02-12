@@ -1,26 +1,38 @@
-import {queryOptions} from "@tanstack/react-query";
+import {queryOptions, useQuery} from "@tanstack/react-query";
 
+import type {JobListParams} from "../schemas";
 import {jobKeys} from "./keys";
 import * as services from "./services";
 
-export const myJobsQueryOptions = (params?: {limit?: number; offset?: number}) =>
+// ============================================
+// Available Jobs Query
+// ============================================
+
+export const availableJobsQueryOptions = (params?: JobListParams) =>
   queryOptions({
-    queryKey: jobKeys.myJobs(params),
-    queryFn: () => services.listMyJobs(params),
+    queryKey: jobKeys.list(params),
+    queryFn: () => services.getAvailableJobs(params),
     staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
-export const availableJobsQueryOptions = (params?: {limit?: number; offset?: number}) =>
-  queryOptions({
-    queryKey: jobKeys.availableJobs(params),
-    queryFn: () => services.listAvailableJobs(params),
-    staleTime: 5 * 60 * 1000,
-  });
+export const useAvailableJobs = (params?: JobListParams) => {
+  return useQuery(availableJobsQueryOptions(params));
+};
 
-export const jobQueryOptions = (jobId: string) =>
+// ============================================
+// Job Detail Query
+// ============================================
+
+export const jobDetailQueryOptions = (jobId: string) =>
   queryOptions({
     queryKey: jobKeys.detail(jobId),
-    queryFn: () => services.getJob(jobId),
+    queryFn: () => services.getJobById(jobId),
     enabled: !!jobId,
     staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
+
+export const useJob = (jobId: string) => {
+  return useQuery(jobDetailQueryOptions(jobId));
+};

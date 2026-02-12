@@ -37,7 +37,7 @@ apiClient.interceptors.request.use((config) => {
 // Auth client interceptor - add temp token if exists, and device fingerprint
 authClient.interceptors.request.use((config) => {
   const { tempToken } = useAuthStore.getState();
-  console.log(tempToken);
+
   // Use tempToken for registration flow if it exists
   if (tempToken) {
     config.headers.Authorization = `Bearer ${tempToken}`;

@@ -3,16 +3,47 @@ import {apiClient} from "@shared/api/client";
 import {
   type CreateJobRequest,
   CreateJobRequestSchema,
+  type JobListParams,
+  type JobListResponse,
+  JobListResponseSchema,
   type JobResponse,
   JobResponseSchema,
-  type ListJobsResponse,
-  ListJobsResponseSchema,
-  type UpdateJobRequest,
-  UpdateJobRequestSchema,
 } from "../schemas";
 
 // ============================================
+// Get Available Jobs (with filters)
+// GET /api/v1/jobs
+// ============================================
+
+export const getAvailableJobs = async (params?: JobListParams): Promise<JobListResponse> => {
+  try {
+    // Filter out undefined/null values for cleaner query string
+    const queryParams: Record<string, string | number> = {};
+
+    if (params?.job_type) {
+      queryParams.job_type = params.job_type;
+    }
+    if (params?.bedroom_count) {
+      queryParams.bedroom_count = params.bedroom_count;
+    }
+    if (params?.skip !== undefined) {
+      queryParams.skip = params.skip;
+    }
+    if (params?.limit !== undefined) {
+      queryParams.limit = params.limit;
+    }
+
+    const response = await apiClient.get("/api/v1/jobs", {params: queryParams});
+    return JobListResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error getting available jobs:", error);
+    throw error;
+  }
+};
+
+// ============================================
 // Create Job (multipart/form-data)
+// POST /api/v1/jobs
 // ============================================
 
 export const createJob = async (
@@ -62,73 +93,16 @@ export const createJob = async (
 };
 
 // ============================================
-// List Jobs
+// Get Job By ID
+// GET /api/v1/jobs/{job_id}
 // ============================================
 
-export const listMyJobs = async (params?: {
-  limit?: number;
-  offset?: number;
-}): Promise<ListJobsResponse> => {
-  try {
-    const response = await apiClient.get("/api/v1/jobs/my", {params});
-    return ListJobsResponseSchema.parse(response.data);
-  } catch (error) {
-    console.error("Error listing my jobs:", error);
-    throw error;
-  }
-};
-
-export const listAvailableJobs = async (params?: {
-  limit?: number;
-  offset?: number;
-}): Promise<ListJobsResponse> => {
-  try {
-    const response = await apiClient.get("/api/v1/jobs/available", {params});
-    return ListJobsResponseSchema.parse(response.data);
-  } catch (error) {
-    console.error("Error listing available jobs:", error);
-    throw error;
-  }
-};
-
-// ============================================
-// Get Job
-// ============================================
-
-export const getJob = async (jobId: string): Promise<JobResponse> => {
+export const getJobById = async (jobId: string): Promise<JobResponse> => {
   try {
     const response = await apiClient.get(`/api/v1/jobs/${jobId}`);
     return JobResponseSchema.parse(response.data);
   } catch (error) {
     console.error(`Error getting job ${jobId}:`, error);
-    throw error;
-  }
-};
-
-// ============================================
-// Update Job
-// ============================================
-
-export const updateJob = async (jobId: string, data: UpdateJobRequest): Promise<JobResponse> => {
-  try {
-    const validated = UpdateJobRequestSchema.parse(data);
-    const response = await apiClient.put(`/api/v1/jobs/${jobId}`, validated);
-    return JobResponseSchema.parse(response.data);
-  } catch (error) {
-    console.error(`Error updating job ${jobId}:`, error);
-    throw error;
-  }
-};
-
-// ============================================
-// Cancel Job
-// ============================================
-
-export const cancelJob = async (jobId: string): Promise<void> => {
-  try {
-    await apiClient.post(`/api/v1/jobs/${jobId}/cancel`);
-  } catch (error) {
-    console.error(`Error cancelling job ${jobId}:`, error);
     throw error;
   }
 };

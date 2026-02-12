@@ -1,88 +1,59 @@
-import { createFileRoute } from "@tanstack/react-router";
+import {createFileRoute} from "@tanstack/react-router";
+import {useShallow} from "zustand/react/shallow";
 
-import { JobCard, type JobCardProps } from "@/entities/Job";
+import {
+  JobCard,
+  useAvailableJobs,
+  transformJobToCardProps,
+  useJobFiltersStore,
+  type JobListParams,
+} from "@/entities/Job";
 
-import { JobsFilter } from "@/widgets/JobsFilter";
+import {JobsFilter} from "@/widgets/JobsFilter";
 
-import { Button, PageHeader } from "@shared/ui";
+import {Button, PageHeader} from "@shared/ui";
 
 export const Route = createFileRoute("/(app)/jobs/")({
   component: JobsPage,
 });
 
-// Mock data for demonstration
-const mockJobs: JobCardProps[] = [
-  {
-    id: "1",
-    title: "2 Bedroom Delivery",
-    distance: 125,
-    isHotDeal: true,
-    isNewListing: true,
-    origin: {
-      city: "Chicago",
-      state: "IL",
-    },
-    destination: {
-      city: "Indianapolis",
-      state: "IN",
-    },
-    dates: {
-      start: "Aug 12-14",
-      end: "2023",
-    },
-    truckSize: {
-      type: "Medium",
-      length: "40'",
-    },
-    weight: 4200,
-    volume: 1200,
-    badges: {
-      verifiedMover: true,
-      paymentProtected: true,
-      escrow: true,
-    },
-    price: 1850,
-  },
-  {
-    id: "2",
-    title: "3 Bedroom Move",
-    distance: 85,
-    isHotDeal: false,
-    isNewListing: false,
-    origin: {
-      city: "Detroit",
-      state: "MI",
-    },
-    destination: {
-      city: "Columbus",
-      state: "OH",
-    },
-    dates: {
-      start: "Aug 18-20",
-      end: "2023",
-    },
-    truckSize: {
-      type: "Large",
-      length: "53'",
-    },
-    weight: 6500,
-    volume: 1800,
-    badges: {
-      verifiedMover: true,
-      paymentProtected: true,
-    },
-    price: 2450,
-  },
-];
-
 function JobsPage() {
+  const filters = useJobFiltersStore(
+    useShallow((state): JobListParams => ({
+      job_type: state.jobType,
+      bedroom_count: state.bedroomCount,
+      skip: state.skip,
+      limit: state.limit,
+    }))
+  );
+  const resetFilters = useJobFiltersStore((state) => state.actions.resetFilters);
+
+  const {data, isLoading, isError, error, refetch} = useAvailableJobs(filters);
+
   const handleViewDetails = (id: string | number) => {
+    // TODO: Navigate to job detail page when route is created
     console.log("View details for job:", id);
   };
 
   const handleClaimJob = (id: string | number) => {
+    // TODO: Implement claim job mutation
     console.log("Claim job:", id);
   };
+
+  const handleRefresh = () => {
+    refetch();
+  };
+
+  const handlePostNewJob = () => {
+    // TODO: Navigate to new job page when route is created
+    console.log("Post new job");
+  };
+
+  const handleResetFilters = () => {
+    resetFilters();
+  };
+
+  const jobs = data?.jobs.map(transformJobToCardProps) ?? [];
 
   return (
     <div>
@@ -90,10 +61,15 @@ function JobsPage() {
         title="Available Jobs"
         actions={
           <>
-            <Button variant="secondary" size="default">
-              Refresh Jobs
+            <Button
+              variant="secondary"
+              size="default"
+              onClick={handleRefresh}
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Refresh Jobs"}
             </Button>
-            <Button variant="primary" size="default">
+            <Button variant="primary" size="default" onClick={handlePostNewJob}>
               Post New Job
             </Button>
           </>
@@ -108,15 +84,54 @@ function JobsPage() {
         </aside>
 
         {/* Right Column: Jobs Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {mockJobs.map((job) => (
-            <JobCard
-              key={job.id}
-              {...job}
-              onViewDetails={handleViewDetails}
-              onClaimJob={handleClaimJob}
-            />
-          ))}
+        <div>
+          {isLoading && (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-gray-500">Loading jobs...</div>
+            </div>
+          )}
+
+          {isError && (
+            <div className="flex flex-col items-center justify-center py-12 gap-4">
+              <div className="text-red-500">
+                Failed to load jobs: {error?.message || "Unknown error"}
+              </div>
+              <Button variant="secondary" size="default" onClick={handleRefresh}>
+                Try Again
+              </Button>
+            </div>
+          )}
+
+          {!isLoading && !isError && jobs.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-12 gap-4">
+              <div className="text-gray-500">No jobs available</div>
+              <Button variant="secondary" size="default" onClick={handleResetFilters}>
+                Reset Filters
+              </Button>
+            </div>
+          )}
+
+          {!isLoading && !isError && jobs.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {jobs.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    {...job}
+                    onViewDetails={handleViewDetails}
+                    onClaimJob={handleClaimJob}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination info */}
+              {data && (
+                <div className="mt-6 text-center text-sm text-gray-500">
+                  Showing {data.jobs.length} of {data.total} jobs
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
