@@ -1,27 +1,17 @@
-import type { ComponentType, SVGProps } from "react";
-
 import type { FileRouteTypes } from "@/app/routeTree.gen";
-import {
-  AvailableJobsIcon,
-  ChatsIcon,
-  ClaimedJobsIcon,
-  DashboardIcon,
-  MyJobsIcon,
-  ProfileIcon,
-} from "@/shared/assets/icons/sidebar/SidebarIcons";
 
 export type AppRoutePaths = FileRouteTypes["to"];
 export interface SidebarItem {
   route: AppRoutePaths;
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  iconSrc: string;
   name: string;
 }
 
 export const sidebarItems: SidebarItem[] = [
-  { route: "/dashboard", name: "Dashboard", icon: DashboardIcon },
-  { route: "/jobs", name: "Available Jobs", icon: AvailableJobsIcon },
-  { route: "/my", name: "My Jobs", icon: MyJobsIcon },
-  { route: "/chat", name: "Chats", icon: ChatsIcon },
-  { route: "/claimed", name: "Claimed Jobs", icon: ClaimedJobsIcon },
-  { route: "/profile", name: "Profile", icon: ProfileIcon },
+  { route: "/dashboard", name: "Dashboard", iconSrc: "/assets/figma/icons/dashboard.svg" },
+  { route: "/jobs", name: "Available Jobs", iconSrc: "/assets/figma/icons/available-jobs.svg" },
+  { route: "/my", name: "My Jobs", iconSrc: "/assets/figma/icons/my-jobs.svg" },
+  { route: "/chat", name: "Chats", iconSrc: "/assets/figma/icons/chats.svg" },
+  { route: "/claimed", name: "Claimed Jobs", iconSrc: "/assets/figma/icons/claimed-jobs.svg" },
+  { route: "/profile", name: "Profile", iconSrc: "/assets/figma/icons/profile.svg" },
 ];

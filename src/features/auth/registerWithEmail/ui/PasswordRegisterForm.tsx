@@ -131,7 +131,11 @@ export const PasswordRegisterForm: React.FC<PasswordRegisterFormProps> = ({ onSu
 
       {setPassword.error && <ErrorMessage error={setPassword.error} />}
 
-      <Button type="submit" disabled={!isValid || setPassword.isPending}>
+      <Button
+        type="submit"
+        disabled={!isValid || setPassword.isPending}
+        className="w-full h-11 rounded-md font-medium text-base text-white bg-[#60A5FA] hover:bg-[#60A5FA]/90 disabled:bg-[rgba(96,165,250,0.6)] disabled:cursor-not-allowed disabled:hover:bg-[rgba(96,165,250,0.6)] transition-colors"
+      >
         {setPassword.isPending ? "Submitting..." : "Submit"}
       </Button>
     </form>

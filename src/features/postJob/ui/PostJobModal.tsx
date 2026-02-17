@@ -1,11 +1,11 @@
 import { useState } from "react";
 
 import { FileText } from "lucide-react";
+import { X } from "lucide-react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@shared/ui";
 
 import { usePostJobStore } from "../model/usePostJobStore";
-
 import { CancelJobDialog } from "./CancelJobDialog";
 import { SuccessJobDialog } from "./SuccessJobDialog";
 import { PostJobStep1 } from "./steps/PostJobStep1";
@@ -58,14 +58,25 @@ export const PostJobModal = ({ open, onClose }: PostJobModalProps) => {
 
   return (
     <>
-      <Dialog open={open && !showCancelDialog && !showSuccessDialog} onOpenChange={handleCloseClick}>
-        <DialogContent className="max-w-5xl p-0" showClose={true} onClose={handleCloseClick}>
+      <Dialog
+        open={open && !showCancelDialog && !showSuccessDialog}
+        onOpenChange={handleCloseClick}
+      >
+        <DialogContent className="max-w-5xl p-0" showClose={false} onClose={handleCloseClick}>
           {/* Header */}
-          <DialogHeader className="bg-[#60A5FA] px-6 py-4">
+          <DialogHeader className="bg-[#60A5FA] px-6 py-4 relative">
             <DialogTitle className="flex items-center gap-3 text-white text-xl font-bold">
               <FileText className="size-6" />
               Job Information
             </DialogTitle>
+            <button
+              type="button"
+              onClick={handleCloseClick}
+              className="inline-flex items-center justify-center size-8 rounded-sm opacity-80 hover:opacity-100 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 absolute right-6 top-1/2 -translate-y-1/2"
+              aria-label="Close"
+            >
+              <X className="size-6 text-white" />
+            </button>
           </DialogHeader>
 
           {/* Form Content */}
@@ -73,7 +84,9 @@ export const PostJobModal = ({ open, onClose }: PostJobModalProps) => {
             {currentStep === 1 && <PostJobStep1 onCancel={handleCloseClick} />}
             {currentStep === 2 && <PostJobStep2 onCancel={handleCloseClick} />}
             {currentStep === 3 && <PostJobStep3 onCancel={handleCloseClick} />}
-            {currentStep === 4 && <PostJobStep4 onCancel={handleCloseClick} onSuccess={handleSuccess} />}
+            {currentStep === 4 && (
+              <PostJobStep4 onCancel={handleCloseClick} onSuccess={handleSuccess} />
+            )}
           </div>
         </DialogContent>
       </Dialog>

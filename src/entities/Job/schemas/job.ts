@@ -1,8 +1,4 @@
-import {z} from "zod";
-
-// ============================================
-// Enums
-// ============================================
+import { z } from "zod";
 
 export const JobTypeSchema = z.enum(["residential", "office", "storage"]);
 
@@ -36,10 +32,6 @@ export type BedroomCount = z.infer<typeof BedroomCountSchema>;
 export type JobStatus = z.infer<typeof JobStatusSchema>;
 export type AdditionalService = z.infer<typeof AdditionalServiceSchema>;
 
-// ============================================
-// Job Response (full job object from API)
-// ============================================
-
 export const JobResponseSchema = z.object({
   id: z.string().uuid(),
   company_id: z.string().uuid(),
@@ -63,11 +55,6 @@ export const JobResponseSchema = z.object({
 
 export type JobResponse = z.infer<typeof JobResponseSchema>;
 
-// ============================================
-// Create Job Request (for multipart/form-data)
-// ============================================
-
-// Decimal pattern for payout_amount and cut_amount
 const decimalPattern = /^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$/;
 
 export const CreateJobRequestSchema = z.object({
@@ -92,48 +79,50 @@ export const CreateJobRequestSchema = z.object({
 
 export type CreateJobRequest = z.infer<typeof CreateJobRequestSchema>;
 
-// ============================================
-// Update Job Request
-// ============================================
-
 export const UpdateJobRequestSchema = CreateJobRequestSchema.partial();
 
 export type UpdateJobRequest = z.infer<typeof UpdateJobRequestSchema>;
 
-// ============================================
-// Job List Response (paginated)
-// ============================================
-
 export const JobListResponseSchema = z.object({
   jobs: z.array(JobResponseSchema),
   total: z.number().int(),
-  skip: z.number().int(),
+  offset: z.number().int(),
   limit: z.number().int(),
 });
 
 export type JobListResponse = z.infer<typeof JobListResponseSchema>;
 
-// ============================================
-// Job List Query Params
-// ============================================
-
 export const JobListParamsSchema = z.object({
   job_type: JobTypeSchema.optional().nullable(),
   bedroom_count: BedroomCountSchema.optional().nullable(),
-  skip: z.number().int().min(0).default(0),
+  offset: z.number().int().min(0).default(0),
   limit: z.number().int().min(1).max(100).default(20),
 });
 
 export type JobListParams = z.infer<typeof JobListParamsSchema>;
 
-// ============================================
-// My Jobs Query Params
-// ============================================
-
 export const MyJobsParamsSchema = z.object({
   status: JobStatusSchema.optional().nullable(),
-  skip: z.number().int().min(0).default(0),
+  offset: z.number().int().min(0).default(0),
   limit: z.number().int().min(1).max(100).default(20),
 });
 
 export type MyJobsParams = z.infer<typeof MyJobsParamsSchema>;
+
+export const ExportJobsRequestSchema = z.object({
+  job_ids: z.array(z.string().uuid()).optional().nullable(),
+});
+
+export type ExportJobsRequest = z.infer<typeof ExportJobsRequestSchema>;
+
+export const CancelJobsRequestSchema = z.object({
+  job_ids: z.array(z.string().uuid()).min(1, "At least one job id is required"),
+});
+
+export const CancelJobsResponseSchema = z.object({
+  cancelled_count: z.number().int(),
+  message: z.string(),
+});
+
+export type CancelJobsRequest = z.infer<typeof CancelJobsRequestSchema>;
+export type CancelJobsResponse = z.infer<typeof CancelJobsResponseSchema>;

@@ -1,9 +1,5 @@
 import {z} from "zod";
 
-// ============================================
-// User Info Schema (from login response)
-// ============================================
-
 export const UserInfoSchema = z.object({
   id: z.string(),
   email: z.string(),
@@ -14,18 +10,12 @@ export const UserInfoSchema = z.object({
 
 export type UserInfo = z.infer<typeof UserInfoSchema>;
 
-// ============================================
-// Registration Flow Schemas
-// ============================================
-
-// Send OTP Request
 export const SendOTPRequestSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
 export type SendOTPRequest = z.infer<typeof SendOTPRequestSchema>;
 
-// Send OTP Response
 export const SendOTPResponseSchema = z.object({
   message: z.string(),
   email: z.string().email(),
@@ -33,7 +23,6 @@ export const SendOTPResponseSchema = z.object({
 
 export type SendOTPResponse = z.infer<typeof SendOTPResponseSchema>;
 
-// Verify OTP Request
 export const VerifyOTPRequestSchema = z.object({
   email: z.string().email("Invalid email address"),
   otp_code: z
@@ -44,7 +33,6 @@ export const VerifyOTPRequestSchema = z.object({
 
 export type VerifyOTPRequest = z.infer<typeof VerifyOTPRequestSchema>;
 
-// Verify OTP Response
 export const VerifyOTPResponseSchema = z.object({
   temp_token: z.string(),
   message: z.string(),
@@ -66,7 +54,6 @@ export const SetPasswordResponseSchema = z.object({
 
 export type SetPasswordResponse = z.infer<typeof SetPasswordResponseSchema>;
 
-// Register Company Request
 export const RegisterCompanyRequestSchema = z.object({
   name: z.string().min(2, "Company name must be at least 2 characters").max(150),
   email: z.string().email("Invalid email address"),
@@ -83,7 +70,6 @@ export const RegisterCompanyRequestSchema = z.object({
 
 export type RegisterCompanyRequest = z.infer<typeof RegisterCompanyRequestSchema>;
 
-// Register Company Response
 export const RegisterCompanyResponseSchema = z.object({
   company_id: z.string(),
   message: z.string(),
@@ -91,11 +77,6 @@ export const RegisterCompanyResponseSchema = z.object({
 
 export type RegisterCompanyResponse = z.infer<typeof RegisterCompanyResponseSchema>;
 
-// ============================================
-// Login Flow Schemas
-// ============================================
-
-// Login Request
 export const LoginRequestSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
@@ -103,7 +84,6 @@ export const LoginRequestSchema = z.object({
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 
-// Login Response
 export const LoginResponseSchema = z.object({
   access_token: z.string(),
   refresh_token: z.string(),
@@ -113,18 +93,12 @@ export const LoginResponseSchema = z.object({
 
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
 
-// ============================================
-// Token Management Schemas
-// ============================================
-
-// Refresh Token Request
 export const RefreshTokenRequestSchema = z.object({
   refresh_token: z.string(),
 });
 
 export type RefreshTokenRequest = z.infer<typeof RefreshTokenRequestSchema>;
 
-// Refresh Token Response
 export const RefreshTokenResponseSchema = z.object({
   access_token: z.string(),
   refresh_token: z.string(),
@@ -133,14 +107,12 @@ export const RefreshTokenResponseSchema = z.object({
 
 export type RefreshTokenResponse = z.infer<typeof RefreshTokenResponseSchema>;
 
-// Logout Request
 export const LogoutRequestSchema = z.object({
   refresh_token: z.string(),
 });
 
 export type LogoutRequest = z.infer<typeof LogoutRequestSchema>;
 
-// Logout Response
 export const LogoutResponseSchema = z.object({
   message: z.string(),
 });
@@ -154,11 +126,6 @@ export const LogoutAllResponseSchema = z.object({
 
 export type LogoutAllResponse = z.infer<typeof LogoutAllResponseSchema>;
 
-// ============================================
-// Forgot Password Flow Schemas
-// ============================================
-
-// Forgot Password Request
 export const ForgotPasswordRequestSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
@@ -173,7 +140,6 @@ export const ForgotPasswordResponseSchema = z.object({
 
 export type ForgotPasswordResponse = z.infer<typeof ForgotPasswordResponseSchema>;
 
-// Forgot Password Verify OTP Request
 export const ForgotPasswordVerifyOTPRequestSchema = z.object({
   email: z.string().email("Invalid email address"),
   otp_code: z
@@ -184,7 +150,6 @@ export const ForgotPasswordVerifyOTPRequestSchema = z.object({
 
 export type ForgotPasswordVerifyOTPRequest = z.infer<typeof ForgotPasswordVerifyOTPRequestSchema>;
 
-// Forgot Password Verify OTP Response
 export const ForgotPasswordVerifyOTPResponseSchema = z.object({
   temp_token: z.string(),
   message: z.string(),
@@ -192,23 +157,32 @@ export const ForgotPasswordVerifyOTPResponseSchema = z.object({
 
 export type ForgotPasswordVerifyOTPResponse = z.infer<typeof ForgotPasswordVerifyOTPResponseSchema>;
 
-// Forgot Password Reset Request
 export const ForgotPasswordResetRequestSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export type ForgotPasswordResetRequest = z.infer<typeof ForgotPasswordResetRequestSchema>;
 
-// Forgot Password Reset Response
 export const ForgotPasswordResetResponseSchema = z.object({
   message: z.string(),
 });
 
 export type ForgotPasswordResetResponse = z.infer<typeof ForgotPasswordResetResponseSchema>;
 
-// ============================================
-// Company Profile Schema
-// ============================================
+
+const CompanyProfileDocumentSchema = z.object({
+  id: z.string().uuid(),
+  document_type: z.enum([
+    "mc_license",
+    "dot_certificate",
+    "insurance_certificate",
+    "business_license",
+  ]),
+  status: z.enum(["pending", "approved", "rejected"]),
+  uploaded_at: z.string().datetime(),
+  reviewed_at: z.string().datetime().nullable(),
+  rejection_reason: z.string().nullable(),
+});
 
 export const CompanyProfileResponseSchema = z.object({
   id: z.string().uuid(),
@@ -223,6 +197,10 @@ export const CompanyProfileResponseSchema = z.object({
   contact_person: z.string(),
   phone_number: z.string(),
   description: z.string().nullable(),
+  documents: z.array(CompanyProfileDocumentSchema).optional().default([]),
+  is_verified: z.boolean().nullable().optional(),
+  average_rating: z.number().nullable().optional(),
+  completed_jobs: z.number().int().nullable().optional(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
 });

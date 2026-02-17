@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -6,25 +6,46 @@ import { Button } from "@/shared/ui/Button/Button";
 import { Input } from "@/shared/ui/Input/Input";
 import { Textarea } from "@/shared/ui/Textarea/Textarea";
 
+import { useCompanyProfile } from "@/entities/Auth";
+
 export const Route = createFileRoute("/(app)/profile/company/")({
   component: CompanyInformationPage,
 });
 
 function CompanyInformationPage() {
+  const { data: companyProfile, isLoading, isError, refetch } = useCompanyProfile();
+
   const [formData, setFormData] = useState({
-    companyName: "TransAtlantic Logistics",
-    contactPerson: "John Smith",
-    emailAddress: "contact@transatlantic.com",
-    phoneNumber: "(312) 555-0198",
-    address: "1234 S Wabash Ave",
-    city: "Chicago",
-    state: "Illinois",
-    zipCode: "60605",
-    mcLicenseNumber: "MC-1234567",
-    dotNumber: "DOT-9876543",
-    companyDescription:
-      "We specialize in long-distance furniture transportation with over 10 years of experience. Our team of professionals ensures safe and timely delivery of your precious items.",
+    companyName: "",
+    contactPerson: "",
+    emailAddress: "",
+    phoneNumber: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    mcLicenseNumber: "",
+    dotNumber: "",
+    companyDescription: "",
   });
+
+  useEffect(() => {
+    if (!companyProfile) return;
+
+    setFormData({
+      companyName: companyProfile.name,
+      contactPerson: companyProfile.contact_person,
+      emailAddress: companyProfile.email,
+      phoneNumber: companyProfile.phone_number,
+      address: companyProfile.address,
+      city: companyProfile.city,
+      state: companyProfile.state,
+      zipCode: companyProfile.zip_code,
+      mcLicenseNumber: companyProfile.mc_license_number,
+      dotNumber: companyProfile.dot_number,
+      companyDescription: companyProfile.description ?? "",
+    });
+  }, [companyProfile]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -32,14 +53,44 @@ function CompanyInformationPage() {
   };
 
   const handleCancel = () => {
-    // Reset to initial values or navigate away
-    console.log("Cancel clicked");
+    if (!companyProfile) return;
+
+    setFormData({
+      companyName: companyProfile.name,
+      contactPerson: companyProfile.contact_person,
+      emailAddress: companyProfile.email,
+      phoneNumber: companyProfile.phone_number,
+      address: companyProfile.address,
+      city: companyProfile.city,
+      state: companyProfile.state,
+      zipCode: companyProfile.zip_code,
+      mcLicenseNumber: companyProfile.mc_license_number,
+      dotNumber: companyProfile.dot_number,
+      companyDescription: companyProfile.description ?? "",
+    });
   };
 
   const handleSave = () => {
-    // Save the form data
+    // TODO: Implement company profile update endpoint
     console.log("Save clicked", formData);
   };
+
+  if (isLoading) {
+    return <div className="text-[#666C72]">Loading company information...</div>;
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-3">
+        <p className="text-[#FF0000]">Failed to load company information.</p>
+        <div>
+          <Button variant="secondary" onClick={() => refetch()}>
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

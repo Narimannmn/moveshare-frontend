@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { usePostJobStore } from "../../model/usePostJobStore";
+import { MoveDetailsChecklist } from "../MoveDetailsChecklist";
 
 interface PostJobStep2Props {
   onCancel: () => void;
@@ -26,26 +27,44 @@ const LocationButton = ({ label, selected, onClick }: LocationButtonProps) => (
   </button>
 );
 
-export const PostJobStep2 = ({ onCancel }: PostJobStep2Props) => {
+export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
   const formData = usePostJobStore((state) => state.formData);
   const updateFormData = usePostJobStore((state) => state.actions.updateFormData);
   const nextStep = usePostJobStore((state) => state.actions.nextStep);
   const prevStep = usePostJobStore((state) => state.actions.prevStep);
 
   const [pickupAddress, setPickupAddress] = useState(formData.pickupAddress);
-  const [pickupBuildingType, setPickupBuildingType] = useState<"house" | "stairs" | "elevator">("house");
-  const [pickupFloor, setPickupFloor] = useState("");
+  const [pickupBuildingType, setPickupBuildingType] = useState<"house" | "stairs" | "elevator">(
+    "house"
+  );
+  const [pickupFloor, setPickupFloor] = useState(formData.pickupFloor);
   const [pickupDistance, setPickupDistance] = useState<"<50" | "50-100" | "100-200" | ">200">();
 
   const [deliveryAddress, setDeliveryAddress] = useState(formData.deliveryAddress);
-  const [deliveryBuildingType, setDeliveryBuildingType] = useState<"house" | "stairs" | "elevator">("house");
-  const [deliveryFloor, setDeliveryFloor] = useState("");
+  const [deliveryBuildingType, setDeliveryBuildingType] = useState<"house" | "stairs" | "elevator">(
+    "house"
+  );
+  const [deliveryFloor, setDeliveryFloor] = useState(formData.deliveryFloor);
   const [deliveryDistance, setDeliveryDistance] = useState<"<50" | "50-100" | "100-200" | ">200">();
+
+  useEffect(() => {
+    setPickupAddress(formData.pickupAddress);
+    setDeliveryAddress(formData.deliveryAddress);
+    setPickupFloor(formData.pickupFloor);
+    setDeliveryFloor(formData.deliveryFloor);
+  }, [
+    formData.deliveryAddress,
+    formData.deliveryFloor,
+    formData.pickupAddress,
+    formData.pickupFloor,
+  ]);
 
   const handleNext = () => {
     updateFormData({
       pickupAddress,
       deliveryAddress,
+      pickupFloor,
+      deliveryFloor,
     });
     nextStep();
   };
@@ -54,6 +73,8 @@ export const PostJobStep2 = ({ onCancel }: PostJobStep2Props) => {
     updateFormData({
       pickupAddress,
       deliveryAddress,
+      pickupFloor,
+      deliveryFloor,
     });
     prevStep();
   };
@@ -115,7 +136,8 @@ export const PostJobStep2 = ({ onCancel }: PostJobStep2Props) => {
           <select
             value={pickupFloor}
             onChange={(e) => setPickupFloor(e.target.value)}
-            className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA] bg-white"
+            className="w-full h-11 border border-[#D8D8D8] rounded-lg pl-10 pr-12 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA] bg-white"
+            style={{ textIndent: "8px" }}
           >
             <option value="">Select floor</option>
             {[...Array(20)].map((_, i) => (
@@ -189,7 +211,8 @@ export const PostJobStep2 = ({ onCancel }: PostJobStep2Props) => {
           <select
             value={deliveryFloor}
             onChange={(e) => setDeliveryFloor(e.target.value)}
-            className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA] bg-white"
+            className="w-full h-11 border border-[#D8D8D8] rounded-lg pl-10 pr-12 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA] bg-white"
+            style={{ textIndent: "8px" }}
           >
             <option value="">Select floor</option>
             {[...Array(20)].map((_, i) => (
@@ -224,7 +247,7 @@ export const PostJobStep2 = ({ onCancel }: PostJobStep2Props) => {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4 justify-end">
+        <div className="flex gap-4 justify-end pt-2">
           <button
             type="button"
             onClick={handleBack}
@@ -237,7 +260,9 @@ export const PostJobStep2 = ({ onCancel }: PostJobStep2Props) => {
             onClick={handleNext}
             disabled={!isValid}
             className={`h-11 rounded-lg px-4 py-2.5 text-base font-normal text-white min-w-[120px] ${
-              isValid ? "bg-[#60A5FA] hover:bg-[#5094E0]" : "bg-[rgba(96,165,250,0.6)] cursor-not-allowed"
+              isValid
+                ? "bg-[#60A5FA] hover:bg-[#5094E0]"
+                : "bg-[rgba(96,165,250,0.6)] cursor-not-allowed"
             }`}
           >
             Next Step
@@ -245,69 +270,13 @@ export const PostJobStep2 = ({ onCancel }: PostJobStep2Props) => {
         </div>
       </div>
 
-      {/* Right Column: Move Details Checklist */}
-      <MoveDetailsChecklist step={2} />
-    </div>
-  );
-};
-
-const MoveDetailsChecklist = ({ step }: { step: number }) => {
-  const formData = usePostJobStore((state) => state.formData);
-
-  const items = [
-    { label: "Job Title:", status: formData.jobType || "Select", completed: !!formData.jobType },
-    { label: "Number of rooms:", status: formData.bedroomCount ? `${formData.bedroomCount}` : "Select", completed: !!formData.bedroomCount },
-    { label: "Truck:", status: "Select", completed: step > 1 },
-    { label: "Job Description:", status: formData.description ? "Completed" : "Select", completed: !!formData.description },
-    { label: "Pickup Location:", status: formData.pickupAddress || "Select", completed: step >= 2 && !!formData.pickupAddress },
-    { label: "Delivery Location:", status: formData.deliveryAddress || "Select", completed: step >= 2 && !!formData.deliveryAddress },
-    { label: "Additional Services:", status: "Select", completed: step > 2 },
-    { label: "Loading Assistance:", status: "Select", completed: step > 2 },
-    { label: "Images of Items / PDF of Inventory List:", status: "Select", completed: step > 2 },
-    { label: "Pickup Date:", status: "Select", completed: step > 3 },
-    { label: "Pickup Time Window:", status: "Select", completed: step > 3 },
-    { label: "Delivery Date:", status: "Select", completed: step > 3 },
-    { label: "Delivery Time Window:", status: "Select", completed: step > 3 },
-    { label: "Payout Amount:", status: "Select", completed: step > 3 },
-    { label: "Payment ($):", status: "Select", completed: step > 3 },
-  ];
-
-  return (
-    <div className="flex-1 bg-[#F1F4F9] rounded-lg p-4 h-fit space-y-6">
-      <p className="text-base font-bold text-[#263238]">Move details</p>
-      <div className="space-y-4">
-        {items.map((item, index) => (
-          <ChecklistItem key={index} {...item} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-interface ChecklistItemProps {
-  label: string;
-  status: string;
-  completed?: boolean;
-}
-
-const ChecklistItem = ({ label, status, completed = false }: ChecklistItemProps) => {
-  return (
-    <div className={`flex gap-1 items-center ${!completed ? "opacity-50" : ""}`}>
-      <div className="flex gap-2 items-center shrink-0">
-        <div className="size-6 flex items-center justify-center">
-          <svg className="size-6" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M9 12l2 2 4-4"
-              stroke="#60A5FA"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-        <p className="text-sm font-bold text-[#2C3E50]">{label}</p>
-      </div>
-      <p className="text-sm font-normal text-[#A6A6A6]">{status}</p>
+      <MoveDetailsChecklist
+        step={2}
+        preview={{
+          pickupAddress,
+          deliveryAddress,
+        }}
+      />
     </div>
   );
 };

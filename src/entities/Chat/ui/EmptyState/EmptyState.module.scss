@@ -9,9 +9,20 @@
 }
 
 .icon {
-  font-size: 64px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: #f1f4f9;
+  color: #666c72;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 16px;
-  opacity: 0.5;
+}
+
+.icon :global(svg) {
+  width: 28px;
+  height: 28px;
 }
 
 .title {

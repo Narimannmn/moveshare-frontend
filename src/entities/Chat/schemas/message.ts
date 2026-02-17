@@ -12,7 +12,6 @@ export const MessageSchema = z.object({
 export const MessageListSchema = z.array(MessageSchema);
 
 export const SendMessageRequestSchema = z.object({
-  conversationId: z.string(),
   content: z.string().min(1, "Message cannot be empty"),
 });
 

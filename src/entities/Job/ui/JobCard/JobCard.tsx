@@ -62,6 +62,26 @@ export const JobCard = memo(
       onClaimJob?.(id);
     };
 
+    const formatLocation = (location: { city: string; state: string }) => {
+      const city = location.city.trim();
+      const state = location.state.trim();
+
+      if (city && state) {
+        return `${city}, ${state}`;
+      }
+      if (city) {
+        return city;
+      }
+      if (state) {
+        return state;
+      }
+
+      return "Unknown";
+    };
+
+    const originText = formatLocation(origin);
+    const destinationText = formatLocation(destination);
+
     return (
       <div className={cn(styles.card, className)}>
         {/* Header */}
@@ -79,37 +99,22 @@ export const JobCard = memo(
         {/* Route */}
         <div className={styles.route}>
           <div className={styles.location}>
-            <span className={styles.locationText}>
-              {origin.city}, {origin.state}
-            </span>
+            <span className={styles.locationText}>{originText}</span>
           </div>
           <div className={styles.arrow}>→</div>
           <div className={styles.location}>
-            <span className={styles.locationText}>
-              {destination.city}, {destination.state}
-            </span>
+            <span className={styles.locationText}>{destinationText}</span>
           </div>
         </div>
 
         {/* Map Placeholder */}
         <div className={styles.mapContainer}>
           <div className={styles.map}>
-            {/* Map visualization would go here */}
-            <div className={styles.mapPin} style={{ left: "25%", top: "40%" }}>
-              📍
-            </div>
-            <div className={styles.mapPin} style={{ left: "75%", top: "55%" }}>
-              📍
-            </div>
-            <svg className={styles.mapRoute} viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path
-                d="M 25 40 Q 50 20, 75 55"
-                stroke="white"
-                strokeWidth="1"
-                fill="none"
-                strokeDasharray="5,5"
-              />
-            </svg>
+            <img
+              src="/assets/figma/images/job-map.svg"
+              alt={`${originText} to ${destinationText} route`}
+              className={styles.mapImage}
+            />
           </div>
         </div>
 
@@ -140,7 +145,6 @@ export const JobCard = memo(
             <span className={styles.detailValue}>{volume.toLocaleString()} cu ft</span>
           </div>
         </div>
-
 
         {/* Footer */}
         <div className={styles.footer}>

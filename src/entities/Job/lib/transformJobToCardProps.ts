@@ -1,6 +1,104 @@
 import type {JobResponse} from "../schemas";
 import type {JobCardProps} from "../ui/JobCard/JobCard";
 
+const US_STATE_NAME_TO_ABBREVIATION: Record<string, string> = {
+  alabama: "AL",
+  alaska: "AK",
+  arizona: "AZ",
+  arkansas: "AR",
+  california: "CA",
+  colorado: "CO",
+  connecticut: "CT",
+  delaware: "DE",
+  "district of columbia": "DC",
+  florida: "FL",
+  georgia: "GA",
+  hawaii: "HI",
+  idaho: "ID",
+  illinois: "IL",
+  indiana: "IN",
+  iowa: "IA",
+  kansas: "KS",
+  kentucky: "KY",
+  louisiana: "LA",
+  maine: "ME",
+  maryland: "MD",
+  massachusetts: "MA",
+  michigan: "MI",
+  minnesota: "MN",
+  mississippi: "MS",
+  missouri: "MO",
+  montana: "MT",
+  nebraska: "NE",
+  nevada: "NV",
+  "new hampshire": "NH",
+  "new jersey": "NJ",
+  "new mexico": "NM",
+  "new york": "NY",
+  "north carolina": "NC",
+  "north dakota": "ND",
+  ohio: "OH",
+  oklahoma: "OK",
+  oregon: "OR",
+  pennsylvania: "PA",
+  "rhode island": "RI",
+  "south carolina": "SC",
+  "south dakota": "SD",
+  tennessee: "TN",
+  texas: "TX",
+  utah: "UT",
+  vermont: "VT",
+  virginia: "VA",
+  washington: "WA",
+  "west virginia": "WV",
+  wisconsin: "WI",
+  wyoming: "WY",
+};
+
+const US_STATE_ABBREVIATIONS = new Set(Object.values(US_STATE_NAME_TO_ABBREVIATION));
+
+const normalizeState = (rawState: string): string => {
+  const abbreviationMatches = rawState.match(/\b([A-Za-z]{2})\b/g) ?? [];
+  for (const match of abbreviationMatches) {
+    const upper = match.toUpperCase();
+    if (US_STATE_ABBREVIATIONS.has(upper)) {
+      return upper;
+    }
+  }
+
+  const cleanedState = rawState
+    .toLowerCase()
+    .replace(/[0-9]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!cleanedState) {
+    return "";
+  }
+
+  if (US_STATE_NAME_TO_ABBREVIATION[cleanedState]) {
+    return US_STATE_NAME_TO_ABBREVIATION[cleanedState];
+  }
+
+  let matchedStateName = "";
+  for (const stateName of Object.keys(US_STATE_NAME_TO_ABBREVIATION)) {
+    if (cleanedState.includes(stateName) && stateName.length > matchedStateName.length) {
+      matchedStateName = stateName;
+    }
+  }
+
+  if (matchedStateName) {
+    return US_STATE_NAME_TO_ABBREVIATION[matchedStateName];
+  }
+
+  const fallbackToken = cleanedState.split(" ")[0] ?? "";
+  if (fallbackToken.length === 2) {
+    return fallbackToken.toUpperCase();
+  }
+
+  return rawState.trim();
+};
+
 /**
  * Parses an address string to extract city and state
  * Expected format: "123 Street, City, State ZIP" or similar
@@ -9,12 +107,10 @@ const parseAddress = (address: string): {city: string; state: string} => {
   const parts = address.split(",").map((p) => p.trim());
 
   if (parts.length >= 2) {
-    // Try to get city from second-to-last part and state from last part
+    // Expected shape: street, city, state zip
     const city = parts[parts.length - 2] || "Unknown";
-    const stateZip = parts[parts.length - 1] || "";
-    // Extract state abbreviation (first 2-letter word)
-    const stateMatch = stateZip.match(/\b([A-Z]{2})\b/);
-    const state = stateMatch ? stateMatch[1] : stateZip.split(" ")[0] || "??";
+    const stateSource = parts[parts.length - 1] || "";
+    const state = normalizeState(stateSource);
     return {city, state};
   }
 
@@ -49,9 +145,6 @@ const formatBedroomTitle = (
   return jobTypeMap[jobType] || "Move";
 };
 
-/**
- * Formats datetime to display format
- */
 const formatDateRange = (
   pickupDatetime: string,
   deliveryDatetime: string
@@ -85,9 +178,7 @@ const formatDateRange = (
   };
 };
 
-/**
- * Gets truck size based on bedroom count
- */
+
 const getTruckSize = (
   bedroomCount: JobResponse["bedroom_count"]
 ): {type: string; length: string} => {

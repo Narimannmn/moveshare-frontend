@@ -51,7 +51,12 @@ export const useAuthStore = create<AuthStore>()(
 
           clearRegistrationEmail: () => set({ registrationEmail: null }),
 
-          updateTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
+          updateTokens: (accessToken, refreshToken) =>
+            set({
+              accessToken,
+              refreshToken,
+              tempToken: null,
+            }),
 
           logout: () => set(initialState),
         },

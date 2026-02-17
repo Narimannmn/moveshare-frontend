@@ -1,8 +1,14 @@
-import {apiClient} from "@shared/api/client";
+import { apiClient } from "@shared/api/client";
 
 import {
+  type CancelJobsRequest,
+  CancelJobsRequestSchema,
+  type CancelJobsResponse,
+  CancelJobsResponseSchema,
   type CreateJobRequest,
   CreateJobRequestSchema,
+  type ExportJobsRequest,
+  ExportJobsRequestSchema,
   type JobListParams,
   type JobListResponse,
   JobListResponseSchema,
@@ -27,14 +33,14 @@ export const getAvailableJobs = async (params?: JobListParams): Promise<JobListR
     if (params?.bedroom_count) {
       queryParams.bedroom_count = params.bedroom_count;
     }
-    if (params?.skip !== undefined) {
-      queryParams.skip = params.skip;
+    if (params?.offset !== undefined) {
+      queryParams.offset = params.offset;
     }
     if (params?.limit !== undefined) {
       queryParams.limit = params.limit;
     }
 
-    const response = await apiClient.get("/api/v1/jobs", {params: queryParams});
+    const response = await apiClient.get("/api/v1/jobs", { params: queryParams });
     return JobListResponseSchema.parse(response.data);
   } catch (error) {
     console.error("Error getting available jobs:", error);
@@ -83,7 +89,7 @@ export const createJob = async (
     }
 
     const response = await apiClient.post("/api/v1/jobs", formData, {
-      headers: {"Content-Type": "multipart/form-data"},
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
     return JobResponseSchema.parse(response.data);
@@ -120,17 +126,52 @@ export const getMyJobs = async (params?: MyJobsParams): Promise<JobListResponse>
     if (params?.status) {
       queryParams.status = params.status;
     }
-    if (params?.skip !== undefined) {
-      queryParams.skip = params.skip;
+    if (params?.offset !== undefined) {
+      queryParams.offset = params.offset;
     }
     if (params?.limit !== undefined) {
       queryParams.limit = params.limit;
     }
 
-    const response = await apiClient.get("/api/v1/jobs/my", {params: queryParams});
+    const response = await apiClient.get("/api/v1/jobs/my", { params: queryParams });
     return JobListResponseSchema.parse(response.data);
   } catch (error) {
     console.error("Error getting my jobs:", error);
+    throw error;
+  }
+};
+
+// ============================================
+// Export Jobs CSV
+// POST /api/v1/jobs/export/csv
+// ============================================
+
+export const exportJobsCsv = async (request?: ExportJobsRequest): Promise<Blob> => {
+  try {
+    const validated = ExportJobsRequestSchema.parse(request ?? {});
+    const response = await apiClient.post("/api/v1/jobs/export/csv", validated, {
+      responseType: "blob",
+    });
+
+    return response.data as Blob;
+  } catch (error) {
+    console.error("Error exporting jobs csv:", error);
+    throw error;
+  }
+};
+
+// ============================================
+// Cancel Jobs (bulk)
+// POST /api/v1/jobs/bulk/cancel
+// ============================================
+
+export const cancelJobs = async (request: CancelJobsRequest): Promise<CancelJobsResponse> => {
+  try {
+    const validated = CancelJobsRequestSchema.parse(request);
+    const response = await apiClient.post("/api/v1/jobs/bulk/cancel", validated);
+    return CancelJobsResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error cancelling jobs:", error);
     throw error;
   }
 };

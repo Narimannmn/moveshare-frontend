@@ -2,8 +2,12 @@ import { memo, useEffect, useMemo, useRef } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { cn } from "@/shared/lib/utils";
+import { CircleX, Loader2, MessageCircleOff, MessageSquare } from "lucide-react";
 
+import { cn } from "@/shared/lib/utils";
+import { getJwtSubject } from "@/shared/utils/jwt/getJwtSubject";
+
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 import { EmptyState, MessageBubble, useConversations, useMessages } from "@/entities/Chat";
 
 import styles from "./MessageThread.module.scss";
@@ -13,11 +17,15 @@ export interface MessageThreadProps {
   className?: string;
 }
 
-const CURRENT_USER_ID = "1";
-
 const BackArrowIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M15 18L9 12L15 6" stroke="#202224" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M15 18L9 12L15 6"
+      stroke="#202224"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
@@ -35,6 +43,8 @@ const WarningIcon = () => (
 
 export const MessageThread = memo(({ conversationId, className }: MessageThreadProps) => {
   const navigate = useNavigate();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const currentUserId = useMemo(() => getJwtSubject(accessToken) ?? "", [accessToken]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { data: messages, isLoading, isError } = useMessages(conversationId);
   const { data: conversations } = useConversations();
@@ -44,8 +54,13 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
   }, [conversations, conversationId]);
 
   const otherUser = useMemo(() => {
-    return conversation?.participants.find((p) => p.id !== CURRENT_USER_ID) ?? null;
-  }, [conversation]);
+    if (!conversation) return null;
+    if (!currentUserId) return conversation.participants[0] ?? null;
+
+    return (
+      conversation.participants.find((participant) => participant.id !== currentUserId) ?? null
+    );
+  }, [conversation, currentUserId]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -62,7 +77,7 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
     return (
       <div className={cn(styles.container, className)}>
         <EmptyState
-          icon="💬"
+          icon={<MessageCircleOff />}
           title="No conversation selected"
           message="Select a conversation to start messaging"
         />
@@ -73,7 +88,11 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
   if (isLoading) {
     return (
       <div className={cn(styles.container, className)}>
-        <EmptyState icon="⏳" title="Loading messages" message="Please wait..." />
+        <EmptyState
+          icon={<Loader2 className="animate-spin" />}
+          title="Loading messages"
+          message="Please wait..."
+        />
       </div>
     );
   }
@@ -81,7 +100,11 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
   if (isError) {
     return (
       <div className={cn(styles.container, className)}>
-        <EmptyState icon="❌" title="Error loading messages" message="Please try again later" />
+        <EmptyState
+          icon={<CircleX />}
+          title="Error loading messages"
+          message="Please try again later"
+        />
       </div>
     );
   }
@@ -98,7 +121,7 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
           </div>
         </div>
         <EmptyState
-          icon="💭"
+          icon={<MessageSquare />}
           title="No messages yet"
           message="Send a message to start the conversation"
         />
@@ -135,7 +158,7 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
           <MessageBubble
             key={message.id}
             message={message}
-            isOwnMessage={message.senderId === CURRENT_USER_ID}
+            isOwnMessage={currentUserId ? message.senderId === currentUserId : false}
             senderName={otherUser?.name}
             senderAvatar={otherUser?.avatar}
           />

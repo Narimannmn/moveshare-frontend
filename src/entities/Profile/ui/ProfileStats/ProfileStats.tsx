@@ -6,12 +6,14 @@ import styles from "./ProfileStats.module.scss";
 
 export interface ProfileStatsProps {
   jobsCompleted: number;
-  averageRating: number;
+  averageRating: number | null;
   className?: string;
 }
 
 export const ProfileStats = memo(
   ({ jobsCompleted, averageRating, className }: ProfileStatsProps) => {
+    const formattedRating = averageRating === null ? "N/A" : averageRating.toFixed(1);
+
     return (
       <div className={cn(styles.container, className)}>
         <div className={styles.statCard}>
@@ -20,7 +22,7 @@ export const ProfileStats = memo(
         </div>
 
         <div className={styles.statCard}>
-          <div className={styles.value}>{averageRating.toFixed(1)}</div>
+          <div className={styles.value}>{formattedRating}</div>
           <div className={styles.label}>Average Rating</div>
         </div>
       </div>

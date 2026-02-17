@@ -1,5 +1,7 @@
 import { memo } from "react";
 
+import { useCompanyProfile } from "@/entities/Auth/api";
+import { useMyJobs } from "@/entities/Job/api";
 import { cn } from "@/shared/lib/utils";
 
 import { ProfileAvatar } from "../ProfileAvatar";
@@ -11,30 +13,28 @@ export interface ProfileCardProps {
   className?: string;
 }
 
-const mockData = {
-  name: "TransAtlantic Logistics",
-  email: "contact@transatlantic.com",
-  isVerified: true,
-  jobsCompleted: 42,
-  averageRating: 4.8,
-};
-
 export const ProfileCard = memo(({ className }: ProfileCardProps) => {
+  const { data: companyProfile } = useCompanyProfile();
+  const { data: completedJobsData } = useMyJobs({
+    status: "completed",
+    offset: 0,
+    limit: 1,
+  });
+
+  const companyName = companyProfile?.name || "Company";
+  const email = companyProfile?.email || "No email";
+  const isVerified = companyProfile?.is_verified ?? false;
+  const jobsCompleted = companyProfile?.completed_jobs ?? completedJobsData?.total ?? 0;
+  const averageRating = companyProfile?.average_rating ?? null;
+
   return (
     <div className={cn(styles.card, className)}>
       <div className={styles.content}>
-        <ProfileAvatar name={mockData.name} size="xl" editable />
+        <ProfileAvatar name={companyName} size="xl" editable />
 
-        <ProfileHeader
-          companyName={mockData.name}
-          email={mockData.email}
-          isVerified={mockData.isVerified}
-        />
+        <ProfileHeader companyName={companyName} email={email} isVerified={isVerified} />
 
-        <ProfileStats
-          jobsCompleted={mockData.jobsCompleted}
-          averageRating={mockData.averageRating}
-        />
+        <ProfileStats jobsCompleted={jobsCompleted} averageRating={averageRating} />
       </div>
     </div>
   );

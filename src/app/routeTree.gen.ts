@@ -13,6 +13,7 @@ import { Route as authRouteRouteImport } from './../pages/(auth)/route'
 import { Route as appRouteRouteImport } from './../pages/(app)/route'
 import { Route as IndexRouteImport } from './../pages/index'
 import { Route as appProfileRouteRouteImport } from './../pages/(app)/profile/route'
+import { Route as appAdminRouteRouteImport } from './../pages/(app)/admin/route'
 import { Route as authRegisterIndexRouteImport } from './../pages/(auth)/register/index'
 import { Route as authLoginIndexRouteImport } from './../pages/(auth)/login/index'
 import { Route as authForgotIndexRouteImport } from './../pages/(auth)/forgot/index'
@@ -22,6 +23,7 @@ import { Route as appJobsIndexRouteImport } from './../pages/(app)/jobs/index'
 import { Route as appDashboardIndexRouteImport } from './../pages/(app)/dashboard/index'
 import { Route as appClaimedIndexRouteImport } from './../pages/(app)/claimed/index'
 import { Route as appChatIndexRouteImport } from './../pages/(app)/chat/index'
+import { Route as appAdminIndexRouteImport } from './../pages/(app)/admin/index'
 import { Route as authRegisterVerifyRouteImport } from './../pages/(auth)/register/verify'
 import { Route as authRegisterVerificationRouteImport } from './../pages/(auth)/register/verification'
 import { Route as authRegisterReviewRouteImport } from './../pages/(auth)/register/review'
@@ -35,6 +37,12 @@ import { Route as appProfilePaymentIndexRouteImport } from './../pages/(app)/pro
 import { Route as appProfileNotificationsIndexRouteImport } from './../pages/(app)/profile/notifications/index'
 import { Route as appProfileFleetIndexRouteImport } from './../pages/(app)/profile/fleet/index'
 import { Route as appProfileCompanyIndexRouteImport } from './../pages/(app)/profile/company/index'
+import { Route as appAdminSupportIndexRouteImport } from './../pages/(app)/admin/support/index'
+import { Route as appAdminSettingIndexRouteImport } from './../pages/(app)/admin/setting/index'
+import { Route as appAdminReviewCompanyIndexRouteImport } from './../pages/(app)/admin/review-company/index'
+import { Route as appAdminFreezeCompanyIndexRouteImport } from './../pages/(app)/admin/freeze-company/index'
+import { Route as appAdminFinanceIndexRouteImport } from './../pages/(app)/admin/finance/index'
+import { Route as appAdminCommissionIndexRouteImport } from './../pages/(app)/admin/commission/index'
 
 const authRouteRoute = authRouteRouteImport.update({
   id: '/(auth)',
@@ -52,6 +60,11 @@ const IndexRoute = IndexRouteImport.update({
 const appProfileRouteRoute = appProfileRouteRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => appRouteRoute,
+} as any)
+const appAdminRouteRoute = appAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => appRouteRoute,
 } as any)
 const authRegisterIndexRoute = authRegisterIndexRouteImport.update({
@@ -98,6 +111,11 @@ const appChatIndexRoute = appChatIndexRouteImport.update({
   id: '/chat/',
   path: '/chat/',
   getParentRoute: () => appRouteRoute,
+} as any)
+const appAdminIndexRoute = appAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => appAdminRouteRoute,
 } as any)
 const authRegisterVerifyRoute = authRegisterVerifyRouteImport.update({
   id: '/register/verify',
@@ -167,9 +185,42 @@ const appProfileCompanyIndexRoute = appProfileCompanyIndexRouteImport.update({
   path: '/company/',
   getParentRoute: () => appProfileRouteRoute,
 } as any)
+const appAdminSupportIndexRoute = appAdminSupportIndexRouteImport.update({
+  id: '/support/',
+  path: '/support/',
+  getParentRoute: () => appAdminRouteRoute,
+} as any)
+const appAdminSettingIndexRoute = appAdminSettingIndexRouteImport.update({
+  id: '/setting/',
+  path: '/setting/',
+  getParentRoute: () => appAdminRouteRoute,
+} as any)
+const appAdminReviewCompanyIndexRoute =
+  appAdminReviewCompanyIndexRouteImport.update({
+    id: '/review-company/',
+    path: '/review-company/',
+    getParentRoute: () => appAdminRouteRoute,
+  } as any)
+const appAdminFreezeCompanyIndexRoute =
+  appAdminFreezeCompanyIndexRouteImport.update({
+    id: '/freeze-company/',
+    path: '/freeze-company/',
+    getParentRoute: () => appAdminRouteRoute,
+  } as any)
+const appAdminFinanceIndexRoute = appAdminFinanceIndexRouteImport.update({
+  id: '/finance/',
+  path: '/finance/',
+  getParentRoute: () => appAdminRouteRoute,
+} as any)
+const appAdminCommissionIndexRoute = appAdminCommissionIndexRouteImport.update({
+  id: '/commission/',
+  path: '/commission/',
+  getParentRoute: () => appAdminRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof appAdminRouteRouteWithChildren
   '/profile': typeof appProfileRouteRouteWithChildren
   '/chat/$id': typeof appChatIdRoute
   '/login/verify': typeof authLoginVerifyRoute
@@ -178,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/register/review': typeof authRegisterReviewRoute
   '/register/verification': typeof authRegisterVerificationRoute
   '/register/verify': typeof authRegisterVerifyRoute
+  '/admin/': typeof appAdminIndexRoute
   '/chat': typeof appChatIndexRoute
   '/claimed': typeof appClaimedIndexRoute
   '/dashboard': typeof appDashboardIndexRoute
@@ -187,6 +239,12 @@ export interface FileRoutesByFullPath {
   '/forgot': typeof authForgotIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
+  '/admin/commission': typeof appAdminCommissionIndexRoute
+  '/admin/finance': typeof appAdminFinanceIndexRoute
+  '/admin/freeze-company': typeof appAdminFreezeCompanyIndexRoute
+  '/admin/review-company': typeof appAdminReviewCompanyIndexRoute
+  '/admin/setting': typeof appAdminSettingIndexRoute
+  '/admin/support': typeof appAdminSupportIndexRoute
   '/profile/company': typeof appProfileCompanyIndexRoute
   '/profile/fleet': typeof appProfileFleetIndexRoute
   '/profile/notifications': typeof appProfileNotificationsIndexRoute
@@ -203,6 +261,7 @@ export interface FileRoutesByTo {
   '/register/review': typeof authRegisterReviewRoute
   '/register/verification': typeof authRegisterVerificationRoute
   '/register/verify': typeof authRegisterVerifyRoute
+  '/admin': typeof appAdminIndexRoute
   '/chat': typeof appChatIndexRoute
   '/claimed': typeof appClaimedIndexRoute
   '/dashboard': typeof appDashboardIndexRoute
@@ -212,6 +271,12 @@ export interface FileRoutesByTo {
   '/forgot': typeof authForgotIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
+  '/admin/commission': typeof appAdminCommissionIndexRoute
+  '/admin/finance': typeof appAdminFinanceIndexRoute
+  '/admin/freeze-company': typeof appAdminFreezeCompanyIndexRoute
+  '/admin/review-company': typeof appAdminReviewCompanyIndexRoute
+  '/admin/setting': typeof appAdminSettingIndexRoute
+  '/admin/support': typeof appAdminSupportIndexRoute
   '/profile/company': typeof appProfileCompanyIndexRoute
   '/profile/fleet': typeof appProfileFleetIndexRoute
   '/profile/notifications': typeof appProfileNotificationsIndexRoute
@@ -224,6 +289,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteRouteWithChildren
   '/(auth)': typeof authRouteRouteWithChildren
+  '/(app)/admin': typeof appAdminRouteRouteWithChildren
   '/(app)/profile': typeof appProfileRouteRouteWithChildren
   '/(app)/chat/$id': typeof appChatIdRoute
   '/(auth)/login/verify': typeof authLoginVerifyRoute
@@ -232,6 +298,7 @@ export interface FileRoutesById {
   '/(auth)/register/review': typeof authRegisterReviewRoute
   '/(auth)/register/verification': typeof authRegisterVerificationRoute
   '/(auth)/register/verify': typeof authRegisterVerifyRoute
+  '/(app)/admin/': typeof appAdminIndexRoute
   '/(app)/chat/': typeof appChatIndexRoute
   '/(app)/claimed/': typeof appClaimedIndexRoute
   '/(app)/dashboard/': typeof appDashboardIndexRoute
@@ -241,6 +308,12 @@ export interface FileRoutesById {
   '/(auth)/forgot/': typeof authForgotIndexRoute
   '/(auth)/login/': typeof authLoginIndexRoute
   '/(auth)/register/': typeof authRegisterIndexRoute
+  '/(app)/admin/commission/': typeof appAdminCommissionIndexRoute
+  '/(app)/admin/finance/': typeof appAdminFinanceIndexRoute
+  '/(app)/admin/freeze-company/': typeof appAdminFreezeCompanyIndexRoute
+  '/(app)/admin/review-company/': typeof appAdminReviewCompanyIndexRoute
+  '/(app)/admin/setting/': typeof appAdminSettingIndexRoute
+  '/(app)/admin/support/': typeof appAdminSupportIndexRoute
   '/(app)/profile/company/': typeof appProfileCompanyIndexRoute
   '/(app)/profile/fleet/': typeof appProfileFleetIndexRoute
   '/(app)/profile/notifications/': typeof appProfileNotificationsIndexRoute
@@ -252,6 +325,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/profile'
     | '/chat/$id'
     | '/login/verify'
@@ -260,6 +334,7 @@ export interface FileRouteTypes {
     | '/register/review'
     | '/register/verification'
     | '/register/verify'
+    | '/admin/'
     | '/chat'
     | '/claimed'
     | '/dashboard'
@@ -269,6 +344,12 @@ export interface FileRouteTypes {
     | '/forgot'
     | '/login'
     | '/register'
+    | '/admin/commission'
+    | '/admin/finance'
+    | '/admin/freeze-company'
+    | '/admin/review-company'
+    | '/admin/setting'
+    | '/admin/support'
     | '/profile/company'
     | '/profile/fleet'
     | '/profile/notifications'
@@ -285,6 +366,7 @@ export interface FileRouteTypes {
     | '/register/review'
     | '/register/verification'
     | '/register/verify'
+    | '/admin'
     | '/chat'
     | '/claimed'
     | '/dashboard'
@@ -294,6 +376,12 @@ export interface FileRouteTypes {
     | '/forgot'
     | '/login'
     | '/register'
+    | '/admin/commission'
+    | '/admin/finance'
+    | '/admin/freeze-company'
+    | '/admin/review-company'
+    | '/admin/setting'
+    | '/admin/support'
     | '/profile/company'
     | '/profile/fleet'
     | '/profile/notifications'
@@ -305,6 +393,7 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/(auth)'
+    | '/(app)/admin'
     | '/(app)/profile'
     | '/(app)/chat/$id'
     | '/(auth)/login/verify'
@@ -313,6 +402,7 @@ export interface FileRouteTypes {
     | '/(auth)/register/review'
     | '/(auth)/register/verification'
     | '/(auth)/register/verify'
+    | '/(app)/admin/'
     | '/(app)/chat/'
     | '/(app)/claimed/'
     | '/(app)/dashboard/'
@@ -322,6 +412,12 @@ export interface FileRouteTypes {
     | '/(auth)/forgot/'
     | '/(auth)/login/'
     | '/(auth)/register/'
+    | '/(app)/admin/commission/'
+    | '/(app)/admin/finance/'
+    | '/(app)/admin/freeze-company/'
+    | '/(app)/admin/review-company/'
+    | '/(app)/admin/setting/'
+    | '/(app)/admin/support/'
     | '/(app)/profile/company/'
     | '/(app)/profile/fleet/'
     | '/(app)/profile/notifications/'
@@ -364,6 +460,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof appProfileRouteRouteImport
+      parentRoute: typeof appRouteRoute
+    }
+    '/(app)/admin': {
+      id: '/(app)/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof appAdminRouteRouteImport
       parentRoute: typeof appRouteRoute
     }
     '/(auth)/register/': {
@@ -428,6 +531,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/chat'
       preLoaderRoute: typeof appChatIndexRouteImport
       parentRoute: typeof appRouteRoute
+    }
+    '/(app)/admin/': {
+      id: '/(app)/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof appAdminIndexRouteImport
+      parentRoute: typeof appAdminRouteRoute
     }
     '/(auth)/register/verify': {
       id: '/(auth)/register/verify'
@@ -520,8 +630,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appProfileCompanyIndexRouteImport
       parentRoute: typeof appProfileRouteRoute
     }
+    '/(app)/admin/support/': {
+      id: '/(app)/admin/support/'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof appAdminSupportIndexRouteImport
+      parentRoute: typeof appAdminRouteRoute
+    }
+    '/(app)/admin/setting/': {
+      id: '/(app)/admin/setting/'
+      path: '/setting'
+      fullPath: '/admin/setting'
+      preLoaderRoute: typeof appAdminSettingIndexRouteImport
+      parentRoute: typeof appAdminRouteRoute
+    }
+    '/(app)/admin/review-company/': {
+      id: '/(app)/admin/review-company/'
+      path: '/review-company'
+      fullPath: '/admin/review-company'
+      preLoaderRoute: typeof appAdminReviewCompanyIndexRouteImport
+      parentRoute: typeof appAdminRouteRoute
+    }
+    '/(app)/admin/freeze-company/': {
+      id: '/(app)/admin/freeze-company/'
+      path: '/freeze-company'
+      fullPath: '/admin/freeze-company'
+      preLoaderRoute: typeof appAdminFreezeCompanyIndexRouteImport
+      parentRoute: typeof appAdminRouteRoute
+    }
+    '/(app)/admin/finance/': {
+      id: '/(app)/admin/finance/'
+      path: '/finance'
+      fullPath: '/admin/finance'
+      preLoaderRoute: typeof appAdminFinanceIndexRouteImport
+      parentRoute: typeof appAdminRouteRoute
+    }
+    '/(app)/admin/commission/': {
+      id: '/(app)/admin/commission/'
+      path: '/commission'
+      fullPath: '/admin/commission'
+      preLoaderRoute: typeof appAdminCommissionIndexRouteImport
+      parentRoute: typeof appAdminRouteRoute
+    }
   }
 }
+
+interface appAdminRouteRouteChildren {
+  appAdminIndexRoute: typeof appAdminIndexRoute
+  appAdminCommissionIndexRoute: typeof appAdminCommissionIndexRoute
+  appAdminFinanceIndexRoute: typeof appAdminFinanceIndexRoute
+  appAdminFreezeCompanyIndexRoute: typeof appAdminFreezeCompanyIndexRoute
+  appAdminReviewCompanyIndexRoute: typeof appAdminReviewCompanyIndexRoute
+  appAdminSettingIndexRoute: typeof appAdminSettingIndexRoute
+  appAdminSupportIndexRoute: typeof appAdminSupportIndexRoute
+}
+
+const appAdminRouteRouteChildren: appAdminRouteRouteChildren = {
+  appAdminIndexRoute: appAdminIndexRoute,
+  appAdminCommissionIndexRoute: appAdminCommissionIndexRoute,
+  appAdminFinanceIndexRoute: appAdminFinanceIndexRoute,
+  appAdminFreezeCompanyIndexRoute: appAdminFreezeCompanyIndexRoute,
+  appAdminReviewCompanyIndexRoute: appAdminReviewCompanyIndexRoute,
+  appAdminSettingIndexRoute: appAdminSettingIndexRoute,
+  appAdminSupportIndexRoute: appAdminSupportIndexRoute,
+}
+
+const appAdminRouteRouteWithChildren = appAdminRouteRoute._addFileChildren(
+  appAdminRouteRouteChildren,
+)
 
 interface appProfileRouteRouteChildren {
   appProfileIndexRoute: typeof appProfileIndexRoute
@@ -548,6 +724,7 @@ const appProfileRouteRouteWithChildren = appProfileRouteRoute._addFileChildren(
 )
 
 interface appRouteRouteChildren {
+  appAdminRouteRoute: typeof appAdminRouteRouteWithChildren
   appProfileRouteRoute: typeof appProfileRouteRouteWithChildren
   appChatIdRoute: typeof appChatIdRoute
   appChatIndexRoute: typeof appChatIndexRoute
@@ -558,6 +735,7 @@ interface appRouteRouteChildren {
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
+  appAdminRouteRoute: appAdminRouteRouteWithChildren,
   appProfileRouteRoute: appProfileRouteRouteWithChildren,
   appChatIdRoute: appChatIdRoute,
   appChatIndexRoute: appChatIndexRoute,

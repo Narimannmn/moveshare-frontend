@@ -1,12 +1,12 @@
-import {create} from "zustand";
-import {devtools} from "zustand/middleware";
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 
-import type {BedroomCount, JobType} from "@/entities/Job/schemas";
+import type { BedroomCount, JobType } from "@/entities/Job/schemas";
 
 interface JobFiltersState {
   jobType: JobType | null;
   bedroomCount: BedroomCount | null;
-  skip: number;
+  offset: number;
   limit: number;
 }
 
@@ -18,12 +18,12 @@ interface JobFiltersActions {
   resetFilters: () => void;
 }
 
-type JobFiltersStore = JobFiltersState & {actions: JobFiltersActions};
+type JobFiltersStore = JobFiltersState & { actions: JobFiltersActions };
 
 const initialState: JobFiltersState = {
   jobType: null,
   bedroomCount: null,
-  skip: 0,
+  offset: 0,
   limit: 20,
 };
 
@@ -33,19 +33,18 @@ export const useJobFiltersStore = create<JobFiltersStore>()(
       ...initialState,
 
       actions: {
-        setJobType: (jobType) => set({jobType, skip: 0}, false, "setJobType"),
+        setJobType: (jobType) => set({ jobType, offset: 0 }, false, "setJobType"),
 
         setBedroomCount: (bedroomCount) =>
-          set({bedroomCount, skip: 0}, false, "setBedroomCount"),
+          set({ bedroomCount, offset: 0 }, false, "setBedroomCount"),
 
-        setPage: (page) =>
-          set((state) => ({skip: page * state.limit}), false, "setPage"),
+        setPage: (page) => set((state) => ({ offset: page * state.limit }), false, "setPage"),
 
-        setLimit: (limit) => set({limit, skip: 0}, false, "setLimit"),
+        setLimit: (limit) => set({ limit, offset: 0 }, false, "setLimit"),
 
         resetFilters: () => set(initialState, false, "resetFilters"),
       },
     }),
-    {name: "JobFiltersStore"}
+    { name: "JobFiltersStore" }
   )
 );

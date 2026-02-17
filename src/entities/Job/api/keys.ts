@@ -1,4 +1,4 @@
-import type {JobListParams, MyJobsParams} from "../schemas";
+import type { JobListParams, MyJobsParams } from "../schemas";
 
 export const jobKeys = {
   all: ["jobs"] as const,
@@ -17,4 +17,6 @@ export const jobKeys = {
 
   // Mutations
   create: () => [...jobKeys.all, "create"] as const,
+  cancel: () => [...jobKeys.all, "cancel"] as const,
+  exportCsv: () => [...jobKeys.all, "export-csv"] as const,
 } as const;

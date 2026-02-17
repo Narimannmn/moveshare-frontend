@@ -1,33 +1,158 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import axios from "axios";
+
+import { type CreateJobRequest, useCreateJob } from "@/entities/Job";
+
+import { DatePicker } from "@shared/ui";
 
 import { usePostJobStore } from "../../model/usePostJobStore";
+import { MoveDetailsChecklist } from "../MoveDetailsChecklist";
 
 interface PostJobStep4Props {
   onCancel: () => void;
   onSuccess: () => void;
 }
 
-export const PostJobStep4 = ({ onCancel, onSuccess }: PostJobStep4Props) => {
+const parseDatetime = (value: string) => {
+  if (!value) return { date: "", time: "" };
+  const [datePart, timePart = ""] = value.split("T");
+  const time = timePart.substring(0, 5);
+  return { date: datePart || "", time: time || "" };
+};
+
+const formatCreateJobError = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    const responseData = error.response?.data as { detail?: unknown } | undefined;
+    const detail = responseData?.detail;
+
+    if (typeof detail === "string") {
+      return detail;
+    }
+
+    if (Array.isArray(detail)) {
+      const validationMessages = detail
+        .map((item) => {
+          if (typeof item === "object" && item !== null && "msg" in item) {
+            const msg = (item as { msg?: unknown }).msg;
+            return typeof msg === "string" ? msg : null;
+          }
+          return null;
+        })
+        .filter((msg): msg is string => Boolean(msg));
+
+      if (validationMessages.length > 0) {
+        return validationMessages.join(", ");
+      }
+    }
+
+    return error.message || "Failed to create job";
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return "Failed to create job";
+};
+
+export const PostJobStep4 = ({ onCancel: _onCancel, onSuccess }: PostJobStep4Props) => {
   const formData = usePostJobStore((state) => state.formData);
   const updateFormData = usePostJobStore((state) => state.actions.updateFormData);
   const prevStep = usePostJobStore((state) => state.actions.prevStep);
 
-  const [pickupDate, setPickupDate] = useState(formData.pickupDatetime.split("T")[0] || "");
-  const [pickupTime, setPickupTime] = useState(formData.pickupDatetime.split("T")[1]?.substring(0, 5) || "");
-  const [deliveryDate, setDeliveryDate] = useState(formData.deliveryDatetime.split("T")[0] || "");
-  const [deliveryTime, setDeliveryTime] = useState(formData.deliveryDatetime.split("T")[1]?.substring(0, 5) || "");
+  const pickupInitial = parseDatetime(formData.pickupDatetime);
+  const deliveryInitial = parseDatetime(formData.deliveryDatetime);
 
-  const [payoutAmount, setPayoutAmount] = useState(formData.payoutAmount || "1850");
-  const [cutAmount, setCutAmount] = useState(formData.cutAmount || "300");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pickupDate, setPickupDate] = useState(pickupInitial.date);
+  const [pickupTime, setPickupTime] = useState(pickupInitial.time);
+  const [deliveryDate, setDeliveryDate] = useState(deliveryInitial.date);
+  const [deliveryTime, setDeliveryTime] = useState(deliveryInitial.time);
+
+  const [payoutAmount, setPayoutAmount] = useState(formData.payoutAmount || "");
+  const [cutAmount, setCutAmount] = useState(formData.cutAmount || "");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const createJobMutation = useCreateJob({
+    navigateOnSuccess: false,
+    onSuccess,
+    onError: (error) => {
+      setSubmitError(formatCreateJobError(error));
+    },
+  });
+  const timeOptions = useMemo(
+    () =>
+      Array.from({ length: 48 }, (_, index) => {
+        const hour = Math.floor(index / 2);
+        const minute = index % 2 === 0 ? "00" : "30";
+        return `${String(hour).padStart(2, "0")}:${minute}`;
+      }),
+    []
+  );
+
+  useEffect(() => {
+    const pickup = parseDatetime(formData.pickupDatetime);
+    const delivery = parseDatetime(formData.deliveryDatetime);
+    setPickupDate(pickup.date);
+    setPickupTime(pickup.time);
+    setDeliveryDate(delivery.date);
+    setDeliveryTime(delivery.time);
+  }, [formData.pickupDatetime, formData.deliveryDatetime]);
+
+  useEffect(() => {
+    setPayoutAmount(formData.payoutAmount || "");
+    setCutAmount(formData.cutAmount || "");
+  }, [formData.payoutAmount, formData.cutAmount]);
+
+  const previewPickupDatetime =
+    pickupDate && pickupTime ? `${pickupDate}T${pickupTime}:00.000Z` : "";
+  const previewDeliveryDatetime =
+    deliveryDate && deliveryTime ? `${deliveryDate}T${deliveryTime}:00.000Z` : "";
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
-      // Combine date and time
-      const pickupDatetime = `${pickupDate}T${pickupTime}:00.000Z`;
-      const deliveryDatetime = `${deliveryDate}T${deliveryTime}:00.000Z`;
+      if (!formData.jobType) {
+        setSubmitError("Job type is required.");
+        return;
+      }
+
+      const payoutNumber = Number(payoutAmount);
+      const cutNumber = Number(cutAmount);
+
+      if (!Number.isFinite(payoutNumber) || payoutNumber <= 0) {
+        setSubmitError("Payout amount must be greater than 0.");
+        return;
+      }
+
+      if (!Number.isFinite(cutNumber) || cutNumber < 0) {
+        setSubmitError("Cut amount cannot be negative.");
+        return;
+      }
+
+      if (cutNumber > payoutNumber) {
+        setSubmitError("Cut amount cannot exceed payout amount.");
+        return;
+      }
+
+      const pickupDatetime = previewPickupDatetime;
+      const deliveryDatetime = previewDeliveryDatetime;
+      if (new Date(pickupDatetime) >= new Date(deliveryDatetime)) {
+        setSubmitError("Delivery datetime must be after pickup datetime.");
+        return;
+      }
+
+      const uploadedFiles = formData.uploadedFiles ?? [];
+      const allowedImageTypes = new Set(["image/jpeg", "image/jpg", "image/png"]);
+      const itemImages = uploadedFiles.filter((file) => allowedImageTypes.has(file.type));
+      const inventoryPdf = uploadedFiles.find(
+        (file) => file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")
+      );
+
+      if (itemImages.length === 0 && !inventoryPdf) {
+        setSubmitError("Upload at least one image or PDF file.");
+        return;
+      }
 
       updateFormData({
         pickupDatetime,
@@ -36,230 +161,226 @@ export const PostJobStep4 = ({ onCancel, onSuccess }: PostJobStep4Props) => {
         cutAmount,
       });
 
-      // TODO: Submit to API
-      console.log("Submitting job:", {
-        ...formData,
-        pickupDatetime,
-        deliveryDatetime,
-        payoutAmount,
-        cutAmount,
+      const payload: CreateJobRequest = {
+        job_type: formData.jobType,
+        bedroom_count: formData.bedroomCount ?? null,
+        description: formData.description.trim(),
+        pickup_address: formData.pickupAddress.trim(),
+        delivery_address: formData.deliveryAddress.trim(),
+        pickup_datetime: pickupDatetime,
+        delivery_datetime: deliveryDatetime,
+        payout_amount: payoutAmount.trim(),
+        cut_amount: cutAmount.trim(),
+        additional_services: formData.additionalServices,
+        loading_assistance_count: formData.loadingAssistanceCount,
+      };
+
+      await createJobMutation.mutateAsync({
+        data: payload,
+        itemImages: itemImages.length > 0 ? itemImages : undefined,
+        inventoryPdf,
       });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Show success dialog
-      onSuccess();
     } catch (error) {
       console.error("Error submitting job:", error);
-      // TODO: Show error message
-    } finally {
-      setIsSubmitting(false);
+      if (!axios.isAxiosError(error)) {
+        setSubmitError(formatCreateJobError(error));
+      }
     }
   };
 
   const handleBack = () => {
+    updateFormData({
+      pickupDatetime: previewPickupDatetime,
+      deliveryDatetime: previewDeliveryDatetime,
+      payoutAmount,
+      cutAmount,
+    });
     prevStep();
   };
 
-  const isValid = pickupDate && pickupTime && deliveryDate && deliveryTime && payoutAmount && cutAmount && !isSubmitting;
+  const isValid = useMemo(
+    () =>
+      Boolean(
+        pickupDate &&
+        pickupTime &&
+        deliveryDate &&
+        deliveryTime &&
+        payoutAmount.trim() &&
+        cutAmount.trim() &&
+        !createJobMutation.isPending
+      ),
+    [
+      pickupDate,
+      pickupTime,
+      deliveryDate,
+      deliveryTime,
+      payoutAmount,
+      cutAmount,
+      createJobMutation.isPending,
+    ]
+  );
 
   return (
-    <div className="flex gap-6">
+    <div className="flex gap-6 items-stretch">
       {/* Left Column: Form */}
-      <div className="flex-1 space-y-6">
-        {/* Progress */}
-        <div className="space-y-2">
-          <p className="text-sm font-normal text-[#202224]">Step 4/4</p>
-          <div className="w-full flex">
-            <div className="flex-1 h-1.5 bg-[#60A5FA]" />
-            <div className="flex-1 h-1.5 bg-[#60A5FA]" />
-            <div className="flex-1 h-1.5 bg-[#60A5FA]" />
-            <div className="flex-1 h-1.5 bg-[#60A5FA]" />
+      <div className="flex-1 self-stretch flex flex-col">
+        <div className="space-y-6">
+          {/* Progress */}
+          <div className="space-y-2">
+            <p className="text-sm font-normal text-[#202224]">Step 4/4</p>
+            <div className="w-full flex">
+              <div className="flex-1 h-1.5 bg-[#60A5FA]" />
+              <div className="flex-1 h-1.5 bg-[#60A5FA]" />
+              <div className="flex-1 h-1.5 bg-[#60A5FA]" />
+              <div className="flex-1 h-1.5 bg-[#60A5FA]" />
+            </div>
           </div>
-        </div>
 
-        {/* Schedule Section */}
-        <div className="space-y-4">
-          <p className="text-base font-bold text-[#202224]">Schedule</p>
+          {/* Schedule Section */}
+          <div className="space-y-4">
+            <p className="text-base font-bold text-[#202224]">Schedule</p>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <p className="text-base font-normal text-[#202224]">
-                Pickup Date <span className="text-red-600">*</span>
-              </p>
-              <div className="relative">
-                <input
-                  type="date"
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <p className="text-base font-normal text-[#202224]">
+                  Pickup Date <span className="text-red-600">*</span>
+                </p>
+                <DatePicker
                   value={pickupDate}
-                  onChange={(e) => setPickupDate(e.target.value)}
-                  className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA]"
+                  onChange={setPickupDate}
+                  placeholder="Select pickup date"
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <p className="text-base font-normal text-[#202224]">
-                Pickup Time Window <span className="text-red-600">*</span>
-              </p>
-              <div className="relative">
-                <input
-                  type="time"
+              <div className="space-y-2">
+                <p className="text-base font-normal text-[#202224]">
+                  Pickup Time Window <span className="text-red-600">*</span>
+                </p>
+                <select
                   value={pickupTime}
                   onChange={(e) => setPickupTime(e.target.value)}
-                  className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA]"
-                />
+                  className={`w-full h-11 border border-[#D8D8D8] rounded-lg pl-10 pr-12 text-base font-normal focus:outline-none focus:border-[#60A5FA] bg-white ${
+                    pickupTime ? "text-[#202224]" : "text-[#A6A6A6]"
+                  }`}
+                  style={{ textIndent: "8px" }}
+                >
+                  <option value="" disabled>
+                    Select pickup time
+                  </option>
+                  {timeOptions.map((time) => (
+                    <option key={`pickup-${time}`} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <p className="text-base font-normal text-[#202224]">
-                Delivery Date <span className="text-red-600">*</span>
-              </p>
-              <div className="relative">
-                <input
-                  type="date"
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <p className="text-base font-normal text-[#202224]">
+                  Delivery Date <span className="text-red-600">*</span>
+                </p>
+                <DatePicker
                   value={deliveryDate}
-                  onChange={(e) => setDeliveryDate(e.target.value)}
-                  className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA]"
+                  onChange={setDeliveryDate}
+                  placeholder="Select delivery date"
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <p className="text-base font-normal text-[#202224]">
-                Delivery Time Window <span className="text-red-600">*</span>
-              </p>
-              <div className="relative">
-                <input
-                  type="time"
+              <div className="space-y-2">
+                <p className="text-base font-normal text-[#202224]">
+                  Delivery Time Window <span className="text-red-600">*</span>
+                </p>
+                <select
                   value={deliveryTime}
                   onChange={(e) => setDeliveryTime(e.target.value)}
-                  className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA]"
-                />
+                  className={`w-full h-11 border border-[#D8D8D8] rounded-lg pl-10 pr-12 text-base font-normal focus:outline-none focus:border-[#60A5FA] bg-white ${
+                    deliveryTime ? "text-[#202224]" : "text-[#A6A6A6]"
+                  }`}
+                  style={{ textIndent: "8px" }}
+                >
+                  <option value="" disabled>
+                    Select delivery time
+                  </option>
+                  {timeOptions.map((time) => (
+                    <option key={`delivery-${time}`} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Payment Details Section */}
-        <div className="space-y-4">
-          <p className="text-base font-bold text-[#202224]">Payment Details</p>
+          {/* Payment Details Section */}
+          <div className="space-y-4">
+            <p className="text-base font-bold text-[#202224]">Payment Details</p>
 
-          <div className="space-y-2">
-            <p className="text-base font-normal text-[#202224]">
-              Payout Amount ($) <span className="text-red-600">*</span>
-            </p>
-            <input
-              type="number"
-              value={payoutAmount}
-              onChange={(e) => setPayoutAmount(e.target.value)}
-              placeholder="1850"
-              className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] placeholder:text-[#A6A6A6] focus:outline-none focus:border-[#60A5FA]"
-            />
-          </div>
+            <div className="space-y-2">
+              <p className="text-base font-normal text-[#202224]">
+                Payout Amount ($) <span className="text-red-600">*</span>
+              </p>
+              <input
+                type="number"
+                value={payoutAmount}
+                onChange={(e) => setPayoutAmount(e.target.value)}
+                placeholder="1850"
+                className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] placeholder:text-[#A6A6A6] focus:outline-none focus:border-[#60A5FA]"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <p className="text-base font-normal text-[#202224]">
-              Cut <span className="text-red-600">*</span>
-            </p>
-            <input
-              type="number"
-              value={cutAmount}
-              onChange={(e) => setCutAmount(e.target.value)}
-              placeholder="300"
-              className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] placeholder:text-[#A6A6A6] focus:outline-none focus:border-[#60A5FA]"
-            />
+            <div className="space-y-2">
+              <p className="text-base font-normal text-[#202224]">
+                Cut <span className="text-red-600">*</span>
+              </p>
+              <input
+                type="number"
+                value={cutAmount}
+                onChange={(e) => setCutAmount(e.target.value)}
+                placeholder="300"
+                className="w-full h-11 border border-[#D8D8D8] rounded-lg px-4 text-base font-normal text-[#202224] placeholder:text-[#A6A6A6] focus:outline-none focus:border-[#60A5FA]"
+              />
+            </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4 justify-end">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="h-11 rounded-lg px-4 py-2.5 text-base font-normal text-[#202224] border border-[#D8D8D8] bg-white hover:bg-gray-50"
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={!isValid}
-            className={`h-11 rounded-lg px-4 py-2.5 text-base font-normal text-white min-w-[120px] ${
-              isValid ? "bg-[#60A5FA] hover:bg-[#5094E0]" : "bg-[rgba(96,165,250,0.6)] cursor-not-allowed"
-            }`}
-          >
-            {isSubmitting ? "Posting..." : "Post Job"}
-          </button>
+        <div className="space-y-2 mt-auto pt-6">
+          {submitError && <p className="text-sm text-[#FF0000]">{submitError}</p>}
+          <div className="flex gap-4 justify-end">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="h-11 rounded-lg px-4 py-2.5 text-base font-normal text-[#202224] border border-[#D8D8D8] bg-white hover:bg-gray-50"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={!isValid}
+              className={`h-11 rounded-lg px-4 py-2.5 text-base font-normal text-white min-w-[120px] ${
+                isValid
+                  ? "bg-[#60A5FA] hover:bg-[#5094E0]"
+                  : "bg-[rgba(96,165,250,0.6)] cursor-not-allowed"
+              }`}
+            >
+              {createJobMutation.isPending ? "Posting..." : "Post Job"}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Right Column: Move Details Checklist */}
-      <MoveDetailsChecklist step={4} />
-    </div>
-  );
-};
-
-const MoveDetailsChecklist = ({ step }: { step: number }) => {
-  const formData = usePostJobStore((state) => state.formData);
-
-  const items = [
-    { label: "Job Title:", status: formData.jobType || "Select", completed: !!formData.jobType },
-    { label: "Number of rooms:", status: formData.bedroomCount ? `${formData.bedroomCount}` : "Select", completed: !!formData.bedroomCount },
-    { label: "Truck:", status: "Select", completed: step > 1 },
-    { label: "Job Description:", status: formData.description ? "Completed" : "Select", completed: !!formData.description },
-    { label: "Pickup Location:", status: formData.pickupAddress || "Select", completed: !!formData.pickupAddress },
-    { label: "Delivery Location:", status: formData.deliveryAddress || "Select", completed: !!formData.deliveryAddress },
-    { label: "Additional Services:", status: formData.additionalServices || "Select", completed: !!formData.additionalServices },
-    { label: "Loading Assistance:", status: formData.loadingAssistanceCount ? `${formData.loadingAssistanceCount} helper(s)` : "Select", completed: !!formData.loadingAssistanceCount },
-    { label: "Images of Items / PDF of Inventory List:", status: "5 photo", completed: step >= 3 },
-    { label: "Pickup Date:", status: formData.pickupDatetime ? formData.pickupDatetime.split("T")[0] : "Select", completed: step >= 4 && !!formData.pickupDatetime },
-    { label: "Pickup Time Window:", status: formData.pickupDatetime ? formData.pickupDatetime.split("T")[1]?.substring(0, 5) : "Select", completed: step >= 4 && !!formData.pickupDatetime },
-    { label: "Delivery Date:", status: formData.deliveryDatetime ? formData.deliveryDatetime.split("T")[0] : "Select", completed: step >= 4 && !!formData.deliveryDatetime },
-    { label: "Delivery Time Window:", status: formData.deliveryDatetime ? formData.deliveryDatetime.split("T")[1]?.substring(0, 5) : "Select", completed: step >= 4 && !!formData.deliveryDatetime },
-    { label: "Payout Amount:", status: formData.payoutAmount ? `$${formData.payoutAmount}` : "Select", completed: step >= 4 && !!formData.payoutAmount },
-    { label: "Payment ($):", status: formData.cutAmount ? `$${formData.cutAmount}` : "Select", completed: step >= 4 && !!formData.cutAmount },
-  ];
-
-  return (
-    <div className="flex-1 bg-[#F1F4F9] rounded-lg p-4 h-fit space-y-6">
-      <p className="text-base font-bold text-[#263238]">Move details</p>
-      <div className="space-y-4">
-        {items.map((item, index) => (
-          <ChecklistItem key={index} {...item} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-interface ChecklistItemProps {
-  label: string;
-  status: string;
-  completed?: boolean;
-}
-
-const ChecklistItem = ({ label, status, completed = false }: ChecklistItemProps) => {
-  return (
-    <div className={`flex gap-1 items-center ${!completed ? "opacity-50" : ""}`}>
-      <div className="flex gap-2 items-center shrink-0">
-        <div className="size-6 flex items-center justify-center">
-          <svg className="size-6" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M9 12l2 2 4-4"
-              stroke="#60A5FA"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-        <p className="text-sm font-bold text-[#2C3E50]">{label}</p>
-      </div>
-      <p className="text-sm font-normal text-[#A6A6A6]">{status}</p>
+      <MoveDetailsChecklist
+        step={4}
+        preview={{
+          pickupDatetime: previewPickupDatetime,
+          deliveryDatetime: previewDeliveryDatetime,
+          payoutAmount,
+          cutAmount,
+        }}
+      />
     </div>
   );
 };

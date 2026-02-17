@@ -1,63 +1,88 @@
 import { useState } from "react";
 
-import type { JobType, BedroomCount } from "@/entities/Job";
-
-import { Button, Textarea } from "@shared/ui";
+import type { BedroomCount, JobType } from "@/entities/Job";
 
 import { usePostJobStore } from "../../model/usePostJobStore";
+import { MoveDetailsChecklist } from "../MoveDetailsChecklist";
 
 interface PostJobStep1Props {
   onCancel: () => void;
 }
 
-const truckSizeInfo: Record<BedroomCount, { name: string; volume: string; items: string[][] }> = {
+type TruckSizeInfo = {
+  vehicleLabel: string;
+  volume: string;
+  items: string[];
+  imageSrc: string;
+  imageClassName: string;
+};
+
+const truckSizeInfo: Record<BedroomCount, TruckSizeInfo> = {
   "1_bedroom": {
-    name: "Small Van (15+)",
+    vehicleLabel: "Small Van (15+)",
     volume: "1 Bedroom - 10–15 m³",
-    items: [
-      ["Bed or sofa", "Up to 10 boxes"],
-      ["Small wardrobe", "TV, chairs, nightstand"],
-    ],
+    items: ["Bed or sofa", "Small wardrobe", "Up to 10 boxes", "TV, chairs, nightstand"],
+    imageSrc: "/assets/figma/post-job/van-1.svg",
+    imageClassName: "w-20 h-10",
   },
   "2_bedroom": {
-    name: "Medium Van (20+)",
-    volume: "2 Bedrooms - 20–25 m³",
+    vehicleLabel: "Medium Truck",
+    volume: "2 Bedroom - 20–25 m³",
     items: [
-      ["2 Beds or sofas", "Up to 20 boxes"],
-      ["Medium wardrobe", "Appliances"],
+      "2 beds or a bed + sofa",
+      "Wardrobe, chest of drawers",
+      "Refrigerator, washing machine",
+      "Up to 20 boxes",
     ],
+    imageSrc: "/assets/figma/post-job/van-1.svg",
+    imageClassName: "w-20 h-10",
   },
   "3_bedroom": {
-    name: "Large Van (30+)",
-    volume: "3 Bedrooms - 30–35 m³",
+    vehicleLabel: "Medium (20+')",
+    volume: "3 Bedroom - 30–35 m³",
     items: [
-      ["3 Beds", "Up to 30 boxes"],
-      ["Large wardrobe", "Full kitchen"],
+      "Sofa set, 2–3 beds",
+      "Several wardrobes and tables",
+      "Home appliances",
+      "Up to 30 boxes",
     ],
+    imageSrc: "/assets/figma/post-job/trailer-1.svg",
+    imageClassName: "w-[73px] h-[37px]",
   },
   "4_bedroom": {
-    name: "Small Truck (40+)",
-    volume: "4 Bedrooms - 40–45 m³",
+    vehicleLabel: "Medium (20+')",
+    volume: "4 Bedroom - 40–45 m³",
     items: [
-      ["4 Beds", "Up to 40 boxes"],
-      ["Multiple wardrobes", "Full apartment"],
+      "Complete furniture set for a large apartment",
+      "Sports or baby equipment",
+      "Home appliances",
+      "Up to 40 boxes",
     ],
+    imageSrc: "/assets/figma/post-job/trailer-1.svg",
+    imageClassName: "w-[73px] h-[37px]",
   },
   "5_bedroom": {
-    name: "Medium Truck (50+)",
-    volume: "5 Bedrooms - 50–55 m³",
+    vehicleLabel: "Large (26+')",
+    volume: "5 Bedroom - 50–55 m³",
     items: [
-      ["5 Beds", "Up to 50 boxes"],
-      ["Large wardrobes", "Large house"],
+      "Full set of furniture and appliances",
+      "Outdoor and garage items",
+      "Home appliances",
+      "Up to 50 boxes",
     ],
+    imageSrc: "/assets/figma/post-job/truck-1.svg",
+    imageClassName: "w-[78px] h-[42px]",
   },
   "6_plus_bedroom": {
-    name: "Large Truck (60+)",
-    volume: "6+ Bedrooms - 60+ m³",
+    vehicleLabel: "Large (26+')",
+    volume: "6+ Bedroom - 65+ m³",
     items: [
-      ["6+ Beds", "60+ boxes"],
-      ["Multiple large wardrobes", "Very large house"],
+      "Furniture and appliances for the entire house",
+      "Garden and garage equipment",
+      "Large volume of boxes and miscellaneous items",
     ],
+    imageSrc: "/assets/figma/post-job/truck-1.svg",
+    imageClassName: "w-[78px] h-[42px]",
   },
 };
 
@@ -98,7 +123,9 @@ export const PostJobStep1 = ({ onCancel }: PostJobStep1Props) => {
   const nextStep = usePostJobStore((state) => state.actions.nextStep);
 
   const [jobType, setJobType] = useState<JobType | null>(formData.jobType);
-  const [bedroomCount, setBedroomCount] = useState<BedroomCount | null>(formData.bedroomCount);
+  const [bedroomCount, setBedroomCount] = useState<BedroomCount | null>(
+    formData.bedroomCount ?? "1_bedroom"
+  );
   const [description, setDescription] = useState(formData.description);
 
   const handleNext = () => {
@@ -132,7 +159,7 @@ export const PostJobStep1 = ({ onCancel }: PostJobStep1Props) => {
         {/* Job Type */}
         <div className="flex gap-4">
           <RadioBox
-            label="Resdential"
+            label="Residential"
             value="residential"
             selectedValue={jobType}
             onChange={(value) => setJobType(value as JobType)}
@@ -202,32 +229,29 @@ export const PostJobStep1 = ({ onCancel }: PostJobStep1Props) => {
 
         {/* Truck Size Info */}
         {truckInfo && (
-          <div className="border border-[#D8D8D8] flex gap-4 h-[124px] items-center p-4 rounded-md">
-            <div className="flex flex-col gap-2 items-center justify-center shrink-0">
-              <div className="h-10 w-20 flex items-center justify-center">
-                <svg className="w-20 h-10 -scale-y-100 rotate-180" viewBox="0 0 80 40" fill="none">
-                  <path
-                    d="M10 25h15l5-10h20v10h5a5 5 0 110 10h-5v-5H10v5H5a5 5 0 110-10h5v-10z"
-                    fill="#60A5FA"
-                  />
-                </svg>
-              </div>
-              <p className="text-sm font-bold text-[#2C3E50] whitespace-nowrap">{truckInfo.name}</p>
+          <div className="border border-[#D8D8D8] flex gap-4 items-center p-4 rounded-md">
+            <div className="flex flex-col gap-3 items-center justify-center shrink-0 min-w-[92px]">
+              <img
+                src={truckInfo.imageSrc}
+                alt={truckInfo.vehicleLabel}
+                className={`${truckInfo.imageClassName} object-contain`}
+              />
+              <p className="text-sm font-bold text-[#202224] leading-[100%] text-center whitespace-nowrap">
+                {truckInfo.vehicleLabel}
+              </p>
             </div>
-            <div className="flex-1 flex flex-col gap-4 justify-center">
-              <p className="text-sm font-bold text-[#2C3E50]">{truckInfo.volume}</p>
-              <div className="flex gap-4 text-xs font-normal text-[#202224]">
-                {truckInfo.items.map((column, colIndex) => (
-                  <div key={colIndex} className="flex flex-col gap-2">
-                    {column.map((item, itemIndex) => (
-                      <div key={itemIndex} className="flex items-start gap-1">
-                        <span className="text-[#202224]">•</span>
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
+            <div className="flex-1 flex flex-col gap-2 justify-center">
+              <p className="text-sm font-bold text-[#2C3E50] leading-[100%]">{truckInfo.volume}</p>
+              <ul className="flex flex-col gap-2 pl-[18px]">
+                {truckInfo.items.map((item) => (
+                  <li
+                    key={item}
+                    className="text-xs font-normal text-[#202224] leading-[100%] list-disc"
+                  >
+                    {item}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </div>
         )}
@@ -246,7 +270,7 @@ export const PostJobStep1 = ({ onCancel }: PostJobStep1Props) => {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4 justify-end">
+        <div className="flex gap-4 justify-end pt-2">
           <button
             type="button"
             onClick={onCancel}
@@ -259,7 +283,9 @@ export const PostJobStep1 = ({ onCancel }: PostJobStep1Props) => {
             onClick={handleNext}
             disabled={!isValid}
             className={`h-11 rounded-lg px-4 py-2.5 text-base font-normal text-white min-w-[120px] ${
-              isValid ? "bg-[#60A5FA] hover:bg-[#5094E0]" : "bg-[rgba(96,165,250,0.6)] cursor-not-allowed"
+              isValid
+                ? "bg-[#60A5FA] hover:bg-[#5094E0]"
+                : "bg-[rgba(96,165,250,0.6)] cursor-not-allowed"
             }`}
           >
             Next Step
@@ -268,54 +294,14 @@ export const PostJobStep1 = ({ onCancel }: PostJobStep1Props) => {
       </div>
 
       {/* Right Column: Move Details Checklist */}
-      <div className="flex-1 bg-[#F1F4F9] rounded-lg p-4 h-fit space-y-6">
-        <p className="text-base font-bold text-[#263238]">Move details</p>
-        <div className="space-y-4">
-          <ChecklistItem label="Job Title:" completed status="Select" />
-          <ChecklistItem label="Number of rooms:" completed status="Select the number of rooms" />
-          <ChecklistItem label="Truck:" completed status="Select" />
-          <ChecklistItem label="Job Description:" completed status="Select" />
-          <ChecklistItem label="Pickup Location:" status="Select" />
-          <ChecklistItem label="Delivery Location:" status="Select" />
-          <ChecklistItem label="Additional Services:" status="Select" />
-          <ChecklistItem label="Loading Assistance:" status="Select" />
-          <ChecklistItem label="Images of Items / PDF of Inventory List:" status="Select" />
-          <ChecklistItem label="Pickup Date:" status="Select" />
-          <ChecklistItem label="Pickup Time Window:" status="Select" />
-          <ChecklistItem label="Delivery Date:" status="Select" />
-          <ChecklistItem label="Delivery Time Window:" status="Select" />
-          <ChecklistItem label="Payout Amount:" status="Select" />
-          <ChecklistItem label="Payment ($):" status="Select" />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface ChecklistItemProps {
-  label: string;
-  status: string;
-  completed?: boolean;
-}
-
-const ChecklistItem = ({ label, status, completed = false }: ChecklistItemProps) => {
-  return (
-    <div className={`flex gap-1 items-center ${!completed ? "opacity-50" : ""}`}>
-      <div className="flex gap-2 items-center shrink-0">
-        <div className="size-6 flex items-center justify-center">
-          <svg className="size-6" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M9 12l2 2 4-4"
-              stroke="#60A5FA"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-        <p className="text-sm font-bold text-[#2C3E50]">{label}</p>
-      </div>
-      <p className="text-sm font-normal text-[#A6A6A6]">{status}</p>
+      <MoveDetailsChecklist
+        step={1}
+        preview={{
+          jobType,
+          bedroomCount,
+          description,
+        }}
+      />
     </div>
   );
 };

@@ -19,8 +19,8 @@ export const Header = memo(({ className, onNotificationClick }: HeaderProps) => 
     >
       {/* Logo and Brand */}
       <div className="flex items-center gap-3">
-        <img src="/logo.svg" alt="logo" />
-        <span className="text-xl font-semibold text-[#60A5FA]">Moveshare</span>
+        <img src="/logo.svg" alt="MoveShare logo" className="h-9 w-auto" />
+        <span className="text-xl font-semibold text-[#60A5FA]">MoveShare</span>
       </div>
 
       {/* Right Section - Notification & Avatar */}

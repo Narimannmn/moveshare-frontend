@@ -2,10 +2,13 @@ import { memo, useCallback, useMemo, useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
+import { CircleX, Loader2, SearchX } from "lucide-react";
 import { useShallow } from "zustand/shallow";
 
 import { cn } from "@/shared/lib/utils";
+import { getJwtSubject } from "@/shared/utils/jwt/getJwtSubject";
 
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 import { ConversationListItem, EmptyState, useChatStore, useConversations } from "@/entities/Chat";
 
 import { Input } from "@shared/ui";
@@ -16,11 +19,11 @@ export interface ConversationListProps {
   className?: string;
 }
 
-const CURRENT_USER_ID = "1";
-
 export const ConversationList = memo(({ className }: ConversationListProps) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const currentUserId = useMemo(() => getJwtSubject(accessToken) ?? "", [accessToken]);
 
   const { selectedConversationId, actions } = useChatStore(
     useShallow((state) => ({
@@ -37,10 +40,16 @@ export const ConversationList = memo(({ className }: ConversationListProps) => {
 
     const lowercaseQuery = searchQuery.toLowerCase();
     return conversations.filter((conversation) => {
-      const otherUser = conversation.participants.find((p) => p.id !== CURRENT_USER_ID);
-      return otherUser?.name.toLowerCase().includes(lowercaseQuery);
+      const visibleParticipants =
+        currentUserId.length > 0
+          ? conversation.participants.filter((participant) => participant.id !== currentUserId)
+          : conversation.participants;
+
+      return visibleParticipants.some((participant) =>
+        participant.name.toLowerCase().includes(lowercaseQuery)
+      );
     });
-  }, [conversations, searchQuery]);
+  }, [conversations, searchQuery, currentUserId]);
 
   const handleConversationClick = useCallback(
     (id: string) => {
@@ -65,7 +74,11 @@ export const ConversationList = memo(({ className }: ConversationListProps) => {
           </div>
         </div>
         <div className={styles.loadingState}>
-          <EmptyState icon="⏳" title="Loading conversations" message="Please wait..." />
+          <EmptyState
+            icon={<Loader2 className="animate-spin" />}
+            title="Loading conversations"
+            message="Please wait..."
+          />
         </div>
       </div>
     );
@@ -75,7 +88,7 @@ export const ConversationList = memo(({ className }: ConversationListProps) => {
     return (
       <div className={cn(styles.container, className)}>
         <EmptyState
-          icon="❌"
+          icon={<CircleX />}
           title="Error loading conversations"
           message="Please try again later"
         />
@@ -99,7 +112,7 @@ export const ConversationList = memo(({ className }: ConversationListProps) => {
       <div className={styles.list}>
         {filteredConversations.length === 0 ? (
           <EmptyState
-            icon="🔍"
+            icon={<SearchX />}
             title="No conversations found"
             message={searchQuery ? "Try a different search query" : "Start a new conversation"}
           />
@@ -109,7 +122,7 @@ export const ConversationList = memo(({ className }: ConversationListProps) => {
               key={conversation.id}
               conversation={conversation}
               isSelected={conversation.id === selectedConversationId}
-              currentUserId={CURRENT_USER_ID}
+              currentUserId={currentUserId}
               onClick={handleConversationClick}
             />
           ))

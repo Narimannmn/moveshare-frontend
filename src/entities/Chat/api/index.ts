@@ -1,4 +1,4 @@
 export * from "./keys";
 export * from "./services";
 export * from "./queries";
-export * from "./mockData";
+export * from "./mutations";

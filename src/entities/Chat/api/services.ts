@@ -1,22 +1,21 @@
+import { useAuthStore } from "@/entities/Auth/model/store/authStore";
+import { apiClient } from "@/shared/api/client";
+import { getJwtSubject } from "@/shared/utils/jwt/getJwtSubject";
+
 import {
   type ChatUser,
-  type Conversation,
   ConversationListSchema,
-  type Message,
+  type Conversation,
   MessageListSchema,
+  type Message,
+  MessageSchema,
+  SendMessageRequestSchema,
 } from "../schemas";
-import { mockConversations, mockMessages, mockUsers } from "./mockData";
-
-// Simulated network delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getConversations = async (): Promise<Conversation[]> => {
   try {
-    await delay(300); // Simulate network delay
-
-    // Validate with Zod
-    const validated = ConversationListSchema.parse(mockConversations);
-    return validated;
+    const response = await apiClient.get("/api/v1/chat/conversations");
+    return ConversationListSchema.parse(response.data);
   } catch (error) {
     console.error("Error fetching conversations:", error);
     throw error;
@@ -25,10 +24,8 @@ export const getConversations = async (): Promise<Conversation[]> => {
 
 export const getConversationById = async (id: string): Promise<Conversation | null> => {
   try {
-    await delay(200);
-
-    const conversation = mockConversations.find((conv) => conv.id === id);
-    return conversation || null;
+    const conversations = await getConversations();
+    return conversations.find((conversation) => conversation.id === id) ?? null;
   } catch (error) {
     console.error(`Error fetching conversation ${id}:`, error);
     throw error;
@@ -37,13 +34,8 @@ export const getConversationById = async (id: string): Promise<Conversation | nu
 
 export const getMessages = async (conversationId: string): Promise<Message[]> => {
   try {
-    await delay(400);
-
-    const messages = mockMessages[conversationId] || [];
-
-    // Validate with Zod
-    const validated = MessageListSchema.parse(messages);
-    return validated;
+    const response = await apiClient.get(`/api/v1/chat/conversations/${conversationId}/messages`);
+    return MessageListSchema.parse(response.data);
   } catch (error) {
     console.error(`Error fetching messages for conversation ${conversationId}:`, error);
     throw error;
@@ -52,58 +44,34 @@ export const getMessages = async (conversationId: string): Promise<Message[]> =>
 
 export const searchUsers = async (query: string): Promise<ChatUser[]> => {
   try {
-    await delay(200);
+    const conversations = await getConversations();
+    const accessToken = useAuthStore.getState().accessToken;
+    const currentUserId = getJwtSubject(accessToken);
 
-    if (!query.trim()) {
-      return mockUsers.filter((user) => user.id !== "1"); // Exclude current user
+    const usersMap = new Map<string, ChatUser>();
+    for (const conversation of conversations) {
+      for (const participant of conversation.participants) {
+        if (currentUserId && participant.id === currentUserId) continue;
+        usersMap.set(participant.id, participant);
+      }
     }
 
-    const lowercaseQuery = query.toLowerCase();
-    const filtered = mockUsers.filter(
-      (user) =>
-        user.id !== "1" && // Exclude current user
-        user.name.toLowerCase().includes(lowercaseQuery)
-    );
+    const users = Array.from(usersMap.values());
+    const trimmed = query.trim().toLowerCase();
+    if (!trimmed) return users;
 
-    return filtered;
+    return users.filter((user) => user.name.toLowerCase().includes(trimmed));
   } catch (error) {
     console.error("Error searching users:", error);
     throw error;
   }
 };
 
-// Mock send message (will be replaced with WebSocket)
 export const sendMessage = async (conversationId: string, content: string): Promise<Message> => {
   try {
-    await delay(300);
-
-    const newMessage: Message = {
-      id: `msg-${Date.now()}`,
-      conversationId,
-      senderId: "1", // Current user
-      content,
-      createdAt: new Date().toISOString(),
-      isRead: false,
-    };
-
-    // Add to mock data
-    if (!mockMessages[conversationId]) {
-      mockMessages[conversationId] = [];
-    }
-    mockMessages[conversationId].push(newMessage);
-
-    // Update conversation's last message
-    const conversation = mockConversations.find((c) => c.id === conversationId);
-    if (conversation) {
-      conversation.lastMessage = {
-        content: newMessage.content,
-        createdAt: newMessage.createdAt,
-        senderId: newMessage.senderId,
-      };
-      conversation.updatedAt = newMessage.createdAt;
-    }
-
-    return newMessage;
+    const validated = SendMessageRequestSchema.parse({ content });
+    const response = await apiClient.post(`/api/v1/chat/conversations/${conversationId}/messages`, validated);
+    return MessageSchema.parse(response.data);
   } catch (error) {
     console.error("Error sending message:", error);
     throw error;

@@ -17,7 +17,11 @@ export interface ConversationListItemProps {
 export const ConversationListItem = memo(
   ({ conversation, isSelected, currentUserId, onClick, className }: ConversationListItemProps) => {
     const otherUser = useMemo(() => {
-      return conversation.participants.find((p) => p.id !== currentUserId);
+      if (!currentUserId) {
+        return conversation.participants[0];
+      }
+
+      return conversation.participants.find((participant) => participant.id !== currentUserId);
     }, [conversation.participants, currentUserId]);
 
     const formatTimestamp = (dateString: string) => {

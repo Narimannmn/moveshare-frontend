@@ -11,6 +11,8 @@ export interface PostJobFormData {
   // Step 2: Addresses
   pickupAddress: string;
   deliveryAddress: string;
+  pickupFloor: string;
+  deliveryFloor: string;
 
   // Step 3: Schedule
   pickupDatetime: string;
@@ -23,6 +25,8 @@ export interface PostJobFormData {
   // Optional fields
   additionalServices: string;
   loadingAssistanceCount: number;
+  uploadedFilesCount: number;
+  uploadedFiles: File[];
 }
 
 interface PostJobStore {
@@ -43,12 +47,16 @@ const initialFormData: PostJobFormData = {
   description: "",
   pickupAddress: "",
   deliveryAddress: "",
+  pickupFloor: "",
+  deliveryFloor: "",
   pickupDatetime: "",
   deliveryDatetime: "",
   payoutAmount: "",
   cutAmount: "",
   additionalServices: "",
   loadingAssistanceCount: 0,
+  uploadedFilesCount: 0,
+  uploadedFiles: [],
 };
 
 export const usePostJobStore = create<PostJobStore>((set) => ({
