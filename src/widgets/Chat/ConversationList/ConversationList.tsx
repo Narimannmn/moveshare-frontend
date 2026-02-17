@@ -53,13 +53,16 @@ export const ConversationList = memo(({ className }: ConversationListProps) => {
   if (isLoading) {
     return (
       <div className={cn(styles.container, className)}>
-        <div className={styles.searchContainer}>
-          <Input
-            placeholder="Search conversations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            disabled
-          />
+        <div className={styles.header}>
+          <h2 className={styles.title}>Messages</h2>
+          <div className={styles.searchContainer}>
+            <Input
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              disabled
+            />
+          </div>
         </div>
         <div className={styles.loadingState}>
           <EmptyState icon="⏳" title="Loading conversations" message="Please wait..." />
@@ -82,12 +85,15 @@ export const ConversationList = memo(({ className }: ConversationListProps) => {
 
   return (
     <div className={cn(styles.container, className)}>
-      <div className={styles.searchContainer}>
-        <Input
-          placeholder="Search conversations..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      <div className={styles.header}>
+        <h2 className={styles.title}>Messages</h2>
+        <div className={styles.searchContainer}>
+          <Input
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className={styles.list}>

@@ -1,6 +1,6 @@
 import {queryOptions, useQuery} from "@tanstack/react-query";
 
-import type {JobListParams} from "../schemas";
+import type {JobListParams, MyJobsParams} from "../schemas";
 import {jobKeys} from "./keys";
 import * as services from "./services";
 
@@ -35,4 +35,20 @@ export const jobDetailQueryOptions = (jobId: string) =>
 
 export const useJob = (jobId: string) => {
   return useQuery(jobDetailQueryOptions(jobId));
+};
+
+// ============================================
+// My Jobs Query
+// ============================================
+
+export const myJobsQueryOptions = (params?: MyJobsParams) =>
+  queryOptions({
+    queryKey: jobKeys.myJobsList(params),
+    queryFn: () => services.getMyJobs(params),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+export const useMyJobs = (params?: MyJobsParams) => {
+  return useQuery(myJobsQueryOptions(params));
 };

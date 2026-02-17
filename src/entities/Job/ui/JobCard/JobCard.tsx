@@ -30,11 +30,6 @@ export interface JobCardProps {
   };
   weight: number;
   volume: number;
-  badges?: {
-    verifiedMover?: boolean;
-    paymentProtected?: boolean;
-    escrow?: boolean;
-  };
   price: number;
   onViewDetails?: (id: string | number) => void;
   onClaimJob?: (id: string | number) => void;
@@ -54,7 +49,6 @@ export const JobCard = memo(
     truckSize,
     weight,
     volume,
-    badges = {},
     price,
     onViewDetails,
     onClaimJob,
@@ -147,14 +141,6 @@ export const JobCard = memo(
           </div>
         </div>
 
-        {/* Badges */}
-        {(badges.verifiedMover || badges.paymentProtected || badges.escrow) && (
-          <div className={styles.badges}>
-            {badges.verifiedMover && <span className={styles.badge}>Verified Mover</span>}
-            {badges.paymentProtected && <span className={styles.badge}>Payment Protected</span>}
-            {badges.escrow && <span className={styles.badge}>Escrow</span>}
-          </div>
-        )}
 
         {/* Footer */}
         <div className={styles.footer}>

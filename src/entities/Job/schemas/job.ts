@@ -125,3 +125,15 @@ export const JobListParamsSchema = z.object({
 });
 
 export type JobListParams = z.infer<typeof JobListParamsSchema>;
+
+// ============================================
+// My Jobs Query Params
+// ============================================
+
+export const MyJobsParamsSchema = z.object({
+  status: JobStatusSchema.optional().nullable(),
+  skip: z.number().int().min(0).default(0),
+  limit: z.number().int().min(1).max(100).default(20),
+});
+
+export type MyJobsParams = z.infer<typeof MyJobsParamsSchema>;

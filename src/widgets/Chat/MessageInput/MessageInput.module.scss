@@ -1,65 +1,63 @@
 .container {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  padding: 16px;
-  background-color: white;
-  border-top: 1px solid #e5e7eb;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid #d8d8d8;
 }
 
 .textarea {
   flex: 1;
   min-height: 44px;
   max-height: 120px;
-  padding: 12px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  padding: 12px 0;
+  border: none;
   font-family: "Onest", sans-serif;
   font-size: 16px;
+  font-weight: 400;
   line-height: 20px;
+  color: #202224;
   resize: none;
-  transition: border-color 0.2s ease;
+  background: transparent;
+  letter-spacing: 0.2px;
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
   }
 
   &:disabled {
-    background-color: #f3f4f6;
     cursor: not-allowed;
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: #9d9d9d;
   }
 }
 
 .sendButton {
   flex-shrink: 0;
-  width: 44px;
   height: 44px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #3b82f6;
+  background-color: #60a5fa;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  font-family: "Onest", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 100%;
   transition: background-color 0.2s ease;
 
   &:hover:not(:disabled) {
-    background-color: #2563eb;
+    background-color: #4a94f0;
   }
 
   &:disabled {
-    background-color: #d1d5db;
+    background-color: #b0c4de;
     cursor: not-allowed;
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
   }
 }

@@ -151,11 +151,6 @@ export const transformJobToCardProps = (job: JobResponse): JobCardProps => {
     truckSize,
     weight,
     volume,
-    badges: {
-      verifiedMover: true, // Default for listed jobs
-      paymentProtected: true,
-      escrow: job.additional_services.includes("hosting"),
-    },
     price: parseFloat(job.payout_amount),
   };
 };

@@ -1,13 +1,13 @@
 .item {
   display: flex;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 8px;
+  padding: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
-  border-bottom: 1px solid #f1f4f9;
+  border-radius: 8px;
 
   &:hover {
-    background-color: #f8f9fa;
+    background-color: #f1f4f9;
   }
 
   &:focus {
@@ -17,10 +17,10 @@
 }
 
 .selected {
-  background-color: #e8f4fd;
+  background-color: #e6f2ff;
 
   &:hover {
-    background-color: #e8f4fd;
+    background-color: #e6f2ff;
   }
 }
 
@@ -40,9 +40,10 @@
 }
 
 .name {
-  font-size: 14px;
+  font-family: "Onest", sans-serif;
+  font-size: 16px;
   font-weight: 700;
-  line-height: 18px;
+  line-height: 100%;
   color: #202224;
   white-space: nowrap;
   overflow: hidden;
@@ -50,10 +51,11 @@
 }
 
 .timestamp {
-  font-size: 12px;
+  font-family: "Onest", sans-serif;
+  font-size: 10px;
   font-weight: 400;
-  line-height: 16px;
-  color: #666c72;
+  line-height: 100%;
+  color: #90a4ae;
   flex-shrink: 0;
 }
 
@@ -65,10 +67,11 @@
 }
 
 .lastMessage {
-  font-size: 14px;
+  font-family: "Onest", sans-serif;
+  font-size: 12px;
   font-weight: 400;
-  line-height: 18px;
-  color: #666c72;
+  line-height: 100%;
+  color: #a6a6a6;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -79,14 +82,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 63px;
   background-color: #60a5fa;
   color: white;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
+  font-family: "Onest", sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 100%;
+  letter-spacing: 0.1px;
   flex-shrink: 0;
 }

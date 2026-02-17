@@ -7,7 +7,7 @@ export const AppleLoginButton = () => {
   };
 
   return (
-    <Button onClick={handleAppleLogin} variant="outline">
+    <Button onClick={handleAppleLogin} variant="outline" className="w-full">
       <AppleIcon className="size-5" />
       Continue with Apple
     </Button>

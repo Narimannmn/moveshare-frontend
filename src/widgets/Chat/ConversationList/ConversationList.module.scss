@@ -1,18 +1,32 @@
 .container {
   display: flex;
   flex-direction: column;
+  gap: 16px;
   height: 100%;
-  background-color: white;
-  border-right: 1px solid #e5e5e5;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  font-family: "Onest", sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 100%;
+  color: #202224;
 }
 
 .searchContainer {
-  padding: 16px;
-  border-bottom: 1px solid #e5e5e5;
   flex-shrink: 0;
 }
 
 .list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   flex: 1;
   overflow-y: auto;
   min-height: 0;

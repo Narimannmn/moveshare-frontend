@@ -7,7 +7,7 @@ export const GoogleLoginButton = () => {
   };
 
   return (
-    <Button onClick={handleGoogleLogin} variant="outline">
+    <Button onClick={handleGoogleLogin} variant="outline" className="w-full">
       <GoogleIcon className="size-5" />
       Continue with Google
     </Button>

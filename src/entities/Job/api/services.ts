@@ -8,6 +8,7 @@ import {
   JobListResponseSchema,
   type JobResponse,
   JobResponseSchema,
+  type MyJobsParams,
 } from "../schemas";
 
 // ============================================
@@ -103,6 +104,33 @@ export const getJobById = async (jobId: string): Promise<JobResponse> => {
     return JobResponseSchema.parse(response.data);
   } catch (error) {
     console.error(`Error getting job ${jobId}:`, error);
+    throw error;
+  }
+};
+
+// ============================================
+// Get My Jobs (jobs created by current user)
+// GET /api/v1/jobs/my
+// ============================================
+
+export const getMyJobs = async (params?: MyJobsParams): Promise<JobListResponse> => {
+  try {
+    const queryParams: Record<string, string | number> = {};
+
+    if (params?.status) {
+      queryParams.status = params.status;
+    }
+    if (params?.skip !== undefined) {
+      queryParams.skip = params.skip;
+    }
+    if (params?.limit !== undefined) {
+      queryParams.limit = params.limit;
+    }
+
+    const response = await apiClient.get("/api/v1/jobs/my", {params: queryParams});
+    return JobListResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error getting my jobs:", error);
     throw error;
   }
 };

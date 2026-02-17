@@ -1,13 +1,18 @@
 import {createFileRoute} from "@tanstack/react-router";
+import {useState} from "react";
 import {useShallow} from "zustand/react/shallow";
 
 import {
   JobCard,
+  JobDetailsModal,
+  MOCK_JOB_DETAILS,
   useAvailableJobs,
   transformJobToCardProps,
   useJobFiltersStore,
   type JobListParams,
 } from "@/entities/Job";
+
+import {PostJobModal} from "@/features/postJob";
 
 import {JobsFilter} from "@/widgets/JobsFilter";
 
@@ -18,6 +23,9 @@ export const Route = createFileRoute("/(app)/jobs/")({
 });
 
 function JobsPage() {
+  const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+
   const filters = useJobFiltersStore(
     useShallow((state): JobListParams => ({
       job_type: state.jobType,
@@ -31,8 +39,7 @@ function JobsPage() {
   const {data, isLoading, isError, error, refetch} = useAvailableJobs(filters);
 
   const handleViewDetails = (id: string | number) => {
-    // TODO: Navigate to job detail page when route is created
-    console.log("View details for job:", id);
+    setSelectedJobId(String(id));
   };
 
   const handleClaimJob = (id: string | number) => {
@@ -45,8 +52,7 @@ function JobsPage() {
   };
 
   const handlePostNewJob = () => {
-    // TODO: Navigate to new job page when route is created
-    console.log("Post new job");
+    setIsPostJobModalOpen(true);
   };
 
   const handleResetFilters = () => {
@@ -76,8 +82,19 @@ function JobsPage() {
         }
       />
 
+      <PostJobModal open={isPostJobModalOpen} onClose={() => setIsPostJobModalOpen(false)} />
+
+      <JobDetailsModal
+        open={selectedJobId !== null}
+        onClose={() => setSelectedJobId(null)}
+        onClaimJob={() => {
+          if (selectedJobId) handleClaimJob(selectedJobId);
+        }}
+        data={MOCK_JOB_DETAILS}
+      />
+
       {/* Main Layout: Filter Sidebar + Jobs Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
         {/* Left Column: Filters */}
         <aside className="sticky self-start">
           <JobsFilter />
@@ -113,7 +130,7 @@ function JobsPage() {
 
           {!isLoading && !isError && jobs.length > 0 && (
             <>
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))' }}>
                 {jobs.map((job) => (
                   <JobCard
                     key={job.id}

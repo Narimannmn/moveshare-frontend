@@ -1,4 +1,4 @@
-import type {JobListParams} from "../schemas";
+import type {JobListParams, MyJobsParams} from "../schemas";
 
 export const jobKeys = {
   all: ["jobs"] as const,
@@ -6,6 +6,10 @@ export const jobKeys = {
   // List jobs
   lists: () => [...jobKeys.all, "list"] as const,
   list: (params?: JobListParams) => [...jobKeys.lists(), params] as const,
+
+  // My jobs
+  myJobs: () => [...jobKeys.all, "my"] as const,
+  myJobsList: (params?: MyJobsParams) => [...jobKeys.myJobs(), params] as const,
 
   // Job details
   details: () => [...jobKeys.all, "detail"] as const,

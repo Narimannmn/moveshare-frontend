@@ -1,16 +1,21 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useMatchRoute } from "@tanstack/react-router";
 
 import type { SidebarItem as SidebarItemType } from "@/shared/config";
 
 export const SidebarItem = ({ item }: { item: SidebarItemType }) => {
+  const matchRoute = useMatchRoute();
+  const isActive = !!matchRoute({ to: item.route, fuzzy: true });
+  const Icon = item.icon;
+
   return (
     <Link
       to={item.route}
-      activeOptions={{ exact: true }}
-      activeProps={{ className: "bg-blue-500 text-white" }}
-      className="flex items-center gap-3 p-4 rounded-lg cursor-pointer text-gray-700 hover:bg-blue-500 hover:text-white transition-all duration-200 ease-in-out"
+      className={`flex items-center gap-4 h-[52px] px-4 rounded-lg cursor-pointer transition-all duration-200 ease-in-out font-['Onest',sans-serif] text-base ${isActive
+          ? "bg-[#60A5FA] text-white"
+          : "text-[#202224] hover:bg-blue-50"
+        }`}
     >
-      {item.icon}
+      <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-white" : "text-[#60A5FA]"}`} />
       <span>{item.name}</span>
     </Link>
   );
