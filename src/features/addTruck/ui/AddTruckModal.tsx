@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Ruler, Sparkles, Truck, X } from "lucide-react";
 import { z } from "zod";
 
-import { useCreateTruck, CreateTruckRequest } from "@/entities/Truck";
+import { useCreateTruck, type CreateTruckRequest } from "@/entities/Truck";
 import { toast } from "sonner";
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input } from "@/shared/ui";
 

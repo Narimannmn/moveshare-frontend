@@ -42,7 +42,7 @@ export const JobCard = memo(
   ({
     id,
     title,
-    distance,
+    distance: _distance,
     isHotDeal = false,
     isNewListing = false,
     origin,

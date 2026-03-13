@@ -40,8 +40,6 @@ import { Route as appProfileFleetIndexRouteImport } from './../pages/(app)/profi
 import { Route as appProfileCompanyIndexRouteImport } from './../pages/(app)/profile/company/index'
 import { Route as appAdminSupportIndexRouteImport } from './../pages/(app)/admin/support/index'
 import { Route as appAdminSettingIndexRouteImport } from './../pages/(app)/admin/setting/index'
-import { Route as appAdminReviewCompanyIndexRouteImport } from './../pages/(app)/admin/review-company/index'
-import { Route as appAdminFreezeCompanyIndexRouteImport } from './../pages/(app)/admin/freeze-company/index'
 import { Route as appAdminFinanceIndexRouteImport } from './../pages/(app)/admin/finance/index'
 import { Route as appAdminCommissionIndexRouteImport } from './../pages/(app)/admin/commission/index'
 
@@ -201,18 +199,6 @@ const appAdminSettingIndexRoute = appAdminSettingIndexRouteImport.update({
   path: '/setting/',
   getParentRoute: () => appAdminRouteRoute,
 } as any)
-const appAdminReviewCompanyIndexRoute =
-  appAdminReviewCompanyIndexRouteImport.update({
-    id: '/review-company/',
-    path: '/review-company/',
-    getParentRoute: () => appAdminRouteRoute,
-  } as any)
-const appAdminFreezeCompanyIndexRoute =
-  appAdminFreezeCompanyIndexRouteImport.update({
-    id: '/freeze-company/',
-    path: '/freeze-company/',
-    getParentRoute: () => appAdminRouteRoute,
-  } as any)
 const appAdminFinanceIndexRoute = appAdminFinanceIndexRouteImport.update({
   id: '/finance/',
   path: '/finance/',
@@ -248,8 +234,6 @@ export interface FileRoutesByFullPath {
   '/register': typeof authRegisterIndexRoute
   '/admin/commission': typeof appAdminCommissionIndexRoute
   '/admin/finance': typeof appAdminFinanceIndexRoute
-  '/admin/freeze-company': typeof appAdminFreezeCompanyIndexRoute
-  '/admin/review-company': typeof appAdminReviewCompanyIndexRoute
   '/admin/setting': typeof appAdminSettingIndexRoute
   '/admin/support': typeof appAdminSupportIndexRoute
   '/profile/company': typeof appProfileCompanyIndexRoute
@@ -281,8 +265,6 @@ export interface FileRoutesByTo {
   '/register': typeof authRegisterIndexRoute
   '/admin/commission': typeof appAdminCommissionIndexRoute
   '/admin/finance': typeof appAdminFinanceIndexRoute
-  '/admin/freeze-company': typeof appAdminFreezeCompanyIndexRoute
-  '/admin/review-company': typeof appAdminReviewCompanyIndexRoute
   '/admin/setting': typeof appAdminSettingIndexRoute
   '/admin/support': typeof appAdminSupportIndexRoute
   '/profile/company': typeof appProfileCompanyIndexRoute
@@ -319,8 +301,6 @@ export interface FileRoutesById {
   '/(auth)/register/': typeof authRegisterIndexRoute
   '/(app)/admin/commission/': typeof appAdminCommissionIndexRoute
   '/(app)/admin/finance/': typeof appAdminFinanceIndexRoute
-  '/(app)/admin/freeze-company/': typeof appAdminFreezeCompanyIndexRoute
-  '/(app)/admin/review-company/': typeof appAdminReviewCompanyIndexRoute
   '/(app)/admin/setting/': typeof appAdminSettingIndexRoute
   '/(app)/admin/support/': typeof appAdminSupportIndexRoute
   '/(app)/profile/company/': typeof appProfileCompanyIndexRoute
@@ -356,8 +336,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/commission'
     | '/admin/finance'
-    | '/admin/freeze-company'
-    | '/admin/review-company'
     | '/admin/setting'
     | '/admin/support'
     | '/profile/company'
@@ -389,8 +367,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/commission'
     | '/admin/finance'
-    | '/admin/freeze-company'
-    | '/admin/review-company'
     | '/admin/setting'
     | '/admin/support'
     | '/profile/company'
@@ -426,8 +402,6 @@ export interface FileRouteTypes {
     | '/(auth)/register/'
     | '/(app)/admin/commission/'
     | '/(app)/admin/finance/'
-    | '/(app)/admin/freeze-company/'
-    | '/(app)/admin/review-company/'
     | '/(app)/admin/setting/'
     | '/(app)/admin/support/'
     | '/(app)/profile/company/'
@@ -663,20 +637,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appAdminSettingIndexRouteImport
       parentRoute: typeof appAdminRouteRoute
     }
-    '/(app)/admin/review-company/': {
-      id: '/(app)/admin/review-company/'
-      path: '/review-company'
-      fullPath: '/admin/review-company'
-      preLoaderRoute: typeof appAdminReviewCompanyIndexRouteImport
-      parentRoute: typeof appAdminRouteRoute
-    }
-    '/(app)/admin/freeze-company/': {
-      id: '/(app)/admin/freeze-company/'
-      path: '/freeze-company'
-      fullPath: '/admin/freeze-company'
-      preLoaderRoute: typeof appAdminFreezeCompanyIndexRouteImport
-      parentRoute: typeof appAdminRouteRoute
-    }
     '/(app)/admin/finance/': {
       id: '/(app)/admin/finance/'
       path: '/finance'
@@ -698,8 +658,6 @@ interface appAdminRouteRouteChildren {
   appAdminIndexRoute: typeof appAdminIndexRoute
   appAdminCommissionIndexRoute: typeof appAdminCommissionIndexRoute
   appAdminFinanceIndexRoute: typeof appAdminFinanceIndexRoute
-  appAdminFreezeCompanyIndexRoute: typeof appAdminFreezeCompanyIndexRoute
-  appAdminReviewCompanyIndexRoute: typeof appAdminReviewCompanyIndexRoute
   appAdminSettingIndexRoute: typeof appAdminSettingIndexRoute
   appAdminSupportIndexRoute: typeof appAdminSupportIndexRoute
 }
@@ -708,8 +666,6 @@ const appAdminRouteRouteChildren: appAdminRouteRouteChildren = {
   appAdminIndexRoute: appAdminIndexRoute,
   appAdminCommissionIndexRoute: appAdminCommissionIndexRoute,
   appAdminFinanceIndexRoute: appAdminFinanceIndexRoute,
-  appAdminFreezeCompanyIndexRoute: appAdminFreezeCompanyIndexRoute,
-  appAdminReviewCompanyIndexRoute: appAdminReviewCompanyIndexRoute,
   appAdminSettingIndexRoute: appAdminSettingIndexRoute,
   appAdminSupportIndexRoute: appAdminSupportIndexRoute,
 }

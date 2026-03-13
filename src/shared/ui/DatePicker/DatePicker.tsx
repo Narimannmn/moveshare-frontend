@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CalendarDays } from "lucide-react";
 
@@ -24,7 +24,6 @@ const formatDisplayDate = (value: string) => {
 export const DatePicker = ({ value, onChange, placeholder = "Select date", className, disablePast = false }: DatePickerProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const selectedDate = useMemo(() => parseIsoDate(value), [value]);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
