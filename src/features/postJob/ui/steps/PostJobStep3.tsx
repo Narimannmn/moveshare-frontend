@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Checkbox } from "@shared/ui";
 
@@ -10,6 +10,13 @@ interface PostJobStep3Props {
 }
 
 const ALLOWED_FILE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "application/pdf"]);
+const selectChevronStyle = {
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23202224' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")",
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "right 16px center",
+  backgroundSize: "14px",
+} as const;
 
 const parseAdditionalServices = (additionalServices: string): Set<string> =>
   new Set(
@@ -18,6 +25,9 @@ const parseAdditionalServices = (additionalServices: string): Set<string> =>
       .map((service) => service.trim())
       .filter(Boolean)
   );
+
+const getFileSignature = (file: File): string =>
+  `${file.name}:${file.size}:${file.lastModified}:${file.type}`;
 
 export const PostJobStep3 = ({ onCancel: _onCancel }: PostJobStep3Props) => {
   const formData = usePostJobStore((state) => state.formData);
@@ -44,6 +54,7 @@ export const PostJobStep3 = ({ onCancel: _onCancel }: PostJobStep3Props) => {
   const [loadingAssistance, setLoadingAssistance] = useState(formData.loadingAssistanceCount || 1);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>(formData.uploadedFiles ?? []);
   const [fileError, setFileError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
     setLoadingAssistance(formData.loadingAssistanceCount || 1);
   }, [formData.loadingAssistanceCount]);
@@ -102,8 +113,25 @@ export const PostJobStep3 = ({ onCancel: _onCancel }: PostJobStep3Props) => {
         setFileError(null);
       }
 
-      setUploadedFiles(validFiles);
+      setUploadedFiles((prevFiles) => {
+        const merged = [...prevFiles, ...validFiles];
+        const seen = new Set<string>();
+        return merged.filter((file) => {
+          const signature = getFileSignature(file);
+          if (seen.has(signature)) {
+            return false;
+          }
+          seen.add(signature);
+          return true;
+        });
+      });
+
+      e.target.value = "";
     }
+  };
+
+  const handleChooseFilesClick = () => {
+    fileInputRef.current?.click();
   };
 
   const isValid = loadingAssistance > 0 && uploadedFiles.length > 0;
@@ -180,8 +208,8 @@ export const PostJobStep3 = ({ onCancel: _onCancel }: PostJobStep3Props) => {
           <select
             value={loadingAssistance}
             onChange={(e) => setLoadingAssistance(Number(e.target.value))}
-            className="w-full h-11 border border-[#D8D8D8] rounded-lg pl-10 pr-12 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA] bg-white"
-            style={{ textIndent: "8px" }}
+            className="w-full h-11 border border-[#D8D8D8] rounded-lg appearance-none px-4 pr-10 text-base font-normal text-[#202224] focus:outline-none focus:border-[#60A5FA] bg-white"
+            style={selectChevronStyle}
           >
             <option value={1}>1 helper</option>
             <option value={2}>2 helpers</option>
@@ -203,19 +231,21 @@ export const PostJobStep3 = ({ onCancel: _onCancel }: PostJobStep3Props) => {
               <p className="text-sm text-[#A6A6A6]">Drag & drop images here or click to browse</p>
             </div>
             <input
+              ref={fileInputRef}
               type="file"
               multiple
               accept=".jpg,.jpeg,.png,.pdf"
               onChange={handleFileUpload}
-              className="hidden"
+              className="sr-only"
               id="file-upload"
             />
-            <label
-              htmlFor="file-upload"
+            <button
+              type="button"
+              onClick={handleChooseFilesClick}
               className="h-11 rounded-lg px-4 py-2.5 text-base font-normal text-white bg-[#60A5FA] hover:bg-[#5094E0] cursor-pointer"
             >
               Choose Files
-            </label>
+            </button>
             {uploadedFiles.length > 0 && (
               <div className="w-full mt-4">
                 <p className="text-sm font-medium text-[#202224] mb-2">

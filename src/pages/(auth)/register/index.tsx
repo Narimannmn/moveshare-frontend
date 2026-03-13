@@ -4,7 +4,6 @@ import { Typography } from "@/shared/ui";
 
 import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 
-import { AppleLoginButton } from "@features/auth/loginWithApple/ui/AppleLoginButton";
 import { GoogleLoginButton } from "@features/auth/loginWithGoogle/ui/GoogleLoginButton";
 import { EmailRegisterForm } from "@features/auth/registerWithEmail/ui/EmailRegisterForm";
 
@@ -41,12 +40,11 @@ function RegisterPage() {
 
       <div className="space-y-3">
         <GoogleLoginButton />
-        <AppleLoginButton />
       </div>
 
-      <div className="text-center text-sm">
-        <span className="text-[#666C72]">Don't have an account? </span>
-        <Link to="/login" className="text-[#60A5FA] hover:underline font-medium">
+      <div className="flex items-center justify-center gap-2 text-base leading-none">
+        <span className="text-[#202224] opacity-65">Don't have an account?</span>
+        <Link to="/login" className="text-[#60A5FA] font-bold leading-none hover:underline">
           Login
         </Link>
       </div>

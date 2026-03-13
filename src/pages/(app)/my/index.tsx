@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Edit, Eye, Trash2 } from "lucide-react";
 
 import { Button } from "@/shared/ui/Button/Button";
+import { PageHeader } from "@/shared/ui/PageHeader/PageHeader";
 import {
   Pagination,
   PaginationContent,
@@ -135,6 +136,10 @@ function MyJobsPage() {
 
   const jobs = data?.jobs ?? [];
   const total = data?.total ?? 0;
+  const statusCounts = data?.status_counts ?? null;
+  const allCountFromStats = statusCounts
+    ? Object.values(statusCounts).reduce((sum, count) => sum + count, 0)
+    : null;
   const currentPage = Math.floor(offset / limit) + 1;
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const fromJob = jobs.length > 0 ? offset + 1 : 0;
@@ -259,24 +264,43 @@ function MyJobsPage() {
       <PostJobModal open={isPostJobModalOpen} onClose={() => setIsPostJobModalOpen(false)} />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-[#202224]">My Jobs</h1>
-        <div className="flex gap-3">
-          <Button variant="secondary" onClick={handleRefresh} disabled={isLoading}>
-            {isLoading ? "Loading..." : "Refresh"}
-          </Button>
-          <Button variant="primary" onClick={handlePostNewJob}>
-            Post New Job
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="My Jobs"
+        actions={
+          <>
+            <Button variant="secondary" onClick={handleRefresh} disabled={isLoading}>
+              {isLoading ? "Loading..." : "Refresh"}
+            </Button>
+            <Button variant="primary" onClick={handlePostNewJob}>
+              Post New Job
+            </Button>
+          </>
+        }
+      />
 
       {/* Status Tabs */}
       <div className="mb-6">
         <div className="flex gap-6 border-b border-gray-200">
           {statusTabs.map((tab) => {
-            const count =
-              tab.id === "all" ? total : jobs.filter((job) => job.status === tab.id).length;
+            const count = (() => {
+              if (statusCounts) {
+                if (tab.id === "all") {
+                  return allCountFromStats ?? 0;
+                }
+
+                return statusCounts[tab.id] ?? 0;
+              }
+
+              if (tab.id === "all") {
+                return total;
+              }
+
+              if (activeTab === tab.id) {
+                return total;
+              }
+
+              return 0;
+            })();
 
             return (
               <button

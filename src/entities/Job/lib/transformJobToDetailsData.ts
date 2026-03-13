@@ -31,6 +31,21 @@ const asText = (value?: string | null): string => {
   return text.length > 0 ? text : NA_VALUE;
 };
 
+const toInitials = (name?: string | null): string => {
+  const text = asText(name);
+  if (text === NA_VALUE) return "NA";
+
+  const words = text
+    .split(" ")
+    .map((word) => word.trim())
+    .filter(Boolean);
+
+  if (words.length === 0) return "NA";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+
+  return `${words[0][0] ?? ""}${words[1][0] ?? ""}`.toUpperCase();
+};
+
 const parseMoney = (value?: string | null): number | null => {
   if (!value) return null;
   const parsed = Number(value);
@@ -139,7 +154,6 @@ export const createEmptyJobDetailsData = (): JobDetailsData => ({
     estimatedTime: NA_VALUE,
     truckSize: NA_VALUE,
     cargoType: NA_VALUE,
-    weight: NA_VALUE,
     volume: NA_VALUE,
   },
   schedule: {
@@ -162,8 +176,8 @@ export const transformJobToDetailsData = (job: JobResponse): JobDetailsData => (
   title: toTitle(job),
   route: `${toCityState(job.pickup_address)} \u2192 ${toCityState(job.delivery_address)}`,
   company: {
-    initials: "NA",
-    name: NA_VALUE,
+    initials: toInitials(job.company?.name),
+    name: asText(job.company?.name),
     reviews: null,
     avgResponseTime: NA_VALUE,
     completedJobs: null,
@@ -184,7 +198,6 @@ export const transformJobToDetailsData = (job: JobResponse): JobDetailsData => (
     estimatedTime: NA_VALUE,
     truckSize: NA_VALUE,
     cargoType: NA_VALUE,
-    weight: NA_VALUE,
     volume: NA_VALUE,
   },
   schedule: {

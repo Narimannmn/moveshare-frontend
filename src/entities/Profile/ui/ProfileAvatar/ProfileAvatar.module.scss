@@ -64,13 +64,19 @@
   }
 }
 
-/* Change button */
-.changeButton {
+/* Actions bar */
+.actions {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 36px;
+  display: flex;
+}
+
+/* Change button */
+.changeButton {
+  flex: 1;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
   color: white;
@@ -87,6 +93,39 @@
 
   &:hover {
     background: rgba(0, 0, 0, 0.8);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+/* Delete button */
+.deleteButton {
+  width: 36px;
+  background: rgba(220, 38, 38, 0.8);
+  backdrop-filter: blur(4px);
+  color: white;
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgba(220, 38, 38, 0.95);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 
   svg {

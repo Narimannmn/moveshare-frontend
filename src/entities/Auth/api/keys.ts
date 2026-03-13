@@ -17,6 +17,9 @@ export const authKeys = {
   refresh: () => [...authKeys.token(), "refresh"] as const,
   logout: () => [...authKeys.token(), "logout"] as const,
   logoutAll: () => [...authKeys.token(), "logout-all"] as const,
+  sessions: () => [...authKeys.token(), "sessions"] as const,
+  terminateSession: (sessionId: string) =>
+    [...authKeys.sessions(), "terminate", sessionId] as const,
 
   // Forgot password flow
   forgotPassword: () => [...authKeys.all, "forgot-password"] as const,
@@ -26,4 +29,9 @@ export const authKeys = {
 
   // Company profile
   companyProfile: () => [...authKeys.all, "company-profile"] as const,
+  uploadProfileImage: () => [...authKeys.companyProfile(), "upload-image"] as const,
+  deleteProfileImage: () => [...authKeys.companyProfile(), "delete-image"] as const,
+
+  // Notification preferences
+  notificationPreferences: () => [...authKeys.all, "notification-preferences"] as const,
 } as const;

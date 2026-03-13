@@ -1,15 +1,28 @@
 import { apiClient } from "@shared/api/client";
 
 import {
+  type AppliedJobsListResponse,
+  AppliedJobsListResponseSchema,
+  type AppliedJobsParams,
   type CancelJobsRequest,
   CancelJobsRequestSchema,
   type CancelJobsResponse,
   CancelJobsResponseSchema,
+  type ConfirmClaimCheckoutSessionRequest,
+  ConfirmClaimCheckoutSessionRequestSchema,
+  type ConfirmClaimCheckoutSessionResponse,
+  ConfirmClaimCheckoutSessionResponseSchema,
+  type CreateClaimCheckoutSessionRequest,
+  CreateClaimCheckoutSessionRequestSchema,
+  type CreateClaimCheckoutSessionResponse,
+  CreateClaimCheckoutSessionResponseSchema,
   type CreateJobRequest,
   CreateJobRequestSchema,
   type ExportJobsRequest,
   ExportJobsRequestSchema,
   type JobListParams,
+  type JobLocationsResponse,
+  JobLocationsResponseSchema,
   type JobListResponse,
   JobListResponseSchema,
   type JobResponse,
@@ -39,11 +52,32 @@ export const getAvailableJobs = async (params?: JobListParams): Promise<JobListR
     if (params?.limit !== undefined) {
       queryParams.limit = params.limit;
     }
+    if (params?.origin) {
+      queryParams.origin = params.origin;
+    }
+    if (params?.destination) {
+      queryParams.destination = params.destination;
+    }
 
     const response = await apiClient.get("/api/v1/jobs", { params: queryParams });
     return JobListResponseSchema.parse(response.data);
   } catch (error) {
     console.error("Error getting available jobs:", error);
+    throw error;
+  }
+};
+
+// ============================================
+// Get Available Job Locations for Filters
+// GET /api/v1/jobs/locations
+// ============================================
+
+export const getAvailableJobLocations = async (): Promise<JobLocationsResponse> => {
+  try {
+    const response = await apiClient.get("/api/v1/jobs/locations");
+    return JobLocationsResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error getting available job locations:", error);
     throw error;
   }
 };
@@ -172,6 +206,70 @@ export const cancelJobs = async (request: CancelJobsRequest): Promise<CancelJobs
     return CancelJobsResponseSchema.parse(response.data);
   } catch (error) {
     console.error("Error cancelling jobs:", error);
+    throw error;
+  }
+};
+
+// ============================================
+// Create claim checkout session
+// POST /api/v1/jobs/{job_id}/claim/checkout-session
+// ============================================
+
+export const createClaimCheckoutSession = async (
+  jobId: string,
+  request: CreateClaimCheckoutSessionRequest
+): Promise<CreateClaimCheckoutSessionResponse> => {
+  try {
+    const validated = CreateClaimCheckoutSessionRequestSchema.parse(request);
+    const response = await apiClient.post(`/api/v1/jobs/${jobId}/claim/checkout-session`, validated);
+    return CreateClaimCheckoutSessionResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error creating claim checkout session:", error);
+    throw error;
+  }
+};
+
+// ============================================
+// Confirm claim checkout session
+// POST /api/v1/jobs/claim/confirm
+// ============================================
+
+export const confirmClaimCheckoutSession = async (
+  request: ConfirmClaimCheckoutSessionRequest
+): Promise<ConfirmClaimCheckoutSessionResponse> => {
+  try {
+    const validated = ConfirmClaimCheckoutSessionRequestSchema.parse(request);
+    const response = await apiClient.post("/api/v1/jobs/claim/confirm", validated);
+    return ConfirmClaimCheckoutSessionResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error confirming claim checkout session:", error);
+    throw error;
+  }
+};
+
+// ============================================
+// Get applied/claimed jobs for current mover
+// GET /api/v1/jobs/applied
+// ============================================
+
+export const getAppliedJobs = async (params?: AppliedJobsParams): Promise<AppliedJobsListResponse> => {
+  try {
+    const queryParams: Record<string, string | number> = {};
+
+    if (params?.status) {
+      queryParams.status = params.status;
+    }
+    if (params?.skip !== undefined) {
+      queryParams.skip = params.skip;
+    }
+    if (params?.limit !== undefined) {
+      queryParams.limit = params.limit;
+    }
+
+    const response = await apiClient.get("/api/v1/jobs/applied", { params: queryParams });
+    return AppliedJobsListResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error getting applied jobs:", error);
     throw error;
   }
 };

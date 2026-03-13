@@ -1,6 +1,6 @@
 import {queryOptions, useQuery} from "@tanstack/react-query";
 
-import type {JobListParams, MyJobsParams} from "../schemas";
+import type { AppliedJobsParams, JobListParams, MyJobsParams } from "../schemas";
 import {jobKeys} from "./keys";
 import * as services from "./services";
 
@@ -18,6 +18,22 @@ export const availableJobsQueryOptions = (params?: JobListParams) =>
 
 export const useAvailableJobs = (params?: JobListParams) => {
   return useQuery(availableJobsQueryOptions(params));
+};
+
+// ============================================
+// Available Jobs Locations Query
+// ============================================
+
+export const availableJobLocationsQueryOptions = () =>
+  queryOptions({
+    queryKey: jobKeys.locations(),
+    queryFn: () => services.getAvailableJobLocations(),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+export const useAvailableJobLocations = () => {
+  return useQuery(availableJobLocationsQueryOptions());
 };
 
 // ============================================
@@ -51,4 +67,20 @@ export const myJobsQueryOptions = (params?: MyJobsParams) =>
 
 export const useMyJobs = (params?: MyJobsParams) => {
   return useQuery(myJobsQueryOptions(params));
+};
+
+// ============================================
+// Applied / Claimed Jobs Query
+// ============================================
+
+export const appliedJobsQueryOptions = (params?: AppliedJobsParams) =>
+  queryOptions({
+    queryKey: jobKeys.appliedList(params),
+    queryFn: () => services.getAppliedJobs(params),
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+export const useAppliedJobs = (params?: AppliedJobsParams) => {
+  return useQuery(appliedJobsQueryOptions(params));
 };

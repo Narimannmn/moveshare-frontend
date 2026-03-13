@@ -44,30 +44,35 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 export const DialogContent = memo(
   forwardRef<HTMLDivElement, DialogContentProps>(
-    ({ className, children, showClose = true, onClose, ...props }, ref) => (
-      <DialogPortal>
-        <DialogOverlay />
-        <DialogPrimitive.Content
-          ref={ref}
-          className={cn(
-            "fixed left-[50%] top-[50%] z-50 grid w-full max-w-5xl translate-x-[-50%] translate-y-[-50%] gap-4 bg-white shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 rounded-lg overflow-hidden",
-            className
-          )}
-          {...props}
-        >
-          {children}
-          {showClose && (
-            <DialogPrimitive.Close
-              onClick={onClose}
-              className="absolute right-6 top-6 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-10"
-            >
-              <X className="size-6 text-white" />
-              <span className="sr-only">Close</span>
-            </DialogPrimitive.Close>
-          )}
-        </DialogPrimitive.Content>
-      </DialogPortal>
-    )
+    ({ className, children, showClose = true, onClose, ...props }, ref) => {
+      const ariaDescribedBy = props["aria-describedby"];
+
+      return (
+        <DialogPortal>
+          <DialogOverlay />
+          <DialogPrimitive.Content
+            ref={ref}
+            className={cn(
+              "fixed left-[50%] top-[50%] z-50 grid w-full max-w-5xl translate-x-[-50%] translate-y-[-50%] gap-4 bg-white shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 rounded-lg overflow-hidden",
+              className
+            )}
+            {...props}
+            aria-describedby={ariaDescribedBy ?? undefined}
+          >
+            {children}
+            {showClose && (
+              <DialogPrimitive.Close
+                onClick={onClose}
+                className="absolute right-6 top-6 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-10"
+              >
+                <X className="size-6 text-white" />
+                <span className="sr-only">Close</span>
+              </DialogPrimitive.Close>
+            )}
+          </DialogPrimitive.Content>
+        </DialogPortal>
+      );
+    }
   )
 );
 

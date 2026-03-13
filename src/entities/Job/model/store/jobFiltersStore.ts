@@ -6,6 +6,8 @@ import type { BedroomCount, JobType } from "@/entities/Job/schemas";
 interface JobFiltersState {
   jobType: JobType | null;
   bedroomCount: BedroomCount | null;
+  origin: string | null;
+  destination: string | null;
   offset: number;
   limit: number;
 }
@@ -13,6 +15,8 @@ interface JobFiltersState {
 interface JobFiltersActions {
   setJobType: (jobType: JobType | null) => void;
   setBedroomCount: (bedroomCount: BedroomCount | null) => void;
+  setOrigin: (origin: string | null) => void;
+  setDestination: (destination: string | null) => void;
   setPage: (page: number) => void;
   setLimit: (limit: number) => void;
   resetFilters: () => void;
@@ -23,6 +27,8 @@ type JobFiltersStore = JobFiltersState & { actions: JobFiltersActions };
 const initialState: JobFiltersState = {
   jobType: null,
   bedroomCount: null,
+  origin: null,
+  destination: null,
   offset: 0,
   limit: 20,
 };
@@ -37,6 +43,11 @@ export const useJobFiltersStore = create<JobFiltersStore>()(
 
         setBedroomCount: (bedroomCount) =>
           set({ bedroomCount, offset: 0 }, false, "setBedroomCount"),
+
+        setOrigin: (origin) => set({ origin, offset: 0 }, false, "setOrigin"),
+
+        setDestination: (destination) =>
+          set({ destination, offset: 0 }, false, "setDestination"),
 
         setPage: (page) => set((state) => ({ offset: page * state.limit }), false, "setPage"),
 

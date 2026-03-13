@@ -20,6 +20,8 @@ export interface JobCardProps {
     city: string;
     state: string;
   };
+  originAddress?: string;
+  destinationAddress?: string;
   dates: {
     start: string;
     end: string;
@@ -45,6 +47,8 @@ export const JobCard = memo(
     isNewListing = false,
     origin,
     destination,
+    originAddress,
+    destinationAddress,
     dates,
     truckSize,
     weight,
@@ -54,6 +58,20 @@ export const JobCard = memo(
     onClaimJob,
     className,
   }: JobCardProps) => {
+    const buildDirectionsMapUrl = (
+      originInput: string,
+      destinationInput: string,
+      jobId: string | number
+    ): string => {
+      const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").trim().replace(/\/$/, "");
+      const originEncoded = encodeURIComponent(originInput);
+      const destinationEncoded = encodeURIComponent(destinationInput);
+      const jobIdEncoded = encodeURIComponent(String(jobId));
+      const endpointPath = `/api/v1/maps/embed-route?origin=${originEncoded}&destination=${destinationEncoded}&job_id=${jobIdEncoded}`;
+
+      return apiBaseUrl ? `${apiBaseUrl}${endpointPath}` : endpointPath;
+    };
+
     const handleViewDetails = () => {
       onViewDetails?.(id);
     };
@@ -81,6 +99,9 @@ export const JobCard = memo(
 
     const originText = formatLocation(origin);
     const destinationText = formatLocation(destination);
+    const routeOrigin = originAddress?.trim() || originText;
+    const routeDestination = destinationAddress?.trim() || destinationText;
+    const mapSrc = buildDirectionsMapUrl(routeOrigin, routeDestination, id);
 
     return (
       <div className={cn(styles.card, className)}>
@@ -89,7 +110,6 @@ export const JobCard = memo(
           <div className={styles.headerLeft}>
             <h3 className={styles.title}>{title}</h3>
             <div className={styles.metadata}>
-              <span className={styles.distance}>{distance} mi from you</span>
               {isHotDeal && <span className={styles.hotDeal}>Hot deal</span>}
             </div>
           </div>
@@ -110,10 +130,13 @@ export const JobCard = memo(
         {/* Map Placeholder */}
         <div className={styles.mapContainer}>
           <div className={styles.map}>
-            <img
-              src="/assets/figma/images/job-map.svg"
-              alt={`${originText} to ${destinationText} route`}
-              className={styles.mapImage}
+            <iframe
+              src={mapSrc}
+              title={`${originText} to ${destinationText} route map`}
+              className={styles.mapFrame}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
             />
           </div>
         </div>
@@ -152,7 +175,7 @@ export const JobCard = memo(
           <div className={styles.actions}>
             <Button
               variant="outline"
-              size="default"
+              size="sm"
               onClick={handleViewDetails}
               className={styles.viewDetailsButton}
             >
@@ -160,7 +183,7 @@ export const JobCard = memo(
             </Button>
             <Button
               variant="primary"
-              size="default"
+              size="sm"
               onClick={handleClaimJob}
               className={styles.claimButton}
             >

@@ -1,10 +1,10 @@
-import { memo, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 
 import { cn } from "@/shared/lib/utils";
 
-import { type BedroomCount, useJobFiltersStore } from "@/entities/Job";
+import { type BedroomCount, useAvailableJobLocations, useJobFiltersStore } from "@/entities/Job";
 
-import { Button, Checkbox, DatePicker, Input } from "@shared/ui";
+import { Button, Checkbox, DatePicker } from "@shared/ui";
 
 import styles from "./JobsFilter.module.scss";
 
@@ -27,16 +27,130 @@ const TRUCK_SIZE_OPTIONS = [
   { value: "large", label: "Large (≥53')" },
 ];
 
+interface SearchableDropdownProps {
+  value: string;
+  onSelect: (value: string) => void;
+  options: string[];
+  placeholder: string;
+  searchPlaceholder: string;
+  emptyText: string;
+  loading?: boolean;
+}
+
+const SearchableDropdown = ({
+  value,
+  onSelect,
+  options,
+  placeholder,
+  searchPlaceholder,
+  emptyText,
+  loading = false,
+}: SearchableDropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!rootRef.current) return;
+      if (!rootRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+    }
+  }, [isOpen]);
+
+  const filteredOptions = useMemo(() => {
+    if (!searchQuery.trim()) return options;
+
+    const normalizedQuery = searchQuery.toLowerCase();
+    return options.filter((option) => option.toLowerCase().includes(normalizedQuery));
+  }, [options, searchQuery]);
+
+  return (
+    <div ref={rootRef} className={styles.dropdown}>
+      <button
+        type="button"
+        className={cn(styles.dropdownTrigger, !value && styles.dropdownPlaceholder)}
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <span className={styles.dropdownValue}>{value || placeholder}</span>
+        <span className={cn(styles.dropdownArrow, isOpen && styles.dropdownArrowOpen)}>⌄</span>
+      </button>
+
+      {isOpen && (
+        <div className={styles.dropdownMenu}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder={searchPlaceholder}
+            className={styles.dropdownSearch}
+          />
+
+          <div className={styles.dropdownList}>
+            {value && (
+              <button
+                type="button"
+                className={styles.dropdownOption}
+                onClick={() => {
+                  onSelect("");
+                  setIsOpen(false);
+                }}
+              >
+                Clear selection
+              </button>
+            )}
+
+            {loading ? (
+              <div className={styles.dropdownEmpty}>Loading...</div>
+            ) : filteredOptions.length === 0 ? (
+              <div className={styles.dropdownEmpty}>{emptyText}</div>
+            ) : (
+              filteredOptions.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={cn(styles.dropdownOption, option === value && styles.dropdownOptionActive)}
+                  onClick={() => {
+                    onSelect(option);
+                    setIsOpen(false);
+                  }}
+                >
+                  {option}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const JobsFilter = memo(({ className }: JobsFilterProps) => {
   const storeBedroomCount = useJobFiltersStore((state) => state.bedroomCount);
+  const storeOrigin = useJobFiltersStore((state) => state.origin);
+  const storeDestination = useJobFiltersStore((state) => state.destination);
   const setBedroomCount = useJobFiltersStore((state) => state.actions.setBedroomCount);
+  const setOriginFilter = useJobFiltersStore((state) => state.actions.setOrigin);
+  const setDestinationFilter = useJobFiltersStore((state) => state.actions.setDestination);
+  const { data: locationOptions, isLoading: isLocationsLoading } = useAvailableJobLocations();
 
   // Local state for form inputs before applying
   const [localBedroomCount, setLocalBedroomCount] = useState<BedroomCount | null>(
     storeBedroomCount
   );
-  const [origin, setOrigin] = useState("");
-  const [destination, setDestination] = useState("");
+  const [origin, setOrigin] = useState(storeOrigin ?? "");
+  const [destination, setDestination] = useState(storeDestination ?? "");
   const [distance, setDistance] = useState(250);
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
@@ -46,6 +160,8 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
 
   const handleApplyFilters = () => {
     setBedroomCount(localBedroomCount);
+    setOriginFilter(origin.trim() ? origin.trim() : null);
+    setDestinationFilter(destination.trim() ? destination.trim() : null);
     // TODO: Apply other filters when backend supports them
   };
 
@@ -59,6 +175,9 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
     setTruckSizes([]);
     setTruckSizeMin("");
     setTruckSizeMax("");
+    setBedroomCount(null);
+    setOriginFilter(null);
+    setDestinationFilter(null);
   };
 
   const handleTruckSizeToggle = (value: string) => {
@@ -69,8 +188,8 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
 
   const hasActiveFilters =
     localBedroomCount !== null ||
-    origin ||
-    destination ||
+    origin.trim() ||
+    destination.trim() ||
     distance !== 250 ||
     dateStart ||
     dateEnd ||
@@ -106,22 +225,28 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
         {/* Origin */}
         <div className={styles.filterSection}>
           <label className={styles.label}>Origin</label>
-          <Input
+          <SearchableDropdown
             value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
+            onSelect={setOrigin}
+            options={locationOptions?.origins ?? []}
             placeholder="City, State"
-            className={styles.input}
+            searchPlaceholder="Search origin"
+            emptyText="No origins found"
+            loading={isLocationsLoading}
           />
         </div>
 
         {/* Destination */}
         <div className={styles.filterSection}>
           <label className={styles.label}>Destination</label>
-          <Input
+          <SearchableDropdown
             value={destination}
-            onChange={(e) => setDestination(e.target.value)}
+            onSelect={setDestination}
+            options={locationOptions?.destinations ?? []}
             placeholder="City, State"
-            className={styles.input}
+            searchPlaceholder="Search destination"
+            emptyText="No destinations found"
+            loading={isLocationsLoading}
           />
         </div>
 
@@ -149,7 +274,7 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
         {/* Date Start */}
         <div className={styles.filterSection}>
           <label className={styles.label}>Date Start</label>
-          <DatePicker value={dateStart} onChange={setDateStart} placeholder="Select start date" />
+          <DatePicker value={dateStart} onChange={setDateStart} placeholder="Select start date" disablePast />
         </div>
 
         {/* Date End */}

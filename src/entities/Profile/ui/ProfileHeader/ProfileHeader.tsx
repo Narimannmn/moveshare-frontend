@@ -8,7 +8,7 @@ import styles from "./ProfileHeader.module.scss";
 
 export interface ProfileHeaderProps {
   companyName: string;
-  email: string;
+  email?: string | null;
   isVerified: boolean;
   className?: string;
 }
@@ -18,7 +18,7 @@ export const ProfileHeader = memo(
     return (
       <div className={cn(styles.container, className)}>
         <h1 className={styles.companyName}>{companyName}</h1>
-        <p className={styles.email}>{email}</p>
+        {email && <p className={styles.email}>{email}</p>}
         {isVerified && (
           <div className={styles.verifiedBadge}>
             <CheckCircle size={16} />

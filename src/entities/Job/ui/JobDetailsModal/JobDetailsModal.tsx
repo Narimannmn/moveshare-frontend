@@ -33,7 +33,6 @@ export interface JobDetailsData {
     estimatedTime: string;
     truckSize: string;
     cargoType: string;
-    weight: string;
     volume: string;
   };
   schedule: {
@@ -59,21 +58,15 @@ interface JobDetailsModalProps {
 }
 
 const badgeStyles = {
-  blue: "bg-[#e3f2fd] text-[#333]",
-  green: "bg-[#e8f5e9] text-[#333]",
-  yellow: "bg-[#fff8e1] text-[#333]",
+  blue: "bg-[#E3F2FD] text-[#333333]",
+  green: "bg-[#E8F5E9] text-[#333333]",
+  yellow: "bg-[#FFF8E1] text-[#333333]",
 } as const;
 
-const DetailField = memo(
-  ({ label, value }: { label: string; value: string }) => (
-    <div className="flex flex-col gap-2">
-      <span className="text-[12px] font-bold text-[#90A4AE] leading-none">{label}</span>
-      <span className="text-[14px] text-[#202224] leading-[18px]">{value}</span>
-    </div>
-  )
-);
-
-DetailField.displayName = "DetailField";
+const ensureText = (value: string | null | undefined) => {
+  const normalized = (value ?? "").trim();
+  return normalized.length > 0 ? normalized : "N/A";
+};
 
 const formatNumber = (value: number | null): string => {
   if (value === null || Number.isNaN(value)) return "N/A";
@@ -85,71 +78,78 @@ const formatMoney = (value: number | null): string => {
   return `$${value.toLocaleString()}`;
 };
 
-export const JobDetailsModal = memo(
-  ({ open, onClose, onClaimJob, data }: JobDetailsModalProps) => {
-    return (
-      <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent
-          className="w-[min(820.96px,calc(100vw-48px))] max-w-[820.96px] gap-0 p-0 overflow-hidden border border-[#D8D8D8] rounded-[8px]"
-          showClose={false}
-        >
-          <div className="bg-[#60A5FA] h-[63px] flex items-center justify-between px-4">
-            <div className="flex items-center gap-2 text-white min-w-0">
-              <span className="text-[24px] leading-none font-bold truncate">{data.title}</span>
-              <span className="text-[16px] leading-none font-normal truncate">{data.route}</span>
+const DetailField = memo(({ label, value }: { label: string; value: string }) => (
+  <div className="flex min-w-0 flex-col gap-2">
+    <span className="text-[12px] font-bold leading-none text-[#90A4AE]">{label}</span>
+    <span className="text-[14px] leading-[18px] text-[#202224] break-words">{ensureText(value)}</span>
+  </div>
+));
+
+DetailField.displayName = "DetailField";
+
+export const JobDetailsModal = memo(({ open, onClose, onClaimJob, data }: JobDetailsModalProps) => {
+  const badges =
+    data.company.badges.length > 0
+      ? data.company.badges
+      : [];
+
+  return (
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent
+        showClose={false}
+        className="w-[min(1024px,calc(100vw-48px))] max-w-[1024px] border-0 bg-transparent p-0 shadow-none rounded-none overflow-visible data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100"
+      >
+        <div className="overflow-hidden rounded-[8px] bg-white">
+          <div className="flex h-[70px] items-center justify-between bg-[#60A5FA] px-4">
+            <div className="flex min-w-0 items-center gap-2 text-white">
+              <span className="truncate text-[20px] font-bold leading-tight">{ensureText(data.title)}</span>
+              <span className="truncate text-[14px] font-normal leading-tight">{ensureText(data.route)}</span>
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="bg-transparent border-0 p-0 text-white/95 hover:text-white transition-colors shrink-0 focus:outline-none"
+              className="shrink-0 border-0 bg-transparent p-0 text-white/90 transition-colors hover:text-white focus:outline-none"
+              aria-label="Close"
             >
               <X className="size-6" />
             </button>
           </div>
 
-          <div className="bg-white px-4 pt-6 pb-0">
-            <div className="bg-[#F5F6FA] rounded-[8px] px-4 py-4 flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-[11px] min-w-0">
-                  <div className="bg-[#E3F2FD] rounded-[10px] size-12 flex items-center justify-center shrink-0">
-                    <span className="text-[32px] leading-none font-bold text-[#2196F3]">
-                      {data.company.initials}
+          <div className="bg-white px-6 py-4">
+            <div className="rounded-[8px] bg-[#F5F6FA] p-3">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex size-12 items-center justify-center rounded-[10px] bg-[#E3F2FD]">
+                    <span className="text-[20px] font-bold leading-none text-[#2196F3]">
+                      {ensureText(data.company.initials)}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[20px] leading-none font-bold text-[#333333] truncate">
-                      {data.company.name}
-                    </span>
-                    <span className="text-[12px] text-[#90A4AE] leading-none">
+                  <div className="min-w-0">
+                    <p className="truncate text-[18px] font-bold leading-none text-[#333333]">
+                      {ensureText(data.company.name)}
+                    </p>
+                    <p className="mt-2 text-[12px] leading-none text-[#90A4AE]">
                       {data.company.reviews === null ? "N/A" : `${data.company.reviews} reviews`}
-                    </span>
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-6 shrink-0">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[12px] font-bold text-[#90A4AE] leading-none whitespace-nowrap">
-                      Average Response Time
-                    </span>
-                    <span className="text-[14px] text-[#202224] leading-none">
-                      {data.company.avgResponseTime}
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[12px] font-bold text-[#90A4AE] leading-none whitespace-nowrap">
-                      Completed Jobs
-                    </span>
-                    <span className="text-[14px] text-[#202224] leading-none">
+
+                <div className="flex shrink-0 gap-8">
+                  <div>
+                    <p className="text-[12px] font-bold leading-none text-[#90A4AE]">Completed Jobs</p>
+                    <p className="mt-2 text-[14px] leading-none text-[#202224]">
                       {formatNumber(data.company.completedJobs)}
-                    </span>
+                    </p>
                   </div>
                 </div>
               </div>
-              <div className="flex gap-4 flex-wrap">
-                {data.company.badges.map((badge) => (
+
+              <div className="mt-3 flex flex-wrap gap-3">
+                {badges.map((badge) => (
                   <span
                     key={badge.label}
                     className={cn(
-                      "h-6 px-4 rounded-[76px] text-[12px] leading-none inline-flex items-center",
+                      "inline-flex h-7 items-center rounded-[76px] px-4 text-[12px] leading-none",
                       badgeStyles[badge.type]
                     )}
                   >
@@ -159,32 +159,18 @@ export const JobDetailsModal = memo(
               </div>
             </div>
 
-            <div className="mt-4 grid grid-cols-[237px_326.79px_145.17px] justify-between">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-[16px] font-bold text-[#263238] leading-none">
-                  Locations
-                </h3>
-                <div className="flex flex-col gap-4">
-                  <DetailField
-                    label="Pickup Address"
-                    value={data.locations.pickupAddress}
-                  />
-                  <DetailField
-                    label="House/Stairs/Elevator (Pickup)"
-                    value={data.locations.pickupAccess}
-                  />
+            <div className="mt-3 grid gap-6" style={{ gridTemplateColumns: "1.2fr 1fr 0.9fr" }}>
+              <div className="min-w-0">
+                <h3 className="text-[16px] font-bold leading-none text-[#263238]">Locations</h3>
+                <div className="mt-3 flex flex-col gap-3">
+                  <DetailField label="Pickup Address" value={data.locations.pickupAddress} />
+                  <DetailField label="House/Stairs/Elevator (Pickup)" value={data.locations.pickupAccess} />
                   <DetailField
                     label="Estimated Walk Distance (Pickup)"
                     value={data.locations.pickupWalkDistance}
                   />
-                  <DetailField
-                    label="Delivery Address"
-                    value={data.locations.deliveryAddress}
-                  />
-                  <DetailField
-                    label="House/Stairs/Elevator (Delivery)"
-                    value={data.locations.deliveryAccess}
-                  />
+                  <DetailField label="Delivery Address" value={data.locations.deliveryAddress} />
+                  <DetailField label="House/Stairs/Elevator (Delivery)" value={data.locations.deliveryAccess} />
                   <DetailField
                     label="Estimated Walk Distance (Delivery)"
                     value={data.locations.deliveryWalkDistance}
@@ -192,151 +178,105 @@ export const JobDetailsModal = memo(
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4">
-                <h3 className="text-[16px] font-bold text-[#263238] leading-none">
-                  Job Details
-                </h3>
-                <div className="grid grid-cols-[141.62px_145.17px] gap-x-10">
-                  <div className="flex flex-col gap-4">
-                    <DetailField
-                      label="Job ID"
-                      value={data.jobDetails.jobId}
-                    />
-                    <DetailField
-                      label="Distance"
-                      value={data.jobDetails.distance}
-                    />
-                    <DetailField
-                      label="Truck Size"
-                      value={data.jobDetails.truckSize}
-                    />
-                    <DetailField
-                      label="Weight"
-                      value={data.jobDetails.weight}
-                    />
+              <div className="min-w-0">
+                <h3 className="text-[16px] font-bold leading-none text-[#263238]">Job Details</h3>
+                <div className="mt-3 grid min-w-0 grid-cols-2 gap-x-8">
+                  <div className="flex min-w-0 flex-col gap-3">
+                    <DetailField label="Job ID" value={data.jobDetails.jobId} />
+                    <DetailField label="Distance" value={data.jobDetails.distance} />
+                    <DetailField label="Truck Size" value={data.jobDetails.truckSize} />
+
                   </div>
-                  <div className="flex flex-col gap-4">
-                    <DetailField
-                      label="Posted"
-                      value={data.jobDetails.posted}
-                    />
-                    <DetailField
-                      label="Estimated Time"
-                      value={data.jobDetails.estimatedTime}
-                    />
-                    <DetailField
-                      label="Cargo Type"
-                      value={data.jobDetails.cargoType}
-                    />
-                    <DetailField
-                      label="Volume"
-                      value={data.jobDetails.volume}
-                    />
+                  <div className="flex min-w-0 flex-col gap-3">
+                    <DetailField label="Posted" value={data.jobDetails.posted} />
+                    <DetailField label="Estimated Time" value={data.jobDetails.estimatedTime} />
+                    <DetailField label="Cargo Type" value={data.jobDetails.cargoType} />
+                    <DetailField label="Volume" value={data.jobDetails.volume} />
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4">
-                <h3 className="text-[16px] font-bold text-[#263238] leading-none">
-                  Schedule
-                </h3>
-                <div className="flex flex-col gap-4">
-                  <DetailField
-                    label="Pickup Date"
-                    value={data.schedule.pickupDate}
-                  />
-                  <DetailField
-                    label="Delivery Date"
-                    value={data.schedule.deliveryDate}
-                  />
-                  <DetailField
-                    label="Pickup Time"
-                    value={data.schedule.pickupTime}
-                  />
-                  <DetailField
-                    label="Delivery Time"
-                    value={data.schedule.deliveryTime}
-                  />
+              <div className="min-w-0">
+                <h3 className="text-[16px] font-bold leading-none text-[#263238]">Schedule</h3>
+                <div className="mt-3 flex min-w-0 flex-col gap-3">
+                  <DetailField label="Pickup Date" value={data.schedule.pickupDate} />
+                  <DetailField label="Delivery Date" value={data.schedule.deliveryDate} />
+                  <DetailField label="Pickup Time" value={data.schedule.pickupTime} />
+                  <DetailField label="Delivery Time" value={data.schedule.deliveryTime} />
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 flex flex-col gap-2">
-              <span className="text-[16px] text-[#202224] leading-none">Description</span>
-              <div className="border border-[#D8D8D8] rounded-[8px] h-10 px-4 flex items-center">
-                <p className="text-[16px] text-[#A6A6A6] leading-none truncate">
-                  {data.description ||
-                    "Brief description of the additional services indicated above..."}
+            <div className="mt-3 min-w-0">
+              <p className="text-[16px] leading-none text-[#202224]">Description</p>
+              <div className="mt-2 flex h-10 items-center rounded-[8px] border border-[#D8D8D8] px-4">
+                <p className="min-w-0 truncate text-[16px] leading-none text-[#A6A6A6]">
+                  {ensureText(data.description) === "N/A"
+                    ? "Brief description of the additional services indicated above..."
+                    : ensureText(data.description)}
                 </p>
               </div>
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-[20px] font-bold text-[#2C3E50] leading-none">
-                  Additional Services
-                </h3>
-                <div className="flex flex-wrap gap-4">
-                  {data.additionalServices.length > 0 ? data.additionalServices.map((service) => (
-                    <span
-                      key={service}
-                      className="bg-[#F1F4F9] h-[34px] px-4 rounded-[64px] text-[14px] text-[#202224] text-center leading-none inline-flex items-center"
-                    >
-                      {service}
-                    </span>
-                  )) : (
+            <div className="mt-3 grid gap-6 pt-3" style={{ gridTemplateColumns: "1fr 380px" }}>
+              <div className="min-w-0">
+                <h3 className="text-[20px] font-bold leading-none text-[#2C3E50]">Additional Services</h3>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {data.additionalServices.length > 0 ? (
+                    data.additionalServices.map((service) => (
+                      <span
+                        key={service}
+                        className="inline-flex h-[34px] items-center rounded-[64px] bg-[#F1F4F9] px-4 text-[14px] text-[#202224]"
+                      >
+                        {service}
+                      </span>
+                    ))
+                  ) : (
                     <span className="text-[14px] text-[#90A4AE]">No additional services</span>
                   )}
                 </div>
               </div>
-              <div className="flex flex-col gap-4">
-                <h3 className="text-[20px] font-bold text-[#2C3E50] leading-none">
-                  Payment Details
-                </h3>
-                <div className="flex gap-4">
-                  <div className="flex flex-col gap-2 min-w-[84px]">
-                    <span className="text-[12px] font-bold text-[#90A4AE] leading-none">
-                      Payout
-                    </span>
-                    <span className="text-[16px] leading-none font-bold text-[#202224]">
+
+              <div className="min-w-0">
+                <h3 className="text-[20px] font-bold leading-none text-[#2C3E50]">Payment Details</h3>
+                <div className="mt-3 flex gap-8">
+                  <div>
+                    <p className="text-[12px] font-bold leading-none text-[#90A4AE]">Payout</p>
+                    <p className="mt-2 text-[16px] font-bold leading-none text-[#202224]">
                       {formatMoney(data.payment.payout)}
-                    </span>
+                    </p>
                   </div>
-                  <div className="flex flex-col gap-2 min-w-[84px]">
-                    <span className="text-[12px] font-bold text-[#90A4AE] leading-none">
-                      CUT
-                    </span>
-                    <span className="text-[16px] leading-none font-bold text-[#202224]">
+                  <div>
+                    <p className="text-[12px] font-bold leading-none text-[#90A4AE]">CUT</p>
+                    <p className="mt-2 text-[16px] font-bold leading-none text-[#202224]">
                       {formatMoney(data.payment.cut)}
-                    </span>
+                    </p>
                   </div>
-                  <div className="flex flex-col gap-2 min-w-[84px]">
-                    <span className="text-[12px] font-bold text-[#90A4AE] leading-none">
-                      Platform Fee
-                    </span>
-                    <span className="text-[16px] leading-none font-bold text-[#202224]">
+                  <div>
+                    <p className="text-[12px] font-bold leading-none text-[#90A4AE]">Platform Fee</p>
+                    <p className="mt-2 text-[16px] font-bold leading-none text-[#202224]">
                       {formatMoney(data.payment.platformFee)}
-                    </span>
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-[#D8D8D8] h-[76px] px-4 py-4 flex justify-end items-start bg-white">
+          <div className="flex h-[64px] items-center justify-end bg-white px-6">
             <Button
               variant="primary"
               size="default"
-              className="w-[105px] h-[44px] text-[16px] font-normal rounded-[8px]"
               onClick={onClaimJob}
+              className="h-[42px] min-w-[110px] rounded-[8px] text-[16px]"
             >
               Claim Job
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-);
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+});
 
 JobDetailsModal.displayName = "JobDetailsModal";

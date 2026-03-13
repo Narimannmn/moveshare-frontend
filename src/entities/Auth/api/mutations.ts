@@ -7,16 +7,16 @@ import type {
   DocumentType,
   ForgotPasswordResetRequest,
   ForgotPasswordVerifyOTPRequest,
+  LoginResponse,
   RegisterCompanyRequest,
   SetPasswordRequest,
+  UpdateCompanyProfileRequest,
+  UpdateNotificationPreferencesRequest,
   VerifyOTPRequest,
 } from "../schemas";
 import { authKeys } from "./keys";
 import * as services from "./services";
 
-// ============================================
-// Registration Flow Mutations
-// ============================================
 
 export const useSendOTP = () => {
   return useMutation({
@@ -67,46 +67,58 @@ export const useRegisterCompany = () => {
   });
 };
 
-// ============================================
-// Login Flow Mutations
-// ============================================
+const handleAuthSuccess = (
+  data: LoginResponse,
+  navigate: ReturnType<typeof useNavigate>,
+  actions: ReturnType<typeof useAuthStore.getState>["actions"]
+) => {
+  const step = data.user.registration_step;
+
+  // If registration is incomplete, route to the appropriate step
+  const incompleteStepRoutes: Record<string, string> = {
+    pending_otp: "/register/verify",
+    otp_verified: "/register/password",
+    password_set: "/register/company",
+  };
+
+  const incompleteRoute = incompleteStepRoutes[step];
+  if (incompleteRoute) {
+    actions.setTempToken(data.access_token);
+    navigate({ to: incompleteRoute });
+    return;
+  }
+
+  // Profile complete but documents not uploaded → verification step
+  if (!data.user.has_uploaded_documents) {
+    actions.setTempToken(data.access_token);
+    navigate({ to: "/register/verification" });
+    return;
+  }
+
+  // Profile complete + pending status = under review
+  if (data.user.status.toLowerCase() === "pending") {
+    actions.updateTokens(data.access_token, data.refresh_token);
+    navigate({ to: "/register/review" });
+    return;
+  }
+
+  // Fully verified user
+  actions.updateTokens(data.access_token, data.refresh_token);
+  navigate({ to: "/jobs" });
+};
 
 export const useLogin = () => {
-  const authStore = useAuthStore();
+  const actions = useAuthStore((state) => state.actions);
   const navigate = useNavigate();
 
   return useMutation({
     mutationKey: authKeys.login(),
     mutationFn: services.login,
     onSuccess: (data) => {
-      // Step 1: Set tokens based on registration status
-      if (data.user.has_uploaded_documents) {
-        // User completed registration - set access and refresh tokens
-        authStore.actions.updateTokens(data.access_token, data.refresh_token);
-        navigate({ to: "/jobs" });
-        return;
-      }
-      console.log(data);
-      // User has incomplete registration - set temp token for registration flow
-      authStore.actions.setTempToken(data.access_token);
-
-      // Step 2: Redirect based on registration_step
-      const stepRoutes: Record<string, string> = {
-        pending_otp: "/register/verify",
-        otp_verified: "/register/password",
-        password_set: "/register/company",
-        profile_complete: "/register/verification",
-      };
-
-      const redirectTo = stepRoutes[data.user.registration_step] || "/register";
-      navigate({ to: redirectTo });
+      handleAuthSuccess(data, navigate, actions);
     },
   });
 };
-
-// ============================================
-// Token Management Mutations
-// ============================================
 
 export const useRefreshToken = () => {
   const authStore = useAuthStore();
@@ -158,9 +170,17 @@ export const useLogoutAll = () => {
   });
 };
 
-// ============================================
-// Forgot Password Flow Mutations
-// ============================================
+export const useTerminateSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: [...authKeys.sessions(), "terminate"],
+    mutationFn: services.terminateSession,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
+    },
+  });
+};
 
 export const useForgotPassword = () => {
   return useMutation({
@@ -201,14 +221,59 @@ export const useForgotPasswordReset = () => {
   });
 };
 
-// ============================================
-// Document Upload Mutation (Registration Flow)
-// ============================================
-
 export const useUploadCompanyDocument = () => {
   return useMutation({
     mutationKey: authKeys.uploadDocument(),
     mutationFn: ({ documentType, file }: { documentType: DocumentType; file: File }) =>
       services.uploadCompanyDocument(documentType, file),
+  });
+};
+
+export const useUploadCompanyProfileImage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: authKeys.uploadProfileImage(),
+    mutationFn: (file: File) => services.uploadCompanyProfileImage(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: authKeys.companyProfile()});
+    },
+  });
+};
+
+export const useDeleteCompanyProfileImage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: authKeys.deleteProfileImage(),
+    mutationFn: () => services.deleteCompanyProfileImage(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.companyProfile() });
+    },
+  });
+};
+
+export const useUpdateNotificationPreferences = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: [...authKeys.notificationPreferences(), "update"],
+    mutationFn: (data: UpdateNotificationPreferencesRequest) =>
+      services.updateNotificationPreferences(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.notificationPreferences() });
+    },
+  });
+};
+
+export const useUpdateCompanyProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: [...authKeys.companyProfile(), "update"],
+    mutationFn: (data: UpdateCompanyProfileRequest) => services.updateCompanyProfile(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.companyProfile() });
+    },
   });
 };

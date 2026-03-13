@@ -32,6 +32,15 @@ export type BedroomCount = z.infer<typeof BedroomCountSchema>;
 export type JobStatus = z.infer<typeof JobStatusSchema>;
 export type AdditionalService = z.infer<typeof AdditionalServiceSchema>;
 
+export const JobCompanySchema = z.object({
+  id: z.string().uuid(),
+  user_id: z.string().uuid().nullable().optional(),
+  name: z.string(),
+  contact_person: z.string(),
+  phone_number: z.string(),
+  description: z.string().nullable(),
+});
+
 export const JobResponseSchema = z.object({
   id: z.string().uuid(),
   company_id: z.string().uuid(),
@@ -51,6 +60,7 @@ export const JobResponseSchema = z.object({
   status: JobStatusSchema,
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
+  company: JobCompanySchema.nullable().optional(),
 });
 
 export type JobResponse = z.infer<typeof JobResponseSchema>;
@@ -88,6 +98,7 @@ export const JobListResponseSchema = z.object({
   total: z.number().int(),
   offset: z.number().int(),
   limit: z.number().int(),
+  status_counts: z.record(z.string(), z.number().int()).optional().nullable(),
 });
 
 export type JobListResponse = z.infer<typeof JobListResponseSchema>;
@@ -95,6 +106,8 @@ export type JobListResponse = z.infer<typeof JobListResponseSchema>;
 export const JobListParamsSchema = z.object({
   job_type: JobTypeSchema.optional().nullable(),
   bedroom_count: BedroomCountSchema.optional().nullable(),
+  origin: z.string().min(1).max(255).optional().nullable(),
+  destination: z.string().min(1).max(255).optional().nullable(),
   offset: z.number().int().min(0).default(0),
   limit: z.number().int().min(1).max(100).default(20),
 });
@@ -108,6 +121,13 @@ export const MyJobsParamsSchema = z.object({
 });
 
 export type MyJobsParams = z.infer<typeof MyJobsParamsSchema>;
+
+export const JobLocationsResponseSchema = z.object({
+  origins: z.array(z.string()),
+  destinations: z.array(z.string()),
+});
+
+export type JobLocationsResponse = z.infer<typeof JobLocationsResponseSchema>;
 
 export const ExportJobsRequestSchema = z.object({
   job_ids: z.array(z.string().uuid()).optional().nullable(),
@@ -124,5 +144,76 @@ export const CancelJobsResponseSchema = z.object({
   message: z.string(),
 });
 
+export const CreateClaimCheckoutSessionRequestSchema = z.object({
+  success_url: z.string().url(),
+  cancel_url: z.string().url(),
+});
+
+export const CreateClaimCheckoutSessionResponseSchema = z.object({
+  checkout_session_id: z.string(),
+  checkout_url: z.string().url(),
+  expires_at: z.string().datetime().nullable(),
+  amount_cents: z.number().int(),
+  currency: z.string(),
+});
+
+export const JobApplicationStatusSchema = z.enum(["pending", "accepted", "rejected"]);
+
+export const ConfirmClaimCheckoutSessionRequestSchema = z.object({
+  session_id: z.string().min(1),
+  job_id: z.string().uuid().optional().nullable(),
+});
+
+export const ConfirmClaimCheckoutSessionResponseSchema = z.object({
+  job_id: z.string().uuid(),
+  application_id: z.string().uuid(),
+  already_confirmed: z.boolean(),
+  receipt_url: z.string().nullable().optional(),
+  poster_user_id: z.string().uuid().nullable().optional(),
+});
+
+export const AppliedJobItemSchema = z.object({
+  job: JobResponseSchema,
+  application: z.object({
+    id: z.string().uuid(),
+    job_id: z.string().uuid(),
+    company_id: z.string().uuid(),
+    message: z.string().nullable(),
+    proposed_amount: z.string().nullable(),
+    status: JobApplicationStatusSchema,
+    created_at: z.string().datetime(),
+    updated_at: z.string().datetime(),
+  }),
+});
+
+export const AppliedJobsListResponseSchema = z.object({
+  items: z.array(AppliedJobItemSchema),
+  total: z.number().int(),
+  skip: z.number().int(),
+  limit: z.number().int(),
+});
+
+export const AppliedJobsParamsSchema = z.object({
+  status: JobApplicationStatusSchema.optional().nullable(),
+  skip: z.number().int().min(0).default(0),
+  limit: z.number().int().min(1).max(100).default(20),
+});
+
 export type CancelJobsRequest = z.infer<typeof CancelJobsRequestSchema>;
 export type CancelJobsResponse = z.infer<typeof CancelJobsResponseSchema>;
+export type CreateClaimCheckoutSessionRequest = z.infer<
+  typeof CreateClaimCheckoutSessionRequestSchema
+>;
+export type CreateClaimCheckoutSessionResponse = z.infer<
+  typeof CreateClaimCheckoutSessionResponseSchema
+>;
+export type JobApplicationStatus = z.infer<typeof JobApplicationStatusSchema>;
+export type ConfirmClaimCheckoutSessionRequest = z.infer<
+  typeof ConfirmClaimCheckoutSessionRequestSchema
+>;
+export type ConfirmClaimCheckoutSessionResponse = z.infer<
+  typeof ConfirmClaimCheckoutSessionResponseSchema
+>;
+export type AppliedJobItem = z.infer<typeof AppliedJobItemSchema>;
+export type AppliedJobsListResponse = z.infer<typeof AppliedJobsListResponseSchema>;
+export type AppliedJobsParams = z.infer<typeof AppliedJobsParamsSchema>;

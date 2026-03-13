@@ -1,7 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
-import type { CancelJobsRequest, CreateJobRequest, ExportJobsRequest } from "../schemas";
+import type {
+  ConfirmClaimCheckoutSessionRequest,
+  CancelJobsRequest,
+  CreateClaimCheckoutSessionRequest,
+  CreateJobRequest,
+  ExportJobsRequest,
+} from "../schemas";
 import { jobKeys } from "./keys";
 import * as services from "./services";
 
@@ -80,5 +86,40 @@ export const useExportJobsCsv = () => {
   return useMutation({
     mutationKey: jobKeys.exportCsv(),
     mutationFn: (request?: ExportJobsRequest) => services.exportJobsCsv(request),
+  });
+};
+
+// ============================================
+// Create Claim Checkout Session Mutation
+// ============================================
+
+export const useCreateClaimCheckoutSession = () => {
+  return useMutation({
+    mutationKey: jobKeys.claimCheckout(),
+    mutationFn: ({
+      jobId,
+      request,
+    }: {
+      jobId: string;
+      request: CreateClaimCheckoutSessionRequest;
+    }) => services.createClaimCheckoutSession(jobId, request),
+  });
+};
+
+// ============================================
+// Confirm Claim Checkout Session Mutation
+// ============================================
+
+export const useConfirmClaimCheckoutSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: jobKeys.claimConfirm(),
+    mutationFn: (request: ConfirmClaimCheckoutSessionRequest) =>
+      services.confirmClaimCheckoutSession(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: jobKeys.applied() });
+    },
   });
 };

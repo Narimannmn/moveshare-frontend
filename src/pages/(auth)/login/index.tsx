@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { Typography } from "@shared/ui";
 
-import { AppleLoginButton } from "@features/auth/loginWithApple/ui/AppleLoginButton";
 import { EmailLoginForm } from "@features/auth/loginWithEmail/ui/EmailLoginForm";
 import { GoogleLoginButton } from "@features/auth/loginWithGoogle/ui/GoogleLoginButton";
 
@@ -44,13 +43,12 @@ function LoginPage() {
 
           {/* OAuth Buttons */}
           <GoogleLoginButton />
-          <AppleLoginButton />
         </div>
 
         {/* Register Link */}
-        <div className="flex gap-2 items-center text-base">
+        <div className="flex items-center gap-2 text-base leading-none">
           <span className="text-[#202224] opacity-65">Don't have an account?</span>
-          <Link to="/register" className="text-[#60A5FA] font-bold hover:underline">
+          <Link to="/register" className="text-[#60A5FA] font-bold leading-none hover:underline">
             Register
           </Link>
         </div>

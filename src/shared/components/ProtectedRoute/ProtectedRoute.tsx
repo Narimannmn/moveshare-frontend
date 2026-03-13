@@ -4,11 +4,13 @@ import { Navigate, useLocation } from "@tanstack/react-router";
 
 import { useCompanyProfile } from "@/entities/Auth";
 import { useAuthStore } from "@/entities/Auth/model/store/authStore";
+import { getJwtStatus } from "@/shared/utils/jwt/getJwtStatus";
 
 export const ProtectedRoute = ({ children }: PropsWithChildren) => {
   const { pathname } = useLocation();
   const accessToken = useAuthStore((state) => state.accessToken);
   const logout = useAuthStore((state) => state.actions.logout);
+  const tokenStatus = getJwtStatus(accessToken);
 
   const { isLoading, error } = useCompanyProfile();
 
@@ -21,6 +23,10 @@ export const ProtectedRoute = ({ children }: PropsWithChildren) => {
         replace
       />
     );
+  }
+
+  if (tokenStatus === "pending") {
+    return <Navigate to="/register/review" replace />;
   }
 
   // Show loader while fetching company profile

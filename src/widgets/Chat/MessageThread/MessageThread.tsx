@@ -29,17 +29,6 @@ const BackArrowIcon = () => (
   </svg>
 );
 
-const WarningIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M12 9V13M12 17H12.01M4.982 17.326L10.518 3.44C11.01 2.276 12.99 2.276 13.482 3.44L19.018 17.326C19.456 18.358 18.688 19.5 17.536 19.5H6.464C5.312 19.5 4.544 18.358 4.982 17.326Z"
-      stroke="#F59E0B"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 export const MessageThread = memo(({ conversationId, className }: MessageThreadProps) => {
   const navigate = useNavigate();
@@ -113,12 +102,13 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
     return (
       <div className={cn(styles.container, className)}>
         <div className={styles.chatHeader}>
-          <div className={styles.chatHeaderTop}>
-            <button className={styles.backButton} onClick={handleBack} aria-label="Back">
-              <BackArrowIcon />
-            </button>
-            <span className={styles.chatName}>{otherUser?.name ?? "Chat"}</span>
+          <button className={styles.backButton} onClick={handleBack} aria-label="Back">
+            <BackArrowIcon />
+          </button>
+          <div className={styles.avatar}>
+            {(otherUser?.name ?? "C").charAt(0).toUpperCase()}
           </div>
+          <span className={styles.chatName}>{otherUser?.name ?? "Chat"}</span>
         </div>
         <EmptyState
           icon={<MessageSquare />}
@@ -132,25 +122,13 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
   return (
     <div className={cn(styles.container, className)}>
       <div className={styles.chatHeader}>
-        <div className={styles.chatHeaderTop}>
-          <button className={styles.backButton} onClick={handleBack} aria-label="Back">
-            <BackArrowIcon />
-          </button>
-          <span className={styles.chatName}>{otherUser?.name ?? "Chat"}</span>
-          <div className={styles.jobBadge}>
-            <span className={styles.jobBadgeText}>
-              Job #MS-4821: Chicago, IL → Indianapolis, IN
-            </span>
-          </div>
+        <button className={styles.backButton} onClick={handleBack} aria-label="Back">
+          <BackArrowIcon />
+        </button>
+        <div className={styles.avatar}>
+          {(otherUser?.name ?? "C").charAt(0).toUpperCase()}
         </div>
-        <div className={styles.warningBanner}>
-          <div className={styles.warningIcon}>
-            <WarningIcon />
-          </div>
-          <span className={styles.warningText}>
-            Remember: Sharing contact details before payment violates our Terms of Service
-          </span>
-        </div>
+        <span className={styles.chatName}>{otherUser?.name ?? "Chat"}</span>
       </div>
 
       <div className={styles.messageList}>

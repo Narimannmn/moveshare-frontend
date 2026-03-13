@@ -59,7 +59,7 @@
 .label {
   font-family: 'Onest', sans-serif;
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 700;
   color: #202224;
 }
 
@@ -100,6 +100,126 @@
 // Input (override defaults)
 .input {
   margin: 0 !important;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdownTrigger {
+  width: 100%;
+  height: 44px;
+  padding: 10px 16px;
+  font-family: 'Onest', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #202224;
+  background-color: #f1f4f9;
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  &:focus {
+    outline: none;
+    border-color: #60a5fa;
+  }
+
+  &:hover {
+    border-color: #a6a6a6;
+  }
+}
+
+.dropdownPlaceholder {
+  color: #a6a6a6;
+}
+
+.dropdownValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdownArrow {
+  font-size: 14px;
+  color: #666c72;
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+
+.dropdownArrowOpen {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #ffffff;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(32, 34, 36, 0.12);
+  overflow: hidden;
+}
+
+.dropdownSearch {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-bottom: 1px solid #eef0f4;
+  padding: 0 12px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  color: #202224;
+
+  &::placeholder {
+    color: #a6a6a6;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.dropdownList {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdownOption {
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  color: #202224;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f1f4f9;
+  }
+}
+
+.dropdownOptionActive {
+  background-color: #e7f0ff;
+}
+
+.dropdownEmpty {
+  padding: 12px;
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  color: #666c72;
 }
 
 // Slider

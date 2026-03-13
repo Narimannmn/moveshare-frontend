@@ -5,6 +5,7 @@ import { getJwtSubject } from "@/shared/utils/jwt/getJwtSubject";
 import {
   type ChatUser,
   ConversationListSchema,
+  ConversationSchema,
   type Conversation,
   MessageListSchema,
   type Message,
@@ -63,6 +64,18 @@ export const searchUsers = async (query: string): Promise<ChatUser[]> => {
     return users.filter((user) => user.name.toLowerCase().includes(trimmed));
   } catch (error) {
     console.error("Error searching users:", error);
+    throw error;
+  }
+};
+
+export const createDirectConversation = async (participantUserId: string): Promise<Conversation> => {
+  try {
+    const response = await apiClient.post("/api/v1/chat/conversations", {
+      participantUserId,
+    });
+    return ConversationSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error creating direct conversation:", error);
     throw error;
   }
 };

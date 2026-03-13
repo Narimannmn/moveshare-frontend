@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { useChatStore } from "@/entities/Chat";
+import { PageHeader } from "@/shared/ui";
 
 import { ConversationList, MessageInput, MessageThread } from "@/widgets/Chat";
 
@@ -20,9 +21,7 @@ function ChatDetailPage() {
 
   return (
     <div className="flex flex-col gap-6 h-full">
-      <h1 className="font-bold text-[24px] leading-[100%] text-[#202224] font-['Onest',sans-serif]">
-        Chats
-      </h1>
+      <PageHeader title="Chats" className="mb-0" />
       <div className="bg-white rounded-lg p-4 flex-1 overflow-hidden flex gap-6">
         {/* Left sidebar - Conversation list */}
         <aside className="w-70 shrink-0">

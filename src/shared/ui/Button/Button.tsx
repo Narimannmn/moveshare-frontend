@@ -1,6 +1,7 @@
 import { forwardRef, memo } from "react";
 
 import { type VariantProps, cva } from "class-variance-authority";
+import { Loader2 } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 
@@ -52,7 +53,7 @@ export const Button = memo(
           )}
           {...props}
         >
-          {loading ? <span className="animate-spin">⏳</span> : children}
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : children}
         </button>
       );
     }

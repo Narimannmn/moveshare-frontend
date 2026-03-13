@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 
 import { FileText } from "lucide-react";
+import { toast } from "sonner";
 
 import { useUploadCompanyDocument } from "@/entities/Auth/api/mutations";
 import type { DocumentType } from "@/entities/Auth/schemas";
@@ -100,8 +101,8 @@ export const CompanyVerificationForm = ({ onSuccess }: { onSuccess?: () => void 
       // All uploads successful
       if (onSuccess) onSuccess();
     } catch (error) {
-      console.error("Failed to upload documents:", error);
-      // TODO: Show error toast/message to user
+      const message = error instanceof Error ? error.message : "Failed to upload documents";
+      toast.error("Upload Failed", { description: message });
     } finally {
       setIsUploading(false);
     }

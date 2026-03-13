@@ -1,494 +1,530 @@
-import { useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Check, Star, X } from "lucide-react";
+import { toast } from "sonner";
 
-import { FileText, MessageCircle, Star, X } from "lucide-react";
-
-import { Button } from "@/shared/ui/Button/Button";
+import { useCreateDirectConversation } from "@/entities/Chat/api/mutations";
+import { useAppliedJobs } from "@/entities/Job";
+import type { AppliedJobItem, JobResponse } from "@/entities/Job/schemas";
+import { Button, Textarea } from "@/shared/ui";
 
 export const Route = createFileRoute("/(app)/claimed/")({
   component: ClaimedJobsPage,
 });
 
-type JobStatus = "active" | "in-transit" | "completed" | "disputed";
+// ============================================
+// Constants
+// ============================================
 
-interface ClaimedJob {
-  id: string;
-  title: string;
-  jobId: string;
-  price: string;
-  status: JobStatus;
-  progress: {
-    steps: Array<{
-      label: string;
-      completed: boolean;
-      active: boolean;
-    }>;
-  };
-  routeDetails: {
-    origin: string;
-    destination: string;
-    distance: string;
-    duration: string;
-  };
-  schedule: {
-    origin: string;
-    destination: string;
-    distance: string;
-    duration: string;
-  };
-  companyDetails?: {
-    company: string;
-    contact: string;
-    phone: string;
-    email: string;
-  };
-  documents: Array<{
-    id: string;
-    name: string;
-  }>;
-  dispute?: {
-    description: string;
-  };
-  showReview?: boolean;
-  reviewCompany?: string;
+type ClaimedTab = "active" | "in_transit" | "completed" | "disputed";
+
+const TABS: { key: ClaimedTab; label: string }[] = [
+  { key: "active", label: "Active" },
+  { key: "in_transit", label: "In Transit" },
+  { key: "completed", label: "Completed" },
+  { key: "disputed", label: "Disputed" },
+];
+
+const TAB_STATUS_MAP: Record<ClaimedTab, string[]> = {
+  active: ["assigned"],
+  in_transit: ["in_progress"],
+  completed: ["completed"],
+  disputed: ["disputed"],
+};
+
+const BEDROOM_LABELS: Record<string, string> = {
+  "1_bedroom": "1 Bedroom Move",
+  "2_bedroom": "2 Bedroom Move",
+  "3_bedroom": "3 Bedroom Move",
+  "4_bedroom": "4 Bedroom Move",
+  "5_bedroom": "5 Bedroom Move",
+  "6_plus_bedroom": "6+ Bedroom Move",
+};
+
+const JOB_TYPE_LABELS: Record<string, string> = {
+  residential: "Residential Move",
+  office: "Office Move",
+  storage: "Storage Move",
+};
+
+const PROGRESS_STEPS = ["Claimed", "Documents Shared", "In Transit", "Completed"];
+
+// ============================================
+// Helpers
+// ============================================
+
+const toCityState = (address: string): string => {
+  const parts = address
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (parts.length < 2) return address;
+  const city = parts[parts.length - 2] ?? "";
+  const state = (parts[parts.length - 1] ?? "").split(" ")[0] ?? "";
+  return `${city}, ${state}`.trim();
+};
+
+const formatDate = (iso: string): string => {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "-";
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "2-digit", year: "numeric" }).format(d);
+};
+
+const formatMoney = (value: string): string => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "$0";
+  return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+};
+
+const toPublicJobId = (id: string): string => `#MS-${id.replace(/-/g, "").slice(0, 4).toUpperCase()}`;
+
+const getJobTitle = (job: JobResponse): string =>
+  job.bedroom_count
+    ? (BEDROOM_LABELS[job.bedroom_count] ?? JOB_TYPE_LABELS[job.job_type] ?? "Move")
+    : (JOB_TYPE_LABELS[job.job_type] ?? "Move");
+
+const getCompletedSteps = (status: string): number => {
+  switch (status) {
+    case "assigned":
+      return 1;
+    case "in_progress":
+      return 3;
+    case "completed":
+      return 4;
+    case "disputed":
+      return 2;
+    default:
+      return 1;
+  }
+};
+
+const getTabForStatus = (status: string): ClaimedTab => {
+  for (const [tab, statuses] of Object.entries(TAB_STATUS_MAP)) {
+    if (statuses.includes(status)) return tab as ClaimedTab;
+  }
+  return "active";
+};
+
+// ============================================
+// ProgressStepper
+// ============================================
+
+interface ProgressStepperProps {
+  completedSteps: number;
+  isDisputed?: boolean;
 }
 
-const mockJobs: ClaimedJob[] = [
-  {
-    id: "1",
-    title: "Furniture Delivery",
-    jobId: "#MS-4821",
-    price: "$1,850",
-    status: "active",
-    progress: {
-      steps: [
-        { label: "Claimed", completed: true, active: false },
-        { label: "Documents Shared", completed: true, active: false },
-        { label: "Claimed", completed: false, active: true },
-        { label: "Completed", completed: false, active: false },
-      ],
-    },
-    routeDetails: {
-      origin: "Chicago, IL",
-      destination: "Indianapolis, IN",
-      distance: "183 miles",
-      duration: "3 hours",
-    },
-    schedule: {
-      origin: "Chicago, IL",
-      destination: "Indianapolis, IN",
-      distance: "183 miles",
-      duration: "3 hours",
-    },
-    companyDetails: {
-      company: "TransAtlantic Logistics",
-      contact: "John Smith",
-      phone: "(312) 555-0198",
-      email: "john@transatlantic.com",
-    },
-    documents: [
-      { id: "1", name: "Bill of Lading.pdf" },
-      { id: "2", name: "Bill of Lading.pdf" },
-      { id: "3", name: "Bill of Lading.pdf" },
-    ],
-  },
-  {
-    id: "2",
-    title: "Furniture Delivery",
-    jobId: "#MS-4821",
-    price: "$1,850",
-    status: "completed",
-    progress: {
-      steps: [
-        { label: "Claimed", completed: true, active: false },
-        { label: "Documents Shared", completed: true, active: false },
-        { label: "Claimed", completed: true, active: false },
-        { label: "Completed", completed: true, active: false },
-      ],
-    },
-    routeDetails: {
-      origin: "Chicago, IL",
-      destination: "Indianapolis, IN",
-      distance: "183 miles",
-      duration: "3 hours",
-    },
-    schedule: {
-      origin: "Chicago, IL",
-      destination: "Indianapolis, IN",
-      distance: "183 miles",
-      duration: "3 hours",
-    },
-    companyDetails: {
-      company: "TransAtlantic Logistics",
-      contact: "John Smith",
-      phone: "(312) 555-0198",
-      email: "john@transatlantic.com",
-    },
-    documents: [],
-    showReview: true,
-    reviewCompany: "Coastal Warehousing",
-  },
-  {
-    id: "3",
-    title: "Furniture Delivery",
-    jobId: "#MS-4821",
-    price: "$1,850",
-    status: "disputed",
-    progress: {
-      steps: [
-        { label: "Claimed", completed: true, active: false },
-        { label: "Documents Shared", completed: true, active: false },
-        { label: "Claimed", completed: false, active: false },
-        { label: "Completed", completed: false, active: false },
-      ],
-    },
-    routeDetails: {
-      origin: "Chicago, IL",
-      destination: "Indianapolis, IN",
-      distance: "183 miles",
-      duration: "3 hours",
-    },
-    schedule: {
-      origin: "Chicago, IL",
-      destination: "Indianapolis, IN",
-      distance: "183 miles",
-      duration: "3 hours",
-    },
-    companyDetails: {
-      company: "TransAtlantic Logistics",
-      contact: "John Smith",
-      phone: "(312) 555-0198",
-      email: "john@transatlantic.com",
-    },
-    documents: [],
-    dispute: {
-      description:
-        "The client claims that 3 pieces of equipment arrived damaged. Our driver reported the equipment was loaded securely and arrived without incident.",
-    },
-  },
-];
+const ProgressStepper = memo(({ completedSteps, isDisputed = false }: ProgressStepperProps) => (
+  <div className="w-full">
+    <div className="flex items-center px-4">
+      {PROGRESS_STEPS.map((_, index) => {
+        const stepNum = index + 1;
+        const isCompleted = stepNum <= completedSteps;
+        const isDisputedStep = isDisputed && stepNum > completedSteps;
 
-const statusTabs: Array<{ id: JobStatus | "all"; label: string; count: number }> = [
-  { id: "all", label: "Active", count: 3 },
-  { id: "in-transit", label: "In Transit", count: 3 },
-  { id: "completed", label: "Completed", count: 3 },
-  { id: "disputed", label: "Disputed", count: 3 },
-];
-
-function ProgressTracker({ steps }: { steps: ClaimedJob["progress"]["steps"] }) {
-  return (
-    <div className="flex items-center justify-between mb-6">
-      {steps.map((step, index) => (
-        <div key={index} className="flex items-center flex-1">
-          <div className="flex flex-col items-center">
-            {/* Circle */}
+        return (
+          <div key={stepNum} className="contents">
+            {index > 0 && (
+              <div className={`h-px flex-1 ${isCompleted ? "bg-[#60A5FA]" : "bg-[#D8D8D8]"}`} />
+            )}
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                step.completed
-                  ? "bg-blue-500 text-white"
-                  : step.active
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-300 text-gray-500"
+              className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${
+                isCompleted ? "bg-[#60A5FA]" : isDisputedStep ? "bg-[#D8D8D8]" : "bg-[#D8D8D8]"
               }`}
             >
-              {step.completed ? (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              ) : step.active ? (
-                <span>{index + 1}</span>
+              {isCompleted ? (
+                <Check className="size-4" strokeWidth={3} />
+              ) : isDisputedStep ? (
+                "!"
               ) : (
-                <span>{index + 1}</span>
+                stepNum
               )}
             </div>
-            {/* Label */}
-            <span className="text-xs text-gray-600 mt-2 text-center whitespace-nowrap">
-              {step.label}
-            </span>
           </div>
-          {/* Line */}
-          {index < steps.length - 1 && (
-            <div
-              className={`h-0.5 flex-1 mx-2 ${step.completed ? "bg-blue-500" : "bg-gray-300"}`}
-            />
-          )}
-        </div>
+        );
+      })}
+    </div>
+    <div className="mt-2 flex justify-between px-0">
+      {PROGRESS_STEPS.map((label, index) => {
+        const stepNum = index + 1;
+        const isCompleted = stepNum <= completedSteps;
+        const isDisputedStep = isDisputed && stepNum > completedSteps;
+        return (
+          <span
+            key={label}
+            className={`text-center text-sm ${
+              isCompleted ? "text-[#263238]" : isDisputedStep ? "text-[#A6A6A6]" : "text-[#90A4AE]"
+            }`}
+            style={{ width: `${100 / PROGRESS_STEPS.length}%` }}
+          >
+            {label}
+          </span>
+        );
+      })}
+    </div>
+  </div>
+));
+ProgressStepper.displayName = "ProgressStepper";
+
+// ============================================
+// InfoField
+// ============================================
+
+interface InfoFieldProps {
+  label: string;
+  value: string;
+}
+
+const InfoField = memo(({ label, value }: InfoFieldProps) => (
+  <div className="flex items-center gap-6">
+    <span className="w-[95px] shrink-0 text-[15px] font-medium text-[#263238]">{label}</span>
+    <span className="text-[15px] text-[#263238]">{value}</span>
+  </div>
+));
+InfoField.displayName = "InfoField";
+
+// ============================================
+// InfoCard
+// ============================================
+
+interface InfoCardProps {
+  title: string;
+  fields: InfoFieldProps[];
+  highlighted?: boolean;
+}
+
+const InfoCard = memo(({ title, fields, highlighted = false }: InfoCardProps) => (
+  <div className="flex flex-1 flex-col gap-4 rounded-lg bg-[#F9F9F9] p-4">
+    <h4 className="text-base font-bold text-[#263238]">{title}</h4>
+    <div className={`flex flex-col gap-3.5 ${highlighted ? "rounded-lg bg-[#E6F2FF] p-4" : ""}`}>
+      {fields.map((f) => (
+        <InfoField key={f.label} label={f.label} value={f.value} />
       ))}
     </div>
-  );
+  </div>
+));
+InfoCard.displayName = "InfoCard";
+
+// ============================================
+// StarRating
+// ============================================
+
+interface StarRatingProps {
+  rating: number;
+  onRate: (value: number) => void;
 }
 
-function JobCard({ job }: { job: ClaimedJob }) {
-  const [rating, setRating] = useState(0);
-  const [review, setReview] = useState("");
+const StarRating = memo(({ rating, onRate }: StarRatingProps) => (
+  <div className="flex gap-2">
+    {[1, 2, 3, 4, 5].map((star) => (
+      <button
+        key={star}
+        type="button"
+        onClick={() => onRate(star)}
+        className="text-[#FADB14] transition-transform hover:scale-110"
+      >
+        <Star className="size-6" fill={star <= rating ? "#FADB14" : "none"} strokeWidth={1.5} />
+      </button>
+    ))}
+  </div>
+));
+StarRating.displayName = "StarRating";
 
-  const handleOpenChat = () => {
-    console.log("Open chat for job", job.id);
-  };
+// ============================================
+// DocumentCard
+// ============================================
 
-  const handleMarkAsDelivered = () => {
-    console.log("Mark as delivered", job.id);
-  };
+const DocumentCard = memo(({ name }: { name: string }) => (
+  <div className="w-[160px] shrink-0 overflow-hidden rounded-lg border border-[#D8D8D8]">
+    <div className="relative flex h-[80px] items-center justify-center rounded-t-lg bg-[#F5F5F5]">
+      <span className="text-lg">📑</span>
+      <button
+        type="button"
+        className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center text-[#90A4AE] hover:text-[#263238]"
+      >
+        <X className="size-3" />
+      </button>
+    </div>
+    <div className="flex items-center justify-center p-2.5">
+      <span className="text-center text-[13px] text-black">{name}</span>
+    </div>
+  </div>
+));
+DocumentCard.displayName = "DocumentCard";
 
-  const handleRemoveDocument = (docId: string) => {
-    console.log("Remove document", docId);
-  };
+// ============================================
+// ClaimedJobCard
+// ============================================
 
-  const handleUploadDocument = () => {
-    console.log("Upload document for job", job.id);
-  };
+interface ClaimedJobCardProps {
+  item: AppliedJobItem;
+  tab: ClaimedTab;
+}
 
-  const handleSkipReview = () => {
-    console.log("Skip review");
-  };
+const ClaimedJobCard = memo(({ item, tab }: ClaimedJobCardProps) => {
+  const { job } = item;
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const navigate = useNavigate();
+  const createConversation = useCreateDirectConversation();
 
-  const handleSubmitReview = () => {
-    console.log("Submit review", { rating, review });
-  };
+  const handleOpenChat = useCallback(() => {
+    const posterUserId = job.company?.user_id;
+    if (!posterUserId) {
+      toast.error("Unable to open chat", { description: "Company contact information is not available." });
+      return;
+    }
+    createConversation.mutate(posterUserId, {
+      onSuccess: (conversation) => {
+        navigate({ to: "/chat/$id", params: { id: conversation.id } });
+      },
+      onError: () => {
+        toast.error("Failed to open chat");
+      },
+    });
+  }, [job.company?.user_id, createConversation, navigate]);
 
-  const handleViewEvidence = () => {
-    console.log("View evidence for dispute");
-  };
+  const title = getJobTitle(job);
+  const completedSteps = getCompletedSteps(job.status);
+  const isDisputed = tab === "disputed";
 
-  const handleEscalate = () => {
-    console.log("Escalate to admin");
-  };
+  const routeFields: InfoFieldProps[] = [
+    { label: "Origin:", value: toCityState(job.pickup_address) },
+    { label: "Destination:", value: toCityState(job.delivery_address) },
+    { label: "Distance:", value: "N/A" },
+    { label: "Est. Duration:", value: "N/A" },
+  ];
+
+  const scheduleFields: InfoFieldProps[] = [
+    { label: "Pickup:", value: formatDate(job.pickup_datetime) },
+    { label: "Delivery:", value: formatDate(job.delivery_datetime) },
+    { label: "Payout:", value: formatMoney(job.payout_amount) },
+    { label: "Claim Fee:", value: formatMoney(job.cut_amount) },
+  ];
+
+  const contactFields: InfoFieldProps[] = [
+    { label: "Company:", value: job.company?.name ?? "N/A" },
+    { label: "Contact:", value: job.company?.contact_person ?? "N/A" },
+    { label: "Phone:", value: job.company?.phone_number ?? "N/A" },
+    { label: "Email:", value: "N/A" },
+  ];
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
+    <div className="flex flex-col gap-6 rounded-lg bg-white p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-[#202224] mb-1">{job.title}</h3>
-          <span className="text-sm text-gray-500">Job {job.jobId}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h3 className="text-xl font-bold text-[#263238]">{title}</h3>
+          <span className="text-base text-[#90A4AE]">Job {toPublicJobId(job.id)}</span>
         </div>
-        <span className="text-2xl font-bold text-[#202224]">{job.price}</span>
+        <span className="text-xl font-bold text-[#202224]">{formatMoney(job.payout_amount)}</span>
       </div>
 
-      {/* Progress Tracker */}
-      <ProgressTracker steps={job.progress.steps} />
+      {/* Progress Stepper */}
+      <ProgressStepper completedSteps={completedSteps} isDisputed={isDisputed} />
 
-      {/* Route Details & Schedule Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Route Details */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="text-sm font-semibold text-[#202224] mb-3">Route Details</h4>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Origin:</span>
-              <span className="text-[#202224] font-medium">{job.routeDetails.origin}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Destination:</span>
-              <span className="text-[#202224] font-medium">{job.routeDetails.destination}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Distance:</span>
-              <span className="text-[#202224] font-medium">{job.routeDetails.distance}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Est. Duration:</span>
-              <span className="text-[#202224] font-medium">{job.routeDetails.duration}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Schedule */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="text-sm font-semibold text-[#202224] mb-3">Schedule</h4>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Origin:</span>
-              <span className="text-[#202224] font-medium">{job.schedule.origin}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Destination:</span>
-              <span className="text-[#202224] font-medium">{job.schedule.destination}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Distance:</span>
-              <span className="text-[#202224] font-medium">{job.schedule.distance}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Est. Duration:</span>
-              <span className="text-[#202224] font-medium">{job.schedule.duration}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Route Details (Company) */}
-        {job.companyDetails && (
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-[#202224] mb-3">Route Details</h4>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Company:</span>
-                <span className="text-[#202224] font-medium">{job.companyDetails.company}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Contact:</span>
-                <span className="text-[#202224] font-medium">{job.companyDetails.contact}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Phone:</span>
-                <span className="text-[#202224] font-medium">{job.companyDetails.phone}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Email:</span>
-                <span className="text-[#202224] font-medium">{job.companyDetails.email}</span>
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Info Columns */}
+      <div className="flex gap-4">
+        <InfoCard title="Route Details" fields={routeFields} />
+        <InfoCard title="Schedule" fields={scheduleFields} />
+        <InfoCard title="Contact Info" fields={contactFields} highlighted />
       </div>
 
-      {/* Documents Section */}
-      {job.status === "active" && (
-        <div className="mb-6">
-          <h4 className="text-sm font-semibold text-[#202224] mb-3">Documents</h4>
-          <div className="flex items-center gap-4">
-            {job.documents.map((doc) => (
-              <div
-                key={doc.id}
-                className="relative bg-gray-50 border border-gray-200 rounded-lg p-4 w-32 hover:bg-gray-100 transition-colors"
-              >
-                <button
-                  onClick={() => handleRemoveDocument(doc.id)}
-                  className="absolute top-2 right-2 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm hover:bg-gray-100"
-                >
-                  <X className="w-3 h-3 text-gray-600" />
-                </button>
-                <div className="flex flex-col items-center">
-                  <FileText className="w-8 h-8 text-gray-400 mb-2" />
-                  <span className="text-xs text-center text-gray-600 line-clamp-2">{doc.name}</span>
-                </div>
-              </div>
-            ))}
-            <button
-              onClick={handleUploadDocument}
-              className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 w-32 h-full flex flex-col items-center justify-center hover:bg-gray-100 transition-colors"
-            >
-              <span className="text-sm text-gray-500 text-center">Upload Document</span>
-              <span className="text-xs text-gray-400 mt-1">Click to upload or drag & drop</span>
-            </button>
+      {/* Documents Section (active tab only) */}
+      {tab === "active" && (
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2.5">
+            <span className="text-sm">📄</span>
+            <h4 className="text-xl font-bold text-[#263238]">Documents</h4>
+          </div>
+          <div className="flex gap-4">
+            <DocumentCard name="Bill of Lading.pdf" />
+            <DocumentCard name="Bill of Lading.pdf" />
+            <DocumentCard name="Bill of Lading.pdf" />
+            <div className="flex w-[160px] shrink-0 flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed border-[#D8D8D8] px-4 py-6">
+              <span className="text-center text-sm text-[#202224]">Upload Document</span>
+              <span className="text-center text-xs text-[#A6A6A6]">Click to upload or drag & drop</span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Review Section */}
-      {job.showReview && (
-        <div className="border-t border-gray-200 pt-6">
-          <h4 className="text-base font-semibold text-[#202224] mb-2">Leave a Review</h4>
-          <p className="text-sm text-gray-500 mb-4">
-            How was your experience with {job.reviewCompany}?
-          </p>
-          {/* Star Rating */}
-          <div className="flex gap-2 mb-4">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button key={star} onClick={() => setRating(star)} className="focus:outline-none">
-                <Star
-                  className={`w-8 h-8 ${
-                    star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                  }`}
-                />
-              </button>
-            ))}
+      {/* Actions (active tab) */}
+      {tab === "active" && (
+        <div className="flex items-center justify-between">
+          <Button variant="outline" onClick={handleOpenChat} disabled={createConversation.isPending}>
+            {createConversation.isPending ? "Opening..." : "Open Chat"}
+          </Button>
+          <Button variant="primary">Mark as Delivered</Button>
+        </div>
+      )}
+
+      {/* Review Section (completed tab) */}
+      {tab === "completed" && (
+        <div className="flex flex-col gap-4 rounded-lg bg-[#F8F9FA] p-4">
+          <div className="flex flex-col gap-2">
+            <h4 className="text-xl font-bold text-[#202224]">Leave a Review</h4>
+            <p className="text-base text-[#202224]">
+              How was your experience with {job.company?.name ?? "this company"}?
+            </p>
+            <StarRating rating={reviewRating} onRate={setReviewRating} />
           </div>
-          {/* Review Textarea */}
-          <textarea
-            value={review}
-            onChange={(e) => setReview(e.target.value)}
+          <Textarea
+            bg={false}
             placeholder="Share your experience with this company..."
-            className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            rows={4}
+            className="h-[120px]"
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
           />
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 mt-4">
-            <Button variant="secondary" onClick={handleSkipReview}>
-              Skip
-            </Button>
-            <Button variant="primary" onClick={handleSubmitReview}>
-              Submit Review
-            </Button>
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline">Skip</Button>
+            <Button variant="primary">Submit Review</Button>
           </div>
         </div>
       )}
 
-      {/* Dispute Section */}
-      {job.dispute && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <h4 className="text-base font-semibold text-[#202224] mb-2">Dispute Details</h4>
-          <p className="text-sm text-gray-700">{job.dispute.description}</p>
-          <div className="flex gap-3 mt-4">
-            <Button variant="secondary" onClick={handleViewEvidence}>
-              View Evidence
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleEscalate}
-              className="bg-red-500 hover:bg-red-600"
-            >
-              Escalate to Admin
-            </Button>
+      {/* Dispute Section (disputed tab) */}
+      {tab === "disputed" && (
+        <div className="flex flex-col gap-6 rounded-lg bg-[#FFEBEE] p-4">
+          <div className="flex flex-col gap-2">
+            <h4 className="text-xl font-bold text-[#202224]">Dispute Details</h4>
+            <p className="text-base text-[#202224]">
+              The client claims that 3 pieces of equipment arrived damaged. Our driver reported the
+              equipment was loaded securely and arrived without incident.
+            </p>
           </div>
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      {job.status === "active" && (
-        <div className="flex gap-3">
-          <Button variant="secondary" onClick={handleOpenChat} className="gap-2">
-            <MessageCircle size={18} />
-            Open Chat
-          </Button>
-          <Button variant="primary" onClick={handleMarkAsDelivered}>
-            Mark as Delivered
-          </Button>
+          <div className="flex items-center justify-between">
+            <Button variant="outline">View Evidence</Button>
+            <Button variant="danger">Escalate to Admin</Button>
+          </div>
         </div>
       )}
     </div>
   );
+});
+ClaimedJobCard.displayName = "ClaimedJobCard";
+
+// ============================================
+// Tab Component
+// ============================================
+
+interface TabButtonProps {
+  label: string;
+  count: number;
+  isActive: boolean;
+  onClick: () => void;
 }
 
+const TabButton = memo(({ label, count, isActive, onClick }: TabButtonProps) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`flex h-10 items-center gap-1.5 border-b-2 px-4 transition-colors ${
+      isActive
+        ? "border-[#60A5FA] text-[#60A5FA] font-bold"
+        : "border-[#DDD] text-[#90A4AE] font-normal hover:text-[#263238]"
+    }`}
+  >
+    <span className="text-base">{label}</span>
+    <span
+      className={`flex h-[18px] min-w-[22px] items-center justify-center rounded-[10px] px-1.5 text-xs ${
+        isActive ? "bg-[#60A5FA] text-white" : "bg-[#E0E0E0] text-[#202224] font-medium"
+      }`}
+    >
+      {count}
+    </span>
+  </button>
+));
+TabButton.displayName = "TabButton";
+
+// ============================================
+// Page Component
+// ============================================
+
 function ClaimedJobsPage() {
-  const [activeTab, setActiveTab] = useState<JobStatus | "all">("all");
+  const [activeTab, setActiveTab] = useState<ClaimedTab>("active");
+  const [offset] = useState(0);
+  const limit = 50;
+
+  const { data, isLoading, isError, error } = useAppliedJobs({
+    status: "accepted",
+    skip: offset,
+    limit,
+  });
+
+  useEffect(() => {
+    if (isError && error) {
+      const msg = error instanceof Error ? error.message : "Unknown error";
+      toast.error("Failed to Load", { description: `Failed to load claimed jobs: ${msg}` });
+    }
+  }, [isError, error]);
+
+  const items = data?.items ?? [];
+
+  // Count per tab
+  const tabCounts = useMemo(() => {
+    const counts: Record<ClaimedTab, number> = { active: 0, in_transit: 0, completed: 0, disputed: 0 };
+    for (const item of items) {
+      const tab = getTabForStatus(item.job.status);
+      counts[tab]++;
+    }
+    return counts;
+  }, [items]);
+
+  // Filtered items for current tab
+  const filteredItems = useMemo(() => {
+    const statuses = TAB_STATUS_MAP[activeTab];
+    return items.filter((item) => statuses.includes(item.job.status));
+  }, [items, activeTab]);
+
+  const handleTabChange = useCallback((tab: ClaimedTab) => {
+    setActiveTab(tab);
+  }, []);
+
+  const content = useMemo(() => {
+    if (isLoading) {
+      return <div className="py-8 text-center text-base text-[#90A4AE]">Loading claimed jobs...</div>;
+    }
+
+    if (isError) {
+      return <div className="py-8 text-center text-base text-[#90A4AE]">Unable to load jobs</div>;
+    }
+
+    if (filteredItems.length === 0) {
+      return (
+        <div className="py-8 text-center text-base text-[#90A4AE]">
+          No {TABS.find((t) => t.key === activeTab)?.label.toLowerCase()} jobs
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-6">
+        {filteredItems.map((item) => (
+          <ClaimedJobCard key={item.application.id} item={item} tab={activeTab} />
+        ))}
+      </div>
+    );
+  }, [isLoading, isError, filteredItems, activeTab]);
 
   return (
     <div>
-      {/* Header with Tabs */}
-      <div className="mb-6">
-        <div className="flex gap-6 border-b border-gray-200">
-          {statusTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
-                activeTab === tab.id ? "text-blue-500" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {tab.label}{" "}
-              <span className={`ml-1 ${activeTab === tab.id ? "text-blue-500" : "text-gray-400"}`}>
-                {tab.count}
-              </span>
-              {activeTab === tab.id && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Jobs List */}
-      <div>
-        {mockJobs.map((job) => (
-          <JobCard key={job.id} job={job} />
+      {/* Tabs */}
+      <div className="flex border-b border-[#D8D8D8]">
+        {TABS.map((tab) => (
+          <TabButton
+            key={tab.key}
+            label={tab.label}
+            count={tabCounts[tab.key]}
+            isActive={activeTab === tab.key}
+            onClick={() => handleTabChange(tab.key)}
+          />
         ))}
       </div>
+
+      {/* Content */}
+      <div className="mt-6">{content}</div>
     </div>
   );
 }

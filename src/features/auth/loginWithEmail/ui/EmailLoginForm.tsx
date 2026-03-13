@@ -1,6 +1,7 @@
 import {useState} from "react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
+import {Link} from "@tanstack/react-router";
 import {Eye, EyeOff} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
 import {z} from "zod";
@@ -92,6 +93,12 @@ export const EmailLoginForm: React.FC<EmailLoginFormProps> = ({onSuccess}) => {
           />
         )}
       />
+
+      <div className="flex justify-end -mt-1">
+        <Link to="/forgot" className="text-sm text-[#60A5FA] hover:underline">
+          Forgot password?
+        </Link>
+      </div>
 
       {login.error && <ErrorMessage error={login.error} />}
 

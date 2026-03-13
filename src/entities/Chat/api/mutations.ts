@@ -1,12 +1,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { chatKeys } from "./keys";
-import { sendMessage } from "./services";
+import { createDirectConversation, sendMessage } from "./services";
 
 interface SendMessageParams {
   conversationId: string;
   content: string;
 }
+
+export const useCreateDirectConversation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (participantUserId: string) => createDirectConversation(participantUserId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.conversations() });
+    },
+  });
+};
 
 export const useSendMessage = () => {
   const queryClient = useQueryClient();

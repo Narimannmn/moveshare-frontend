@@ -30,6 +30,7 @@ import { Route as authRegisterReviewRouteImport } from './../pages/(auth)/regist
 import { Route as authRegisterPasswordRouteImport } from './../pages/(auth)/register/password'
 import { Route as authRegisterCompanyRouteImport } from './../pages/(auth)/register/company'
 import { Route as authLoginVerifyRouteImport } from './../pages/(auth)/login/verify'
+import { Route as authGoogleCallbackRouteImport } from './../pages/(auth)/google/callback'
 import { Route as appChatIdRouteImport } from './../pages/(app)/chat/$id'
 import { Route as appProfileVerificationIndexRouteImport } from './../pages/(app)/profile/verification/index'
 import { Route as appProfileSecurityIndexRouteImport } from './../pages/(app)/profile/security/index'
@@ -148,6 +149,11 @@ const authLoginVerifyRoute = authLoginVerifyRouteImport.update({
   path: '/login/verify',
   getParentRoute: () => authRouteRoute,
 } as any)
+const authGoogleCallbackRoute = authGoogleCallbackRouteImport.update({
+  id: '/google/callback',
+  path: '/google/callback',
+  getParentRoute: () => authRouteRoute,
+} as any)
 const appChatIdRoute = appChatIdRouteImport.update({
   id: '/chat/$id',
   path: '/chat/$id',
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof appAdminRouteRouteWithChildren
   '/profile': typeof appProfileRouteRouteWithChildren
   '/chat/$id': typeof appChatIdRoute
+  '/google/callback': typeof authGoogleCallbackRoute
   '/login/verify': typeof authLoginVerifyRoute
   '/register/company': typeof authRegisterCompanyRoute
   '/register/password': typeof authRegisterPasswordRoute
@@ -255,6 +262,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chat/$id': typeof appChatIdRoute
+  '/google/callback': typeof authGoogleCallbackRoute
   '/login/verify': typeof authLoginVerifyRoute
   '/register/company': typeof authRegisterCompanyRoute
   '/register/password': typeof authRegisterPasswordRoute
@@ -292,6 +300,7 @@ export interface FileRoutesById {
   '/(app)/admin': typeof appAdminRouteRouteWithChildren
   '/(app)/profile': typeof appProfileRouteRouteWithChildren
   '/(app)/chat/$id': typeof appChatIdRoute
+  '/(auth)/google/callback': typeof authGoogleCallbackRoute
   '/(auth)/login/verify': typeof authLoginVerifyRoute
   '/(auth)/register/company': typeof authRegisterCompanyRoute
   '/(auth)/register/password': typeof authRegisterPasswordRoute
@@ -328,6 +337,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/profile'
     | '/chat/$id'
+    | '/google/callback'
     | '/login/verify'
     | '/register/company'
     | '/register/password'
@@ -360,6 +370,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/chat/$id'
+    | '/google/callback'
     | '/login/verify'
     | '/register/company'
     | '/register/password'
@@ -396,6 +407,7 @@ export interface FileRouteTypes {
     | '/(app)/admin'
     | '/(app)/profile'
     | '/(app)/chat/$id'
+    | '/(auth)/google/callback'
     | '/(auth)/login/verify'
     | '/(auth)/register/company'
     | '/(auth)/register/password'
@@ -581,6 +593,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authLoginVerifyRouteImport
       parentRoute: typeof authRouteRoute
     }
+    '/(auth)/google/callback': {
+      id: '/(auth)/google/callback'
+      path: '/google/callback'
+      fullPath: '/google/callback'
+      preLoaderRoute: typeof authGoogleCallbackRouteImport
+      parentRoute: typeof authRouteRoute
+    }
     '/(app)/chat/$id': {
       id: '/(app)/chat/$id'
       path: '/chat/$id'
@@ -750,6 +769,7 @@ const appRouteRouteWithChildren = appRouteRoute._addFileChildren(
 )
 
 interface authRouteRouteChildren {
+  authGoogleCallbackRoute: typeof authGoogleCallbackRoute
   authLoginVerifyRoute: typeof authLoginVerifyRoute
   authRegisterCompanyRoute: typeof authRegisterCompanyRoute
   authRegisterPasswordRoute: typeof authRegisterPasswordRoute
@@ -762,6 +782,7 @@ interface authRouteRouteChildren {
 }
 
 const authRouteRouteChildren: authRouteRouteChildren = {
+  authGoogleCallbackRoute: authGoogleCallbackRoute,
   authLoginVerifyRoute: authLoginVerifyRoute,
   authRegisterCompanyRoute: authRegisterCompanyRoute,
   authRegisterPasswordRoute: authRegisterPasswordRoute,

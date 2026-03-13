@@ -14,7 +14,6 @@ interface CompanyAccessItem {
   id: string;
   company: string;
   owner: string;
-  email: string;
   jobs: number;
   complaints: number;
   isFrozen: boolean;
@@ -26,7 +25,6 @@ const initialRows: CompanyAccessItem[] = [
     id: "acc-1",
     company: "TransAtlantic Logistics",
     owner: "John Smith",
-    email: "john@transatlantic.com",
     jobs: 18,
     complaints: 0,
     isFrozen: false,
@@ -35,7 +33,6 @@ const initialRows: CompanyAccessItem[] = [
     id: "acc-2",
     company: "Peak Movers",
     owner: "Sasha York",
-    email: "sasha@peakmovers.com",
     jobs: 14,
     complaints: 3,
     isFrozen: true,
@@ -45,7 +42,6 @@ const initialRows: CompanyAccessItem[] = [
     id: "acc-3",
     company: "NorthStar Freight",
     owner: "Maria Lewis",
-    email: "maria@northstarfreight.com",
     jobs: 9,
     complaints: 1,
     isFrozen: false,
@@ -93,7 +89,7 @@ function FreezeCompanyPage() {
         </p>
         <div className="mt-4 flex items-center gap-3">
           <Link
-            to="/admin/review-company"
+            to="/admin/company-managment"
             className="px-3 py-1.5 rounded-[8px] border border-[#D8D8D8] text-[#202224] text-[14px]"
           >
             Review Company
@@ -119,7 +115,6 @@ function FreezeCompanyPage() {
               <tr>
                 <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Company</th>
                 <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Owner</th>
-                <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Email</th>
                 <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Jobs</th>
                 <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Complaints</th>
                 <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Status</th>
@@ -133,7 +128,6 @@ function FreezeCompanyPage() {
                     {row.company}
                   </td>
                   <td className="px-4 py-3 text-[#202224] text-[14px]">{row.owner}</td>
-                  <td className="px-4 py-3 text-[#202224] text-[14px]">{row.email}</td>
                   <td className="px-4 py-3 text-[#202224] text-[14px]">{row.jobs}</td>
                   <td className="px-4 py-3 text-[#202224] text-[14px]">{row.complaints}</td>
                   <td className="px-4 py-3">

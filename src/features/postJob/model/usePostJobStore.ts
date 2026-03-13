@@ -11,6 +11,20 @@ export interface PostJobFormData {
   // Step 2: Addresses
   pickupAddress: string;
   deliveryAddress: string;
+  pickupPlaceId: string | null;
+  deliveryPlaceId: string | null;
+  pickupCity: string | null;
+  pickupState: string | null;
+  pickupPostalCode: string | null;
+  pickupCountry: string | null;
+  pickupLat: number | null;
+  pickupLng: number | null;
+  deliveryCity: string | null;
+  deliveryState: string | null;
+  deliveryPostalCode: string | null;
+  deliveryCountry: string | null;
+  deliveryLat: number | null;
+  deliveryLng: number | null;
   pickupFloor: string;
   deliveryFloor: string;
 
@@ -47,6 +61,20 @@ const initialFormData: PostJobFormData = {
   description: "",
   pickupAddress: "",
   deliveryAddress: "",
+  pickupPlaceId: null,
+  deliveryPlaceId: null,
+  pickupCity: null,
+  pickupState: null,
+  pickupPostalCode: null,
+  pickupCountry: null,
+  pickupLat: null,
+  pickupLng: null,
+  deliveryCity: null,
+  deliveryState: null,
+  deliveryPostalCode: null,
+  deliveryCountry: null,
+  deliveryLat: null,
+  deliveryLng: null,
   pickupFloor: "",
   deliveryFloor: "",
   pickupDatetime: "",

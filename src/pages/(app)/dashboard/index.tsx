@@ -1,8 +1,9 @@
 import { useState } from "react";
 
 import { createFileRoute } from "@tanstack/react-router";
-
 import { Briefcase, DollarSign, Star, Truck } from "lucide-react";
+
+import { PageHeader } from "@/shared/ui";
 import {
   Bar,
   BarChart,
@@ -215,11 +216,7 @@ function DashboardPage() {
 
   return (
     <div>
-      {/* Welcome Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#202224] mb-2">Welcome back, John!</h1>
-        <p className="text-gray-500">Here's your logistics dashboard for today</p>
-      </div>
+      <PageHeader title="Dashboard" />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

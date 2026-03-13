@@ -10,16 +10,16 @@ export const Route = createFileRoute("/(app)/admin")({
 });
 
 interface AdminNavigationItem {
-  to: "/admin/review-company" | "/admin/commission" | "/admin/setting" | "/admin/support";
+  to: "/admin/company-managment" | "/admin/commission" | "/admin/setting" | "/admin/support";
   label: string;
   matchPrefixes: string[];
 }
 
 const adminNavigation: AdminNavigationItem[] = [
   {
-    to: "/admin/review-company",
+    to: "/admin/company-managment",
     label: "Company Management",
-    matchPrefixes: ["/admin/review-company", "/admin/freeze-company"],
+    matchPrefixes: ["/admin/company-managment", "/admin/freeze-company"],
   },
   {
     to: "/admin/commission",

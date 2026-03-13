@@ -4,6 +4,7 @@ export const UserInfoSchema = z.object({
   id: z.string(),
   email: z.string(),
   role: z.string(),
+  status: z.string(),
   registration_step: z.string(),
   has_uploaded_documents: z.boolean(),
 });
@@ -56,7 +57,6 @@ export type SetPasswordResponse = z.infer<typeof SetPasswordResponseSchema>;
 
 export const RegisterCompanyRequestSchema = z.object({
   name: z.string().min(2, "Company name must be at least 2 characters").max(150),
-  email: z.string().email("Invalid email address"),
   address: z.string().min(5, "Address must be at least 5 characters").max(500),
   state: z.string().min(2, "State must be at least 2 characters").max(100),
   city: z.string().min(2, "City must be at least 2 characters").max(100),
@@ -126,6 +126,53 @@ export const LogoutAllResponseSchema = z.object({
 
 export type LogoutAllResponse = z.infer<typeof LogoutAllResponseSchema>;
 
+export const ActiveSessionSchema = z.object({
+  id: z.string().uuid(),
+  device_label: z.string(),
+  location: z.string(),
+  ip_address: z.string().nullable(),
+  is_current: z.boolean(),
+  last_active_at: z.string().datetime(),
+  expires_at: z.string().datetime(),
+});
+
+export type ActiveSession = z.infer<typeof ActiveSessionSchema>;
+
+export const ActiveSessionsListResponseSchema = z.object({
+  sessions: z.array(ActiveSessionSchema),
+  total: z.number().int(),
+});
+
+export type ActiveSessionsListResponse = z.infer<typeof ActiveSessionsListResponseSchema>;
+
+export const TerminateSessionResponseSchema = z.object({
+  message: z.string(),
+});
+
+export type TerminateSessionResponse = z.infer<typeof TerminateSessionResponseSchema>;
+
+export const NotificationPreferencesResponseSchema = z.object({
+  job_matches_enabled: z.boolean(),
+  job_claims_enabled: z.boolean(),
+  messages_enabled: z.boolean(),
+  payment_updates_enabled: z.boolean(),
+  system_updates_enabled: z.boolean(),
+});
+
+export type NotificationPreferencesResponse = z.infer<typeof NotificationPreferencesResponseSchema>;
+
+export const UpdateNotificationPreferencesRequestSchema = z.object({
+  job_matches_enabled: z.boolean().optional(),
+  job_claims_enabled: z.boolean().optional(),
+  messages_enabled: z.boolean().optional(),
+  payment_updates_enabled: z.boolean().optional(),
+  system_updates_enabled: z.boolean().optional(),
+});
+
+export type UpdateNotificationPreferencesRequest = z.infer<
+  typeof UpdateNotificationPreferencesRequestSchema
+>;
+
 export const ForgotPasswordRequestSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
@@ -186,8 +233,8 @@ const CompanyProfileDocumentSchema = z.object({
 
 export const CompanyProfileResponseSchema = z.object({
   id: z.string().uuid(),
+  email: z.string().nullable().optional(),
   name: z.string(),
-  email: z.string().email(),
   address: z.string(),
   state: z.string(),
   city: z.string(),
@@ -197,6 +244,7 @@ export const CompanyProfileResponseSchema = z.object({
   contact_person: z.string(),
   phone_number: z.string(),
   description: z.string().nullable(),
+  profile_image_url: z.string().url().nullable().optional(),
   documents: z.array(CompanyProfileDocumentSchema).optional().default([]),
   is_verified: z.boolean().nullable().optional(),
   average_rating: z.number().nullable().optional(),
@@ -233,3 +281,40 @@ export const UploadDocumentResponseSchema = z.object({
 });
 
 export type UploadDocumentResponse = z.infer<typeof UploadDocumentResponseSchema>;
+
+export const UploadProfileImageResponseSchema = z.object({
+  profile_image_url: z.string().url(),
+  message: z.string(),
+});
+
+export type UploadProfileImageResponse = z.infer<typeof UploadProfileImageResponseSchema>;
+
+// Delete Profile Image Response
+export const DeleteProfileImageResponseSchema = z.object({
+  message: z.string(),
+});
+
+export type DeleteProfileImageResponse = z.infer<typeof DeleteProfileImageResponseSchema>;
+
+// Update Company Profile Request & Response
+export const UpdateCompanyProfileRequestSchema = z.object({
+  name: z.string().min(2, "Company name must be at least 2 characters").max(150),
+  address: z.string().min(5, "Address must be at least 5 characters").max(500),
+  state: z.string().min(2, "State must be at least 2 characters").max(100),
+  city: z.string().min(2, "City must be at least 2 characters").max(100),
+  zip_code: z.string().min(5, "ZIP code must be at least 5 characters").max(20),
+  mc_license_number: z.string().min(1, "MC license number is required").max(100),
+  dot_number: z.string().min(1, "DOT number is required").max(100),
+  contact_person: z.string().min(2, "Contact person must be at least 2 characters").max(255),
+  phone_number: z.string().min(10, "Phone number must be at least 10 characters").max(50),
+  description: z.string().max(5000).optional().nullable(),
+});
+
+export type UpdateCompanyProfileRequest = z.infer<typeof UpdateCompanyProfileRequestSchema>;
+
+export const UpdateCompanyProfileResponseSchema = z.object({
+  company_id: z.string().uuid(),
+  message: z.string(),
+});
+
+export type UpdateCompanyProfileResponse = z.infer<typeof UpdateCompanyProfileResponseSchema>;

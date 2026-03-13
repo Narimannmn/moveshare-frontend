@@ -14,6 +14,14 @@ interface PostJobStep4Props {
   onSuccess: () => void;
 }
 
+const selectChevronStyle = {
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23202224' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")",
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "right 16px center",
+  backgroundSize: "14px",
+} as const;
+
 const parseDatetime = (value: string) => {
   if (!value) return { date: "", time: "" };
   const [datePart, timePart = ""] = value.split("T");
@@ -249,6 +257,7 @@ export const PostJobStep4 = ({ onCancel: _onCancel, onSuccess }: PostJobStep4Pro
                   value={pickupDate}
                   onChange={setPickupDate}
                   placeholder="Select pickup date"
+                  disablePast
                 />
               </div>
 
@@ -259,10 +268,10 @@ export const PostJobStep4 = ({ onCancel: _onCancel, onSuccess }: PostJobStep4Pro
                 <select
                   value={pickupTime}
                   onChange={(e) => setPickupTime(e.target.value)}
-                  className={`w-full h-11 border border-[#D8D8D8] rounded-lg pl-10 pr-12 text-base font-normal focus:outline-none focus:border-[#60A5FA] bg-white ${
+                  className={`w-full h-11 border border-[#D8D8D8] rounded-lg appearance-none px-4 pr-10 text-base font-normal focus:outline-none focus:border-[#60A5FA] bg-white ${
                     pickupTime ? "text-[#202224]" : "text-[#A6A6A6]"
                   }`}
-                  style={{ textIndent: "8px" }}
+                  style={selectChevronStyle}
                 >
                   <option value="" disabled>
                     Select pickup time
@@ -285,6 +294,7 @@ export const PostJobStep4 = ({ onCancel: _onCancel, onSuccess }: PostJobStep4Pro
                   value={deliveryDate}
                   onChange={setDeliveryDate}
                   placeholder="Select delivery date"
+                  disablePast
                 />
               </div>
 
@@ -295,10 +305,10 @@ export const PostJobStep4 = ({ onCancel: _onCancel, onSuccess }: PostJobStep4Pro
                 <select
                   value={deliveryTime}
                   onChange={(e) => setDeliveryTime(e.target.value)}
-                  className={`w-full h-11 border border-[#D8D8D8] rounded-lg pl-10 pr-12 text-base font-normal focus:outline-none focus:border-[#60A5FA] bg-white ${
+                  className={`w-full h-11 border border-[#D8D8D8] rounded-lg appearance-none px-4 pr-10 text-base font-normal focus:outline-none focus:border-[#60A5FA] bg-white ${
                     deliveryTime ? "text-[#202224]" : "text-[#A6A6A6]"
                   }`}
-                  style={{ textIndent: "8px" }}
+                  style={selectChevronStyle}
                 >
                   <option value="" disabled>
                     Select delivery time

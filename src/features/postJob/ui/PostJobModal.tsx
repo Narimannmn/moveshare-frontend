@@ -62,7 +62,11 @@ export const PostJobModal = ({ open, onClose }: PostJobModalProps) => {
         open={open && !showCancelDialog && !showSuccessDialog}
         onOpenChange={handleCloseClick}
       >
-        <DialogContent className="max-w-5xl p-0" showClose={false} onClose={handleCloseClick}>
+        <DialogContent
+          className="max-w-5xl p-0 max-h-[calc(100vh-24px)] overflow-hidden"
+          showClose={false}
+          onClose={handleCloseClick}
+        >
           {/* Header */}
           <DialogHeader className="bg-[#60A5FA] px-6 py-4 relative">
             <DialogTitle className="flex items-center gap-3 text-white text-xl font-bold">
@@ -80,13 +84,15 @@ export const PostJobModal = ({ open, onClose }: PostJobModalProps) => {
           </DialogHeader>
 
           {/* Form Content */}
-          <div className="p-6">
-            {currentStep === 1 && <PostJobStep1 onCancel={handleCloseClick} />}
-            {currentStep === 2 && <PostJobStep2 onCancel={handleCloseClick} />}
-            {currentStep === 3 && <PostJobStep3 onCancel={handleCloseClick} />}
-            {currentStep === 4 && (
-              <PostJobStep4 onCancel={handleCloseClick} onSuccess={handleSuccess} />
-            )}
+          <div className="p-6 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-24px-72px)]">
+            <div style={{ zoom: 0.935 }}>
+              {currentStep === 1 && <PostJobStep1 onCancel={handleCloseClick} />}
+              {currentStep === 2 && <PostJobStep2 onCancel={handleCloseClick} />}
+              {currentStep === 3 && <PostJobStep3 onCancel={handleCloseClick} />}
+              {currentStep === 4 && (
+                <PostJobStep4 onCancel={handleCloseClick} onSuccess={handleSuccess} />
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>

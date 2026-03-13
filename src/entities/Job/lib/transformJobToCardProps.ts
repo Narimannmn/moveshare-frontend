@@ -220,9 +220,7 @@ const getWeightAndVolume = (
   return estimateMap[bedroomCount] || {weight: 4000, volume: 1000};
 };
 
-/**
- * Transforms a JobResponse from the API to JobCardProps for the UI
- */
+
 export const transformJobToCardProps = (job: JobResponse): JobCardProps => {
   const origin = parseAddress(job.pickup_address);
   const destination = parseAddress(job.delivery_address);
@@ -238,6 +236,8 @@ export const transformJobToCardProps = (job: JobResponse): JobCardProps => {
     isNewListing: isNewListing(job.created_at),
     origin,
     destination,
+    originAddress: job.pickup_address,
+    destinationAddress: job.delivery_address,
     dates,
     truckSize,
     weight,

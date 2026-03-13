@@ -13,7 +13,6 @@ export const MOCK_JOB_DETAILS: JobDetailsData = {
     badges: [
       { label: "Verified Mover", type: "blue" },
       { label: "Payment Protected", type: "green" },
-      { label: "Escrow", type: "yellow" },
       { label: "Payment Protected", type: "green" },
     ],
   },
@@ -32,7 +31,6 @@ export const MOCK_JOB_DETAILS: JobDetailsData = {
     estimatedTime: "3 hours 15 minutes",
     truckSize: "Medium (22')",
     cargoType: "Household Goods",
-    weight: "4,200 lbs (1,905 kg)",
     volume: "1,200 cu ft (34 m\u00B3)",
   },
   schedule: {

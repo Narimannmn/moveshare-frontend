@@ -21,7 +21,6 @@ interface CompanyReviewItem {
   id: string;
   company: string;
   owner: string;
-  email: string;
   state: string;
   submittedAt: string;
   jobsPosted: number;
@@ -36,7 +35,6 @@ const initialCompanies: CompanyReviewItem[] = [
     id: "cmp-1001",
     company: "TransAtlantic Logistics",
     owner: "John Smith",
-    email: "john@transatlantic.com",
     state: "Illinois",
     submittedAt: "2026-02-05",
     jobsPosted: 18,
@@ -54,7 +52,6 @@ const initialCompanies: CompanyReviewItem[] = [
     id: "cmp-1002",
     company: "NorthStar Freight",
     owner: "Maria Lewis",
-    email: "maria@northstarfreight.com",
     state: "Texas",
     submittedAt: "2026-02-08",
     jobsPosted: 9,
@@ -72,7 +69,6 @@ const initialCompanies: CompanyReviewItem[] = [
     id: "cmp-1003",
     company: "Peak Movers",
     owner: "Sam Carter",
-    email: "sam@peakmovers.com",
     state: "Florida",
     submittedAt: "2026-02-09",
     jobsPosted: 4,
@@ -128,7 +124,7 @@ function ReviewCompanyPage() {
         </p>
         <div className="mt-4 flex items-center gap-3">
           <Link
-            to="/admin/review-company"
+            to="/admin/company-managment"
             className="px-3 py-1.5 rounded-[8px] bg-[#60A5FA] text-white text-[14px] font-semibold"
           >
             Review Company
@@ -155,7 +151,6 @@ function ReviewCompanyPage() {
                 <tr>
                   <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Company</th>
                   <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Owner</th>
-                  <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Email</th>
                   <th className="text-left text-[#666C72] text-[12px] px-4 py-3">State</th>
                   <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Submitted</th>
                   <th className="text-left text-[#666C72] text-[12px] px-4 py-3">Status</th>
@@ -176,7 +171,6 @@ function ReviewCompanyPage() {
                       {company.company}
                     </td>
                     <td className="px-4 py-3 text-[#202224] text-[14px]">{company.owner}</td>
-                    <td className="px-4 py-3 text-[#202224] text-[14px]">{company.email}</td>
                     <td className="px-4 py-3 text-[#202224] text-[14px]">{company.state}</td>
                     <td className="px-4 py-3 text-[#202224] text-[14px]">{company.submittedAt}</td>
                     <td className="px-4 py-3">
@@ -197,7 +191,6 @@ function ReviewCompanyPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Input label="Company" value={selectedCompany.company} readOnly bg={false} />
                 <Input label="Owner" value={selectedCompany.owner} readOnly bg={false} />
-                <Input label="Email" value={selectedCompany.email} readOnly bg={false} />
                 <Input label="State" value={selectedCompany.state} readOnly bg={false} />
                 <Input
                   label="Jobs Posted"

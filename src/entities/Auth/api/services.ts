@@ -1,8 +1,12 @@
 import { apiClient, authClient } from "@shared/api/client";
 
 import {
+  type ActiveSessionsListResponse,
+  ActiveSessionsListResponseSchema,
   type CompanyProfileResponse,
   CompanyProfileResponseSchema,
+  type DeleteProfileImageResponse,
+  DeleteProfileImageResponseSchema,
   type DocumentType,
   type ForgotPasswordRequest,
   ForgotPasswordRequestSchema,
@@ -20,6 +24,8 @@ import {
   LoginRequestSchema,
   type LoginResponse,
   LoginResponseSchema,
+  type NotificationPreferencesResponse,
+  NotificationPreferencesResponseSchema,
   type LogoutAllResponse,
   LogoutAllResponseSchema,
   LogoutRequestSchema,
@@ -39,17 +45,24 @@ import {
   SetPasswordRequestSchema,
   type SetPasswordResponse,
   SetPasswordResponseSchema,
+  type TerminateSessionResponse,
+  TerminateSessionResponseSchema,
   type UploadDocumentResponse,
   UploadDocumentResponseSchema,
+  type UploadProfileImageResponse,
+  UploadProfileImageResponseSchema,
+  type UpdateCompanyProfileRequest,
+  UpdateCompanyProfileRequestSchema,
+  type UpdateCompanyProfileResponse,
+  UpdateCompanyProfileResponseSchema,
+  type UpdateNotificationPreferencesRequest,
+  UpdateNotificationPreferencesRequestSchema,
   type VerifyOTPRequest,
   VerifyOTPRequestSchema,
   type VerifyOTPResponse,
   VerifyOTPResponseSchema,
 } from "../schemas";
 
-// ============================================
-// Registration Flow Services
-// ============================================
 
 export const sendOTP = async (email: string): Promise<SendOTPResponse> => {
   try {
@@ -109,10 +122,6 @@ export const registerCompany = async (
   }
 };
 
-// ============================================
-// Login Flow Services
-// ============================================
-
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   try {
     const validated = LoginRequestSchema.parse(data);
@@ -123,10 +132,6 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
     throw error;
   }
 };
-
-// ============================================
-// Token Management Services
-// ============================================
 
 export const refreshToken = async (refreshTokenValue: string): Promise<RefreshTokenResponse> => {
   try {
@@ -164,9 +169,48 @@ export const logoutAll = async (): Promise<LogoutAllResponse> => {
   }
 };
 
-// ============================================
-// Forgot Password Flow Services
-// ============================================
+export const getActiveSessions = async (): Promise<ActiveSessionsListResponse> => {
+  try {
+    const response = await apiClient.get("/api/v1/auth/sessions");
+    return ActiveSessionsListResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error fetching active sessions:", error);
+    throw error;
+  }
+};
+
+export const terminateSession = async (sessionId: string): Promise<TerminateSessionResponse> => {
+  try {
+    const response = await apiClient.delete(`/api/v1/auth/sessions/${sessionId}`);
+    return TerminateSessionResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error terminating session:", error);
+    throw error;
+  }
+};
+
+export const getNotificationPreferences = async (): Promise<NotificationPreferencesResponse> => {
+  try {
+    const response = await apiClient.get("/api/v1/notifications/preferences");
+    return NotificationPreferencesResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error fetching notification preferences:", error);
+    throw error;
+  }
+};
+
+export const updateNotificationPreferences = async (
+  data: UpdateNotificationPreferencesRequest
+): Promise<NotificationPreferencesResponse> => {
+  try {
+    const validated = UpdateNotificationPreferencesRequestSchema.parse(data);
+    const response = await apiClient.patch("/api/v1/notifications/preferences", validated);
+    return NotificationPreferencesResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Error updating notification preferences:", error);
+    throw error;
+  }
+};
 
 export const forgotPassword = async (
   data: ForgotPasswordRequest
@@ -212,10 +256,6 @@ export const forgotPasswordReset = async (
   }
 };
 
-// ============================================
-// Document Upload Service (Registration Flow)
-// ============================================
-
 export const uploadCompanyDocument = async (
   documentType: DocumentType,
   file: File
@@ -236,16 +276,51 @@ export const uploadCompanyDocument = async (
   }
 };
 
-// ============================================
-// Company Profile Service
-// ============================================
-
 export const getCompanyProfile = async (): Promise<CompanyProfileResponse> => {
   try {
     const response = await apiClient.get("/api/v1/company/profile");
     return CompanyProfileResponseSchema.parse(response.data);
   } catch (error) {
     console.error("Failed to get company profile:", error);
+    throw error;
+  }
+};
+
+export const uploadCompanyProfileImage = async (file: File): Promise<UploadProfileImageResponse> => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await apiClient.post("/api/v1/company/profile/image", formData, {
+      headers: {"Content-Type": "multipart/form-data"},
+    });
+
+    return UploadProfileImageResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Failed to upload company profile image:", error);
+    throw error;
+  }
+};
+
+export const deleteCompanyProfileImage = async (): Promise<DeleteProfileImageResponse> => {
+  try {
+    const response = await apiClient.delete("/api/v1/company/profile/image");
+    return DeleteProfileImageResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Failed to delete company profile image:", error);
+    throw error;
+  }
+};
+
+export const updateCompanyProfile = async (
+  data: UpdateCompanyProfileRequest
+): Promise<UpdateCompanyProfileResponse> => {
+  try {
+    const validated = UpdateCompanyProfileRequestSchema.parse(data);
+    const response = await apiClient.patch("/api/v1/company/profile", validated);
+    return UpdateCompanyProfileResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error("Failed to update company profile:", error);
     throw error;
   }
 };

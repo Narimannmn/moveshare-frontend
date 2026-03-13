@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-import { Camera } from "lucide-react";
+import { Camera, Trash2 } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 
@@ -11,6 +11,10 @@ export interface ProfileAvatarProps {
   avatar?: string | null;
   size?: "sm" | "md" | "lg" | "xl";
   editable?: boolean;
+  isUploading?: boolean;
+  isDeleting?: boolean;
+  onChangeClick?: () => void;
+  onDeleteClick?: () => void;
   className?: string;
 }
 
@@ -22,7 +26,17 @@ const getInitials = (name: string): string => {
 };
 
 export const ProfileAvatar = memo(
-  ({ name, avatar, size = "md", editable = false, className }: ProfileAvatarProps) => {
+  ({
+    name,
+    avatar,
+    size = "md",
+    editable = false,
+    isUploading = false,
+    isDeleting = false,
+    onChangeClick,
+    onDeleteClick,
+    className,
+  }: ProfileAvatarProps) => {
     const initials = getInitials(name);
 
     return (
@@ -36,10 +50,29 @@ export const ProfileAvatar = memo(
         )}
 
         {editable && (
-          <button className={styles.changeButton} aria-label="Change avatar">
-            <Camera size={16} />
-            <span>Change</span>
-          </button>
+          <div className={styles.actions}>
+            <button
+              type="button"
+              className={styles.changeButton}
+              aria-label="Change avatar"
+              onClick={onChangeClick}
+              disabled={isUploading || isDeleting}
+            >
+              <Camera size={16} />
+              <span>{isUploading ? "Uploading..." : "Change"}</span>
+            </button>
+            {avatar && onDeleteClick && (
+              <button
+                type="button"
+                className={styles.deleteButton}
+                aria-label="Delete avatar"
+                onClick={onDeleteClick}
+                disabled={isUploading || isDeleting}
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
+          </div>
         )}
       </div>
     );
