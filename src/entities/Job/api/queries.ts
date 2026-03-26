@@ -21,19 +21,19 @@ export const useAvailableJobs = (params?: JobListParams) => {
 };
 
 // ============================================
-// Available Jobs Locations Query
+// Job Filter Options Query
 // ============================================
 
-export const availableJobLocationsQueryOptions = () =>
+export const jobFilterOptionsQueryOptions = () =>
   queryOptions({
-    queryKey: jobKeys.locations(),
-    queryFn: () => services.getAvailableJobLocations(),
+    queryKey: jobKeys.filterOptions(),
+    queryFn: () => services.getJobFilterOptions(),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 
-export const useAvailableJobLocations = () => {
-  return useQuery(availableJobLocationsQueryOptions());
+export const useJobFilterOptions = () => {
+  return useQuery(jobFilterOptionsQueryOptions());
 };
 
 // ============================================

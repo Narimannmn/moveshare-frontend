@@ -1,5 +1,6 @@
 import type {JobResponse} from "../schemas";
 import type {JobCardProps} from "../ui/JobCard/JobCard";
+import { getJobTitle, getTruckSize, getWeightAndVolume } from "./constants";
 
 const US_STATE_NAME_TO_ABBREVIATION: Record<string, string> = {
   alabama: "AL",
@@ -117,33 +118,6 @@ const parseAddress = (address: string): {city: string; state: string} => {
   return {city: address, state: ""};
 };
 
-/**
- * Formats bedroom count enum to display title
- */
-const formatBedroomTitle = (
-  bedroomCount: JobResponse["bedroom_count"],
-  jobType: JobResponse["job_type"]
-): string => {
-  if (bedroomCount) {
-    const bedroomMap: Record<string, string> = {
-      "1_bedroom": "1 Bedroom",
-      "2_bedroom": "2 Bedroom",
-      "3_bedroom": "3 Bedroom",
-      "4_bedroom": "4 Bedroom",
-      "5_bedroom": "5 Bedroom",
-      "6_plus_bedroom": "6+ Bedroom",
-    };
-    return `${bedroomMap[bedroomCount] || bedroomCount} Move`;
-  }
-
-  const jobTypeMap: Record<string, string> = {
-    residential: "Residential Move",
-    office: "Office Move",
-    storage: "Storage Move",
-  };
-
-  return jobTypeMap[jobType] || "Move";
-};
 
 const formatDateRange = (
   pickupDatetime: string,
@@ -179,46 +153,6 @@ const formatDateRange = (
 };
 
 
-const getTruckSize = (
-  bedroomCount: JobResponse["bedroom_count"]
-): {type: string; length: string} => {
-  if (!bedroomCount) {
-    return {type: "Standard", length: "26'"};
-  }
-
-  const truckSizeMap: Record<string, {type: string; length: string}> = {
-    "1_bedroom": {type: "Small", length: "16'"},
-    "2_bedroom": {type: "Medium", length: "26'"},
-    "3_bedroom": {type: "Medium", length: "40'"},
-    "4_bedroom": {type: "Large", length: "40'"},
-    "5_bedroom": {type: "Large", length: "53'"},
-    "6_plus_bedroom": {type: "Extra Large", length: "53'"},
-  };
-
-  return truckSizeMap[bedroomCount] || {type: "Medium", length: "26'"};
-};
-
-/**
- * Estimates weight and volume based on bedroom count
- */
-const getWeightAndVolume = (
-  bedroomCount: JobResponse["bedroom_count"]
-): {weight: number; volume: number} => {
-  if (!bedroomCount) {
-    return {weight: 3000, volume: 800};
-  }
-
-  const estimateMap: Record<string, {weight: number; volume: number}> = {
-    "1_bedroom": {weight: 2000, volume: 500},
-    "2_bedroom": {weight: 4000, volume: 1000},
-    "3_bedroom": {weight: 6000, volume: 1500},
-    "4_bedroom": {weight: 8000, volume: 2000},
-    "5_bedroom": {weight: 10000, volume: 2500},
-    "6_plus_bedroom": {weight: 12000, volume: 3000},
-  };
-
-  return estimateMap[bedroomCount] || {weight: 4000, volume: 1000};
-};
 
 
 export const transformJobToCardProps = (job: JobResponse): JobCardProps => {
@@ -230,7 +164,7 @@ export const transformJobToCardProps = (job: JobResponse): JobCardProps => {
 
   return {
     id: job.id,
-    title: formatBedroomTitle(job.bedroom_count, job.job_type),
+    title: getJobTitle(job.bedroom_count, job.job_type),
     distance: 0, // Distance not provided by API - would need geo calculation
     isHotDeal: false, // Not provided by API
     isNewListing: isNewListing(job.created_at),

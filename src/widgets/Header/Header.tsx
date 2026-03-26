@@ -5,7 +5,7 @@ import { Bell, CheckCircle2, Clock3, Settings } from "lucide-react";
 
 import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 import { cn } from "@/shared/lib/utils";
-import { Button } from "@/shared/ui";
+import { Avatar, Button } from "@/shared/ui";
 
 export interface HeaderProps {
   className?: string;
@@ -46,13 +46,6 @@ const INITIAL_NOTIFICATIONS: HeaderNotificationItem[] = [
     unread: true,
   },
 ];
-
-const getInitials = (name: string): string => {
-  const words = name.trim().split(/\s+/);
-  if (words.length === 0) return "";
-  if (words.length === 1) return words[0].charAt(0).toUpperCase();
-  return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
-};
 
 export const Header = memo(({ className, onNotificationClick }: HeaderProps) => {
   const navigate = useNavigate();
@@ -212,23 +205,15 @@ export const Header = memo(({ className, onNotificationClick }: HeaderProps) => 
 
         {/* User Avatar */}
         <button
-          className="size-11 shrink-0 rounded-full flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-[#60A5FA] transition-all"
+          className="shrink-0 rounded-full hover:ring-2 hover:ring-[#60A5FA] transition-all"
           aria-label="User menu"
           onClick={() => navigate({ to: "/profile" })}
         >
-          {companyProfile?.profile_image_url ? (
-            <img
-              src={companyProfile.profile_image_url}
-              alt={companyProfile.name ?? "Profile"}
-              className="size-full object-cover"
-            />
-          ) : (
-            <div className="flex size-full items-center justify-center bg-linear-to-br from-[#60A5FA] to-[#3B82F6]">
-              <span className="text-sm font-semibold text-white">
-                {getInitials(companyProfile?.name ?? "U")}
-              </span>
-            </div>
-          )}
+          <Avatar
+            name={companyProfile?.name ?? "U"}
+            avatar={companyProfile?.profile_image_url}
+            size="lg"
+          />
         </button>
       </div>
     </header>

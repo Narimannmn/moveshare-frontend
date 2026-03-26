@@ -1,88 +1,85 @@
 import { memo, useMemo } from "react";
 
 import { cn } from "@/shared/lib/utils";
+import { Avatar } from "@/shared/ui";
 
 import type { Conversation } from "../../schemas";
-import { UserAvatar } from "../UserAvatar/UserAvatar";
-import styles from "./ConversationListItem.module.scss";
 
 export interface ConversationListItemProps {
   conversation: Conversation;
-  isSelected: boolean;
-  currentUserId: string;
-  onClick: (id: string) => void;
+  isSelected?: boolean;
+  currentUserId?: string;
+  onClick?: (id: string) => void;
   className?: string;
 }
 
+const formatRelativeTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+
+  if (diff < 60000) return "Just now";
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+
+  return date.toLocaleDateString();
+};
+
 export const ConversationListItem = memo(
-  ({ conversation, isSelected, currentUserId, onClick, className }: ConversationListItemProps) => {
+  ({ conversation, isSelected = false, currentUserId, onClick, className }: ConversationListItemProps) => {
     const otherUser = useMemo(() => {
       if (!currentUserId) {
         return conversation.participants[0];
       }
-
-      return conversation.participants.find((participant) => participant.id !== currentUserId);
+      return conversation.participants.find((p) => p.id !== currentUserId);
     }, [conversation.participants, currentUserId]);
-
-    const formatTimestamp = (dateString: string) => {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diff = now.getTime() - date.getTime();
-
-      if (diff < 60000) return "Just now";
-      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-      if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
-
-      return date.toLocaleDateString();
-    };
 
     if (!otherUser) return null;
 
     return (
-      <div
-        className={cn(styles.item, isSelected && styles.selected, className)}
-        onClick={() => onClick(conversation.id)}
-        role="button"
-        tabIndex={0}
+      <button
+        type="button"
+        className={cn(
+          "flex w-full items-center gap-3 rounded-lg px-2 py-3 text-left transition-colors",
+          isSelected ? "bg-[#E6F2FF]" : "hover:bg-gray-50",
+          className
+        )}
+        onClick={() => onClick?.(conversation.id)}
         aria-label={`Conversation with ${otherUser.name}`}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onClick(conversation.id);
-          }
-        }}
       >
-        <UserAvatar
+        <Avatar
           name={otherUser.name}
           avatar={otherUser.avatar}
           isOnline={otherUser.isOnline}
           size="md"
         />
 
-        <div className={styles.content}>
-          <div className={styles.header}>
-            <span className={styles.name}>{otherUser.name}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-[#202224] truncate">
+              {otherUser.name}
+            </span>
             {conversation.lastMessage && (
-              <span className={styles.timestamp}>
-                {formatTimestamp(conversation.lastMessage.createdAt)}
+              <span className="text-xs text-gray-400 shrink-0">
+                {formatRelativeTime(conversation.lastMessage.createdAt)}
               </span>
             )}
           </div>
-
-          <div className={styles.footer}>
-            {conversation.lastMessage && (
-              <span className={styles.lastMessage}>{conversation.lastMessage.content}</span>
-            )}
-            {conversation.unreadCount > 0 && (
-              <span className={styles.unreadBadge}>{conversation.unreadCount}</span>
-            )}
-          </div>
+          <p className="text-sm text-gray-500 truncate mt-0.5">
+            {conversation.lastMessage?.content ?? "No messages"}
+          </p>
         </div>
-      </div>
+
+        {conversation.unreadCount > 0 && (
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#60A5FA] text-[11px] font-bold text-white">
+            {conversation.unreadCount}
+          </span>
+        )}
+      </button>
     );
   }
 );

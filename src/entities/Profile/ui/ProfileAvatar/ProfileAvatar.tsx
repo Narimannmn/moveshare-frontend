@@ -3,6 +3,7 @@ import { memo } from "react";
 import { Camera, Trash2 } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
+import { Avatar } from "@/shared/ui";
 
 import styles from "./ProfileAvatar.module.scss";
 
@@ -18,13 +19,6 @@ export interface ProfileAvatarProps {
   className?: string;
 }
 
-const getInitials = (name: string): string => {
-  const words = name.trim().split(/\s+/);
-  if (words.length === 0) return "";
-  if (words.length === 1) return words[0].charAt(0).toUpperCase();
-  return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
-};
-
 export const ProfileAvatar = memo(
   ({
     name,
@@ -37,17 +31,9 @@ export const ProfileAvatar = memo(
     onDeleteClick,
     className,
   }: ProfileAvatarProps) => {
-    const initials = getInitials(name);
-
     return (
       <div className={cn(styles.container, styles[size], className)}>
-        {avatar ? (
-          <img src={avatar} alt={name} className={styles.image} />
-        ) : (
-          <div className={styles.gradient}>
-            <span className={styles.initials}>{initials}</span>
-          </div>
-        )}
+        <Avatar name={name} avatar={avatar} size={size} className={styles.inner} />
 
         {editable && (
           <div className={styles.actions}>

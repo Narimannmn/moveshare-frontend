@@ -139,7 +139,8 @@ export const PostJobStep3 = ({ onCancel: _onCancel }: PostJobStep3Props) => {
   return (
     <div className="flex gap-6">
       {/* Left Column: Form */}
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 flex flex-col min-h-[500px]">
+        <div className="space-y-6 flex-1">
         {/* Progress */}
         <div className="space-y-2">
           <p className="text-sm font-normal text-[#202224]">Step 3/4</p>
@@ -264,8 +265,10 @@ export const PostJobStep3 = ({ onCancel: _onCancel }: PostJobStep3Props) => {
           </div>
         </div>
 
+        </div>
+
         {/* Actions */}
-        <div className="flex gap-4 justify-end pt-2">
+        <div className="flex gap-4 justify-end pt-6 mt-auto">
           <button
             type="button"
             onClick={handleBack}

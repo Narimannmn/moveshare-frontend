@@ -1,10 +1,10 @@
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 import { cn } from "@/shared/lib/utils";
 
-import { type BedroomCount, useAvailableJobLocations, useJobFiltersStore } from "@/entities/Job";
+import { type BedroomCount, BEDROOM_LABELS, useJobFilterOptions, useJobFiltersStore } from "@/entities/Job";
 
-import { Button, Checkbox, DatePicker } from "@shared/ui";
+import { Button, DatePicker } from "@shared/ui";
 
 import styles from "./JobsFilter.module.scss";
 
@@ -12,20 +12,11 @@ export interface JobsFilterProps {
   className?: string;
 }
 
-const BEDROOM_COUNT_OPTIONS: { value: BedroomCount; label: string }[] = [
-  { value: "1_bedroom", label: "1 Bedroom" },
-  { value: "2_bedroom", label: "2 Bedrooms" },
-  { value: "3_bedroom", label: "3 Bedrooms" },
-  { value: "4_bedroom", label: "4 Bedrooms" },
-  { value: "5_bedroom", label: "5 Bedrooms" },
-  { value: "6_plus_bedroom", label: "6+ Bedrooms" },
-];
+const BEDROOM_COUNT_OPTIONS = (Object.entries(BEDROOM_LABELS) as [BedroomCount, string][]).map(
+  ([value, label]) => ({ value, label })
+);
 
-const TRUCK_SIZE_OPTIONS = [
-  { value: "small", label: "Small (≤26')" },
-  { value: "medium", label: "Medium (27'-52')" },
-  { value: "large", label: "Large (≥53')" },
-];
+
 
 interface SearchableDropdownProps {
   value: string;
@@ -143,7 +134,14 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
   const setBedroomCount = useJobFiltersStore((state) => state.actions.setBedroomCount);
   const setOriginFilter = useJobFiltersStore((state) => state.actions.setOrigin);
   const setDestinationFilter = useJobFiltersStore((state) => state.actions.setDestination);
-  const { data: locationOptions, isLoading: isLocationsLoading } = useAvailableJobLocations();
+  const setPickupDateFrom = useJobFiltersStore((state) => state.actions.setPickupDateFrom);
+  const setPickupDateTo = useJobFiltersStore((state) => state.actions.setPickupDateTo);
+  const { data: filterOptions, isLoading: isFilterOptionsLoading } = useJobFilterOptions();
+
+  const metersToMiles = useCallback((meters: number) => Math.round(meters / 1609.34), []);
+
+  const distanceMinMi = filterOptions?.distance_min_meters != null ? metersToMiles(filterOptions.distance_min_meters) : 0;
+  const distanceMaxMi = filterOptions?.distance_max_meters != null ? metersToMiles(filterOptions.distance_max_meters) : 500;
 
   // Local state for form inputs before applying
   const [localBedroomCount, setLocalBedroomCount] = useState<BedroomCount | null>(
@@ -151,9 +149,9 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
   );
   const [origin, setOrigin] = useState(storeOrigin ?? "");
   const [destination, setDestination] = useState(storeDestination ?? "");
-  const [distance, setDistance] = useState(250);
-  const [dateStart, setDateStart] = useState("");
-  const [dateEnd, setDateEnd] = useState("");
+  const [distance, setDistance] = useState(distanceMaxMi);
+  const [pickupFrom, setPickupFrom] = useState("");
+  const [pickupTo, setPickupTo] = useState("");
   const [truckSizes, setTruckSizes] = useState<string[]>([]);
   const [truckSizeMin, setTruckSizeMin] = useState("");
   const [truckSizeMax, setTruckSizeMax] = useState("");
@@ -162,37 +160,36 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
     setBedroomCount(localBedroomCount);
     setOriginFilter(origin.trim() ? origin.trim() : null);
     setDestinationFilter(destination.trim() ? destination.trim() : null);
-    // TODO: Apply other filters when backend supports them
+    setPickupDateFrom(pickupFrom ? new Date(pickupFrom).toISOString() : null);
+    setPickupDateTo(pickupTo ? new Date(pickupTo).toISOString() : null);
   };
 
   const handleResetBedroomCount = () => {
     setLocalBedroomCount(null);
     setOrigin("");
     setDestination("");
-    setDistance(250);
-    setDateStart("");
-    setDateEnd("");
+    setDistance(distanceMaxMi);
+    setPickupFrom("");
+    setPickupTo("");
     setTruckSizes([]);
     setTruckSizeMin("");
     setTruckSizeMax("");
     setBedroomCount(null);
     setOriginFilter(null);
     setDestinationFilter(null);
+    setPickupDateFrom(null);
+    setPickupDateTo(null);
   };
 
-  const handleTruckSizeToggle = (value: string) => {
-    setTruckSizes((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
-    );
-  };
+
 
   const hasActiveFilters =
     localBedroomCount !== null ||
     origin.trim() ||
     destination.trim() ||
-    distance !== 250 ||
-    dateStart ||
-    dateEnd ||
+    distance !== distanceMaxMi ||
+    pickupFrom ||
+    pickupTo ||
     truckSizes.length > 0 ||
     truckSizeMin ||
     truckSizeMax;
@@ -228,11 +225,11 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
           <SearchableDropdown
             value={origin}
             onSelect={setOrigin}
-            options={locationOptions?.origins ?? []}
+            options={filterOptions?.origins ?? []}
             placeholder="City, State"
             searchPlaceholder="Search origin"
             emptyText="No origins found"
-            loading={isLocationsLoading}
+            loading={isFilterOptionsLoading}
           />
         </div>
 
@@ -242,11 +239,11 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
           <SearchableDropdown
             value={destination}
             onSelect={setDestination}
-            options={locationOptions?.destinations ?? []}
+            options={filterOptions?.destinations ?? []}
             placeholder="City, State"
             searchPlaceholder="Search destination"
             emptyText="No destinations found"
-            loading={isLocationsLoading}
+            loading={isFilterOptionsLoading}
           />
         </div>
 
@@ -255,35 +252,36 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
           <h3 className={styles.sectionTitle}>Distance</h3>
           <input
             type="range"
-            min="0"
-            max="500"
+            min={distanceMinMi}
+            max={distanceMaxMi}
             value={distance}
             onChange={(e) => setDistance(Number(e.target.value))}
             className={styles.slider}
             style={{
-              background: `linear-gradient(to right, #60a5fa 0%, #60a5fa ${(distance / 500) * 100}%, #d8d8d8 ${(distance / 500) * 100}%, #d8d8d8 100%)`,
+              background: distanceMaxMi > distanceMinMi
+                ? `linear-gradient(to right, #60a5fa 0%, #60a5fa ${((distance - distanceMinMi) / (distanceMaxMi - distanceMinMi)) * 100}%, #d8d8d8 ${((distance - distanceMinMi) / (distanceMaxMi - distanceMinMi)) * 100}%, #d8d8d8 100%)`
+                : "#d8d8d8",
             }}
           />
           <div className={styles.sliderLabels}>
-            <span className={styles.sliderLabel}>0 mi</span>
-            <span className={styles.sliderLabel}>250 mi</span>
-            <span className={styles.sliderLabel}>500 mi</span>
+            <span className={styles.sliderLabel}>{distanceMinMi} mi</span>
+            <span className={styles.sliderLabel}>{distanceMaxMi} mi</span>
           </div>
         </div>
 
-        {/* Date Start */}
+        {/* Pickup From */}
         <div className={styles.filterSection}>
-          <label className={styles.label}>Date Start</label>
-          <DatePicker value={dateStart} onChange={setDateStart} placeholder="Select start date" disablePast />
+          <label className={styles.label}>Pickup From</label>
+          <DatePicker value={pickupFrom} onChange={setPickupFrom} placeholder="Select start date" disablePast />
         </div>
 
-        {/* Date End */}
+        {/* Pickup To */}
         <div className={styles.filterSection}>
-          <label className={styles.label}>Date End</label>
-          <DatePicker value={dateEnd} onChange={setDateEnd} placeholder="Select end date" />
+          <label className={styles.label}>Pickup To</label>
+          <DatePicker value={pickupTo} onChange={setPickupTo} placeholder="Select end date" />
         </div>
 
-        {/* Truck Size Checkboxes */}
+        {/* Truck Size Checkboxes — hidden until backend supports truck size filtering
         <div className={styles.filterSection}>
           <h3 className={styles.sectionTitle}>Truck Size</h3>
           <div className={styles.checkboxGroup}>
@@ -298,6 +296,7 @@ export const JobsFilter = memo(({ className }: JobsFilterProps) => {
             ))}
           </div>
         </div>
+        */}
       </div>
 
       {/* Apply Filters Button */}

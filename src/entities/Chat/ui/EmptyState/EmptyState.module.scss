@@ -6,18 +6,19 @@
   height: 100%;
   padding: 32px;
   text-align: center;
+  gap: 4px;
 }
 
 .icon {
   width: 56px;
   height: 56px;
   border-radius: 999px;
-  background: #f1f4f9;
-  color: #666c72;
+  background: #e3f2fd;
+  color: #90a4ae;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .icon :global(svg) {
@@ -26,18 +27,18 @@
 }
 
 .title {
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
   color: #202224;
-  margin: 0 0 8px 0;
+  margin: 0;
 }
 
 .message {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   line-height: 18px;
-  color: #666c72;
+  color: #90a4ae;
   margin: 0;
-  max-width: 300px;
+  max-width: 280px;
 }

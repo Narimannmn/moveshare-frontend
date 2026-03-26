@@ -5,63 +5,30 @@
   flex-shrink: 0;
 }
 
-.image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.gradient {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-}
-
-.initials {
-  color: white;
-  font-weight: 600;
-  font-family: "Onest", sans-serif;
+.inner {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Size variants */
 .sm {
   width: 32px;
   height: 32px;
-
-  .initials {
-    font-size: 14px;
-  }
 }
 
 .md {
   width: 48px;
   height: 48px;
-
-  .initials {
-    font-size: 18px;
-  }
 }
 
 .lg {
   width: 64px;
   height: 64px;
-
-  .initials {
-    font-size: 24px;
-  }
 }
 
 .xl {
   width: 120px;
   height: 120px;
-
-  .initials {
-    font-size: 48px;
-    line-height: 1;
-  }
 }
 
 /* Actions bar */
@@ -74,7 +41,6 @@
   display: flex;
 }
 
-/* Change button */
 .changeButton {
   flex: 1;
   background: rgba(0, 0, 0, 0.7);
@@ -105,7 +71,6 @@
   }
 }
 
-/* Delete button */
 .deleteButton {
   width: 36px;
   background: rgba(220, 38, 38, 0.8);

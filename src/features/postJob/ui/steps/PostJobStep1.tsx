@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { BedroomCount, JobType } from "@/entities/Job";
+import { type BedroomCount, type JobType, TRUCK_SIZE_INFO } from "@/entities/Job";
 
 import { usePostJobStore } from "../../model/usePostJobStore";
 import { MoveDetailsChecklist } from "../MoveDetailsChecklist";
@@ -9,82 +9,6 @@ interface PostJobStep1Props {
   onCancel: () => void;
 }
 
-type TruckSizeInfo = {
-  vehicleLabel: string;
-  volume: string;
-  items: string[];
-  imageSrc: string;
-  imageClassName: string;
-};
-
-const truckSizeInfo: Record<BedroomCount, TruckSizeInfo> = {
-  "1_bedroom": {
-    vehicleLabel: "Small Van (15+)",
-    volume: "1 Bedroom - 10–15 m³",
-    items: ["Bed or sofa", "Small wardrobe", "Up to 10 boxes", "TV, chairs, nightstand"],
-    imageSrc: "/assets/figma/post-job/van-1.svg",
-    imageClassName: "w-20 h-10",
-  },
-  "2_bedroom": {
-    vehicleLabel: "Medium Truck",
-    volume: "2 Bedroom - 20–25 m³",
-    items: [
-      "2 beds or a bed + sofa",
-      "Wardrobe, chest of drawers",
-      "Refrigerator, washing machine",
-      "Up to 20 boxes",
-    ],
-    imageSrc: "/assets/figma/post-job/van-1.svg",
-    imageClassName: "w-20 h-10",
-  },
-  "3_bedroom": {
-    vehicleLabel: "Medium (20+')",
-    volume: "3 Bedroom - 30–35 m³",
-    items: [
-      "Sofa set, 2–3 beds",
-      "Several wardrobes and tables",
-      "Home appliances",
-      "Up to 30 boxes",
-    ],
-    imageSrc: "/assets/figma/post-job/trailer-1.svg",
-    imageClassName: "w-[73px] h-[37px]",
-  },
-  "4_bedroom": {
-    vehicleLabel: "Medium (20+')",
-    volume: "4 Bedroom - 40–45 m³",
-    items: [
-      "Complete furniture set for a large apartment",
-      "Sports or baby equipment",
-      "Home appliances",
-      "Up to 40 boxes",
-    ],
-    imageSrc: "/assets/figma/post-job/trailer-1.svg",
-    imageClassName: "w-[73px] h-[37px]",
-  },
-  "5_bedroom": {
-    vehicleLabel: "Large (26+')",
-    volume: "5 Bedroom - 50–55 m³",
-    items: [
-      "Full set of furniture and appliances",
-      "Outdoor and garage items",
-      "Home appliances",
-      "Up to 50 boxes",
-    ],
-    imageSrc: "/assets/figma/post-job/truck-1.svg",
-    imageClassName: "w-[78px] h-[42px]",
-  },
-  "6_plus_bedroom": {
-    vehicleLabel: "Large (26+')",
-    volume: "6+ Bedroom - 65+ m³",
-    items: [
-      "Furniture and appliances for the entire house",
-      "Garden and garage equipment",
-      "Large volume of boxes and miscellaneous items",
-    ],
-    imageSrc: "/assets/figma/post-job/truck-1.svg",
-    imageClassName: "w-[78px] h-[42px]",
-  },
-};
 
 interface RadioBoxProps {
   label: string;
@@ -139,12 +63,13 @@ export const PostJobStep1 = ({ onCancel }: PostJobStep1Props) => {
 
   const isValid = jobType && bedroomCount && description.trim().length > 0;
 
-  const truckInfo = bedroomCount ? truckSizeInfo[bedroomCount] : null;
+  const truckInfo = bedroomCount ? TRUCK_SIZE_INFO[bedroomCount] : null;
 
   return (
     <div className="flex gap-6">
       {/* Left Column: Form */}
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 flex flex-col min-h-[500px]">
+        <div className="space-y-6 flex-1">
         {/* Progress */}
         <div className="space-y-2">
           <p className="text-sm font-normal text-[#202224]">Step 1/4</p>
@@ -258,7 +183,7 @@ export const PostJobStep1 = ({ onCancel }: PostJobStep1Props) => {
 
         {/* Job Description */}
         <div className="space-y-2">
-          <p className="text-base font-normal text-[#202224]">Label</p>
+          <p className="text-base font-normal text-[#202224]">Job Description</p>
           <div className="border border-[#D8D8D8] rounded-lg px-4 py-2.5 h-[120px]">
             <textarea
               value={description}
@@ -269,8 +194,10 @@ export const PostJobStep1 = ({ onCancel }: PostJobStep1Props) => {
           </div>
         </div>
 
+        </div>
+
         {/* Actions */}
-        <div className="flex gap-4 justify-end pt-2">
+        <div className="flex gap-4 justify-end pt-6 mt-auto">
           <button
             type="button"
             onClick={onCancel}

@@ -17,14 +17,14 @@ import {
 } from "@/shared/ui/Pagination/Pagination";
 
 import {
-  type BedroomCount,
   type JobStatus,
+  getBedroomLabel,
   useCancelJobs,
   useExportJobsCsv,
   useMyJobs,
 } from "@/entities/Job";
 
-import { PostJobModal } from "@/features/postJob";
+import { PostJobButton } from "@/features/postJob";
 
 export const Route = createFileRoute("/(app)/my/")({
   component: MyJobsPage,
@@ -41,15 +41,6 @@ const statusTabs: Array<{
   { id: "completed", label: "Completed" },
   { id: "cancelled", label: "Cancelled" },
 ];
-
-const bedroomLabelMap: Record<BedroomCount, string> = {
-  "1_bedroom": "1 Bedroom",
-  "2_bedroom": "2 Bedroom",
-  "3_bedroom": "3 Bedroom",
-  "4_bedroom": "4 Bedroom",
-  "5_bedroom": "5 Bedroom",
-  "6_plus_bedroom": "6+ Bedroom",
-};
 
 const buildPageItems = (currentPage: number, totalPages: number): Array<number | "ellipsis"> => {
   if (totalPages <= 7) {
@@ -117,7 +108,6 @@ function MyJobsPage() {
   const [activeTab, setActiveTab] = useState<JobStatus | "all">("all");
   const [selectedJobs, setSelectedJobs] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
-  const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
   const [offset, setOffset] = useState(0);
   const [limit, setLimit] = useState(20);
   const cancelJobsMutation = useCancelJobs({
@@ -227,10 +217,6 @@ function MyJobsPage() {
     }
   };
 
-  const handlePostNewJob = () => {
-    setIsPostJobModalOpen(true);
-  };
-
   const handleRefresh = () => {
     refetch();
   };
@@ -254,28 +240,12 @@ function MyJobsPage() {
     });
   };
 
-  const getBedroomLabel = (bedroomCount: BedroomCount | null) => {
-    if (!bedroomCount) return "N/A";
-    return bedroomLabelMap[bedroomCount] ?? bedroomCount;
-  };
-
   return (
     <div>
-      <PostJobModal open={isPostJobModalOpen} onClose={() => setIsPostJobModalOpen(false)} />
-
       {/* Header */}
       <PageHeader
         title="My Jobs"
-        actions={
-          <>
-            <Button variant="secondary" onClick={handleRefresh} disabled={isLoading}>
-              {isLoading ? "Loading..." : "Refresh"}
-            </Button>
-            <Button variant="primary" onClick={handlePostNewJob}>
-              Post New Job
-            </Button>
-          </>
-        }
+        actions={<PostJobButton />}
       />
 
       {/* Status Tabs */}

@@ -11,10 +11,11 @@ interface ClaimJobModalProps {
   confirmLoading?: boolean;
   jobId: string | null;
   jobTitle?: string;
+  payoutAmount?: number;
+  cutAmount?: number;
 }
 
 const FIXED_CLAIM_FEE = 30;
-const MOCK_PAYOUT = 1850;
 
 const formatMoney = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -31,8 +32,13 @@ export const ClaimJobModal = ({
   confirmLoading = false,
   jobId,
   jobTitle,
+  payoutAmount = 0,
+  cutAmount = 0,
 }: ClaimJobModalProps) => {
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  // TODO: restore to false when terms checkbox is re-enabled
+  const [acceptedTerms] = useState(true);
+
+  const earnAmount = payoutAmount - cutAmount;
 
   const resolvedTitle = useMemo(() => {
     const normalized = (jobTitle ?? "").trim();
@@ -45,7 +51,6 @@ export const ClaimJobModal = ({
   };
 
   const handleClose = () => {
-    setAcceptedTerms(false);
     onClose();
   };
 
@@ -63,7 +68,7 @@ export const ClaimJobModal = ({
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent
-        className="max-w-[480px] gap-0 p-0 overflow-visible"
+        className="max-w-[480px] gap-0 p-0 overflow-hidden rounded-lg"
         showClose={false}
         onClose={handleClose}
         aria-describedby="claim-job-description"
@@ -75,7 +80,7 @@ export const ClaimJobModal = ({
                 Claim Job
               </DialogTitle>
               <p className="mt-3 text-base leading-none text-white">
-                You will earn {formatMoney(MOCK_PAYOUT)}
+                You will earn {formatMoney(earnAmount)}
               </p>
             </div>
             <button
@@ -128,13 +133,14 @@ export const ClaimJobModal = ({
 
           <div className="rounded-lg border border-[#EAEFF5] bg-[#F9FBFD] px-4 py-4">
             <p className="text-xs leading-[16px] text-[#5C6F87]">
-              MoveShare charges a <span className="font-medium text-[#70AEFB]">$30 fixed fee</span> per
-              job to cover platform operating costs. You&apos;ll receive{" "}
-              <span className="font-medium text-[#70AEFB]">{formatMoney(MOCK_PAYOUT)}</span> after
+              MoveShare charges a <span className="font-medium text-[#70AEFB]">{formatMoney(FIXED_CLAIM_FEE)}</span> fixed
+              fee per job to cover platform operating costs. You&apos;ll receive{" "}
+              <span className="font-medium text-[#70AEFB]">{formatMoney(earnAmount)}</span> after
               completing this job.
             </p>
           </div>
 
+          {/* Terms checkbox — hidden until legal documents are ready
           <label className="flex items-center gap-2 text-base leading-none text-[#5C6F87] cursor-pointer select-none">
             <input
               type="checkbox"
@@ -153,6 +159,7 @@ export const ClaimJobModal = ({
               </button>
             </span>
           </label>
+          */}
 
         </div>
 

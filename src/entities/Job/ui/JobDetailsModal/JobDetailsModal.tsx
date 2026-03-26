@@ -97,7 +97,7 @@ export const JobDetailsModal = memo(({ open, onClose, onClaimJob, data }: JobDet
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent
         showClose={false}
-        className="w-[min(1024px,calc(100vw-48px))] max-w-[1024px] border-0 bg-transparent p-0 shadow-none rounded-none overflow-visible data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100"
+        className="w-[min(820px,calc(100vw-48px))] max-w-[820px] border-0 bg-transparent p-0 shadow-none rounded-none overflow-visible data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100"
       >
         <div className="overflow-hidden rounded-[8px] bg-white">
           <div className="flex h-[70px] items-center justify-between bg-[#60A5FA] px-4">
@@ -159,74 +159,69 @@ export const JobDetailsModal = memo(({ open, onClose, onClaimJob, data }: JobDet
               </div>
             </div>
 
-            <div className="mt-3 grid gap-6" style={{ gridTemplateColumns: "1.2fr 1fr 0.9fr" }}>
-              <div className="min-w-0">
-                <h3 className="text-[16px] font-bold leading-none text-[#263238]">Locations</h3>
-                <div className="mt-3 flex flex-col gap-3">
-                  <DetailField label="Pickup Address" value={data.locations.pickupAddress} />
-                  <DetailField label="House/Stairs/Elevator (Pickup)" value={data.locations.pickupAccess} />
-                  <DetailField
-                    label="Estimated Walk Distance (Pickup)"
-                    value={data.locations.pickupWalkDistance}
-                  />
-                  <DetailField label="Delivery Address" value={data.locations.deliveryAddress} />
-                  <DetailField label="House/Stairs/Elevator (Delivery)" value={data.locations.deliveryAccess} />
-                  <DetailField
-                    label="Estimated Walk Distance (Delivery)"
-                    value={data.locations.deliveryWalkDistance}
-                  />
-                </div>
+            {/* Locations */}
+            <div className="mt-3">
+              <h3 className="text-[16px] font-bold leading-none text-[#263238]">Locations</h3>
+              <div className="mt-3 grid grid-cols-2 gap-x-8 gap-y-3">
+                <DetailField label="Pickup Address" value={data.locations.pickupAddress} />
+                <DetailField label="Delivery Address" value={data.locations.deliveryAddress} />
+                {/* Hidden until backend supports building access and walk distance
+                <DetailField label="House/Stairs/Elevator (Pickup)" value={data.locations.pickupAccess} />
+                <DetailField label="Estimated Walk Distance (Pickup)" value={data.locations.pickupWalkDistance} />
+                <DetailField label="House/Stairs/Elevator (Delivery)" value={data.locations.deliveryAccess} />
+                <DetailField label="Estimated Walk Distance (Delivery)" value={data.locations.deliveryWalkDistance} />
+                */}
               </div>
+            </div>
 
+            {/* Job Details + Schedule */}
+            <div className="mt-5 grid grid-cols-2 gap-x-8">
               <div className="min-w-0">
                 <h3 className="text-[16px] font-bold leading-none text-[#263238]">Job Details</h3>
-                <div className="mt-3 grid min-w-0 grid-cols-2 gap-x-8">
-                  <div className="flex min-w-0 flex-col gap-3">
-                    <DetailField label="Job ID" value={data.jobDetails.jobId} />
-                    <DetailField label="Distance" value={data.jobDetails.distance} />
-                    <DetailField label="Truck Size" value={data.jobDetails.truckSize} />
-
-                  </div>
-                  <div className="flex min-w-0 flex-col gap-3">
-                    <DetailField label="Posted" value={data.jobDetails.posted} />
-                    <DetailField label="Estimated Time" value={data.jobDetails.estimatedTime} />
-                    <DetailField label="Cargo Type" value={data.jobDetails.cargoType} />
-                    <DetailField label="Volume" value={data.jobDetails.volume} />
-                  </div>
+                <div className="mt-3 grid grid-cols-2 gap-x-8 gap-y-3">
+                  <DetailField label="Job ID" value={data.jobDetails.jobId} />
+                  <DetailField label="Posted" value={data.jobDetails.posted} />
+                  <DetailField label="Distance" value={data.jobDetails.distance} />
+                  <DetailField label="Estimated Time" value={data.jobDetails.estimatedTime} />
+                  <DetailField label="Truck Size" value={data.jobDetails.truckSize} />
+                  <DetailField label="Cargo Type" value={data.jobDetails.cargoType} />
+                  {/* <DetailField label="Volume" value={data.jobDetails.volume} /> */}
                 </div>
               </div>
 
               <div className="min-w-0">
                 <h3 className="text-[16px] font-bold leading-none text-[#263238]">Schedule</h3>
-                <div className="mt-3 flex min-w-0 flex-col gap-3">
+                <div className="mt-3 grid grid-cols-2 gap-x-8 gap-y-3">
                   <DetailField label="Pickup Date" value={data.schedule.pickupDate} />
-                  <DetailField label="Delivery Date" value={data.schedule.deliveryDate} />
                   <DetailField label="Pickup Time" value={data.schedule.pickupTime} />
+                  <DetailField label="Delivery Date" value={data.schedule.deliveryDate} />
                   <DetailField label="Delivery Time" value={data.schedule.deliveryTime} />
                 </div>
               </div>
             </div>
 
-            <div className="mt-3 min-w-0">
-              <p className="text-[16px] leading-none text-[#202224]">Description</p>
-              <div className="mt-2 flex h-10 items-center rounded-[8px] border border-[#D8D8D8] px-4">
-                <p className="min-w-0 truncate text-[16px] leading-none text-[#A6A6A6]">
+            {/* Description */}
+            <div className="mt-5 min-w-0">
+              <p className="text-[16px] font-bold leading-none text-[#263238]">Description</p>
+              <div className="mt-2 rounded-[8px] border border-[#D8D8D8] px-4 py-3">
+                <p className="min-w-0 text-[14px] leading-[20px] text-[#202224]">
                   {ensureText(data.description) === "N/A"
-                    ? "Brief description of the additional services indicated above..."
+                    ? "No description provided"
                     : ensureText(data.description)}
                 </p>
               </div>
             </div>
 
-            <div className="mt-3 grid gap-6 pt-3" style={{ gridTemplateColumns: "1fr 380px" }}>
+            {/* Additional Services + Payment */}
+            <div className="mt-5 grid grid-cols-2 gap-x-8">
               <div className="min-w-0">
-                <h3 className="text-[20px] font-bold leading-none text-[#2C3E50]">Additional Services</h3>
-                <div className="mt-3 flex flex-wrap gap-3">
+                <h3 className="text-[16px] font-bold leading-none text-[#263238]">Additional Services</h3>
+                <div className="mt-3 flex flex-wrap gap-2">
                   {data.additionalServices.length > 0 ? (
                     data.additionalServices.map((service) => (
                       <span
                         key={service}
-                        className="inline-flex h-[34px] items-center rounded-[64px] bg-[#F1F4F9] px-4 text-[14px] text-[#202224]"
+                        className="inline-flex h-[32px] items-center rounded-full bg-[#F1F4F9] px-4 text-[13px] text-[#202224]"
                       >
                         {service}
                       </span>
@@ -238,7 +233,7 @@ export const JobDetailsModal = memo(({ open, onClose, onClaimJob, data }: JobDet
               </div>
 
               <div className="min-w-0">
-                <h3 className="text-[20px] font-bold leading-none text-[#2C3E50]">Payment Details</h3>
+                <h3 className="text-[16px] font-bold leading-none text-[#263238]">Payment Details</h3>
                 <div className="mt-3 flex gap-8">
                   <div>
                     <p className="text-[12px] font-bold leading-none text-[#90A4AE]">Payout</p>

@@ -9,6 +9,7 @@ import { getJwtSubject } from "@/shared/utils/jwt/getJwtSubject";
 
 import { useAuthStore } from "@/entities/Auth/model/store/authStore";
 import { EmptyState, MessageBubble, useConversations, useMessages } from "@/entities/Chat";
+import { Avatar } from "@/shared/ui";
 
 import styles from "./MessageThread.module.scss";
 
@@ -105,9 +106,7 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
           <button className={styles.backButton} onClick={handleBack} aria-label="Back">
             <BackArrowIcon />
           </button>
-          <div className={styles.avatar}>
-            {(otherUser?.name ?? "C").charAt(0).toUpperCase()}
-          </div>
+            <Avatar name={otherUser?.name ?? "Chat"} size="lg" />
           <span className={styles.chatName}>{otherUser?.name ?? "Chat"}</span>
         </div>
         <EmptyState

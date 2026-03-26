@@ -12,8 +12,8 @@ export const jobKeys = {
   myJobs: () => [...jobKeys.all, "my"] as const,
   myJobsList: (params?: MyJobsParams) => [...jobKeys.myJobs(), params] as const,
 
-  // Job locations for filters
-  locations: () => [...jobKeys.all, "locations"] as const,
+  // Job filter options
+  filterOptions: () => [...jobKeys.all, "filter-options"] as const,
 
   // Job details
   details: () => [...jobKeys.all, "detail"] as const,

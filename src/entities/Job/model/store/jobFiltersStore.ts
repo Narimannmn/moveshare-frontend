@@ -8,6 +8,8 @@ interface JobFiltersState {
   bedroomCount: BedroomCount | null;
   origin: string | null;
   destination: string | null;
+  pickupDateFrom: string | null;
+  pickupDateTo: string | null;
   offset: number;
   limit: number;
 }
@@ -17,6 +19,8 @@ interface JobFiltersActions {
   setBedroomCount: (bedroomCount: BedroomCount | null) => void;
   setOrigin: (origin: string | null) => void;
   setDestination: (destination: string | null) => void;
+  setPickupDateFrom: (date: string | null) => void;
+  setPickupDateTo: (date: string | null) => void;
   setPage: (page: number) => void;
   setLimit: (limit: number) => void;
   resetFilters: () => void;
@@ -29,6 +33,8 @@ const initialState: JobFiltersState = {
   bedroomCount: null,
   origin: null,
   destination: null,
+  pickupDateFrom: null,
+  pickupDateTo: null,
   offset: 0,
   limit: 20,
 };
@@ -48,6 +54,12 @@ export const useJobFiltersStore = create<JobFiltersStore>()(
 
         setDestination: (destination) =>
           set({ destination, offset: 0 }, false, "setDestination"),
+
+        setPickupDateFrom: (pickupDateFrom) =>
+          set({ pickupDateFrom, offset: 0 }, false, "setPickupDateFrom"),
+
+        setPickupDateTo: (pickupDateTo) =>
+          set({ pickupDateTo, offset: 0 }, false, "setPickupDateTo"),
 
         setPage: (page) => set((state) => ({ offset: page * state.limit }), false, "setPage"),
 

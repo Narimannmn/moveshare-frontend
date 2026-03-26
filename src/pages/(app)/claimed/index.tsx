@@ -1,20 +1,20 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Check, Star, X } from "lucide-react";
+import { Check, MessageSquare, Star } from "lucide-react";
 import { toast } from "sonner";
 
 import { useCreateDirectConversation } from "@/entities/Chat/api/mutations";
-import { useAppliedJobs } from "@/entities/Job";
+import { getJobTitle, useAppliedJobs } from "@/entities/Job";
 import type { AppliedJobItem, JobResponse } from "@/entities/Job/schemas";
-import { Button, Textarea } from "@/shared/ui";
+import { Button, PageHeader, Textarea } from "@/shared/ui";
 
 export const Route = createFileRoute("/(app)/claimed/")({
   component: ClaimedJobsPage,
 });
 
 // ============================================
-// Constants
+// Types & Constants
 // ============================================
 
 type ClaimedTab = "active" | "in_transit" | "completed" | "disputed";
@@ -33,32 +33,15 @@ const TAB_STATUS_MAP: Record<ClaimedTab, string[]> = {
   disputed: ["disputed"],
 };
 
-const BEDROOM_LABELS: Record<string, string> = {
-  "1_bedroom": "1 Bedroom Move",
-  "2_bedroom": "2 Bedroom Move",
-  "3_bedroom": "3 Bedroom Move",
-  "4_bedroom": "4 Bedroom Move",
-  "5_bedroom": "5 Bedroom Move",
-  "6_plus_bedroom": "6+ Bedroom Move",
-};
-
-const JOB_TYPE_LABELS: Record<string, string> = {
-  residential: "Residential Move",
-  office: "Office Move",
-  storage: "Storage Move",
-};
-
 const PROGRESS_STEPS = ["Claimed", "Documents Shared", "In Transit", "Completed"];
+
 
 // ============================================
 // Helpers
 // ============================================
 
 const toCityState = (address: string): string => {
-  const parts = address
-    .split(",")
-    .map((p) => p.trim())
-    .filter(Boolean);
+  const parts = address.split(",").map((p) => p.trim()).filter(Boolean);
   if (parts.length < 2) return address;
   const city = parts[parts.length - 2] ?? "";
   const state = (parts[parts.length - 1] ?? "").split(" ")[0] ?? "";
@@ -77,25 +60,32 @@ const formatMoney = (value: string): string => {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 };
 
+const formatDistance = (meters: number | null | undefined): string => {
+  if (!meters) return "N/A";
+  const miles = meters / 1609.34;
+  return `${Math.round(miles)} miles`;
+};
+
+const formatDuration = (seconds: number | null | undefined): string => {
+  if (!seconds) return "N/A";
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.round((seconds % 3600) / 60);
+  if (hours === 0) return `${minutes} min`;
+  return minutes > 0 ? `${hours}h ${minutes}m` : `${hours} hours`;
+};
+
 const toPublicJobId = (id: string): string => `#MS-${id.replace(/-/g, "").slice(0, 4).toUpperCase()}`;
 
-const getJobTitle = (job: JobResponse): string =>
-  job.bedroom_count
-    ? (BEDROOM_LABELS[job.bedroom_count] ?? JOB_TYPE_LABELS[job.job_type] ?? "Move")
-    : (JOB_TYPE_LABELS[job.job_type] ?? "Move");
+const getJobCardTitle = (job: JobResponse): string =>
+  getJobTitle(job.bedroom_count, job.job_type);
 
 const getCompletedSteps = (status: string): number => {
   switch (status) {
-    case "assigned":
-      return 1;
-    case "in_progress":
-      return 3;
-    case "completed":
-      return 4;
-    case "disputed":
-      return 2;
-    default:
-      return 1;
+    case "assigned": return 1;
+    case "in_progress": return 3;
+    case "completed": return 4;
+    case "disputed": return 2;
+    default: return 1;
   }
 };
 
@@ -110,12 +100,7 @@ const getTabForStatus = (status: string): ClaimedTab => {
 // ProgressStepper
 // ============================================
 
-interface ProgressStepperProps {
-  completedSteps: number;
-  isDisputed?: boolean;
-}
-
-const ProgressStepper = memo(({ completedSteps, isDisputed = false }: ProgressStepperProps) => (
+const ProgressStepper = memo(({ completedSteps, isDisputed = false }: { completedSteps: number; isDisputed?: boolean }) => (
   <div className="w-full">
     <div className="flex items-center px-4">
       {PROGRESS_STEPS.map((_, index) => {
@@ -130,7 +115,7 @@ const ProgressStepper = memo(({ completedSteps, isDisputed = false }: ProgressSt
             )}
             <div
               className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${
-                isCompleted ? "bg-[#60A5FA]" : isDisputedStep ? "bg-[#D8D8D8]" : "bg-[#D8D8D8]"
+                isCompleted ? "bg-[#60A5FA]" : "bg-[#D8D8D8]"
               }`}
             >
               {isCompleted ? (
@@ -168,54 +153,36 @@ const ProgressStepper = memo(({ completedSteps, isDisputed = false }: ProgressSt
 ProgressStepper.displayName = "ProgressStepper";
 
 // ============================================
-// InfoField
+// InfoRow
 // ============================================
 
-interface InfoFieldProps {
-  label: string;
-  value: string;
-}
-
-const InfoField = memo(({ label, value }: InfoFieldProps) => (
+const InfoRow = memo(({ label, value }: { label: string; value: string }) => (
   <div className="flex items-center gap-6">
-    <span className="w-[95px] shrink-0 text-[15px] font-medium text-[#263238]">{label}</span>
-    <span className="text-[15px] text-[#263238]">{value}</span>
+    <span className="w-24 shrink-0 text-sm font-medium text-[#263238]">{label}</span>
+    <span className="text-sm text-[#263238]">{value}</span>
   </div>
 ));
-InfoField.displayName = "InfoField";
+InfoRow.displayName = "InfoRow";
 
 // ============================================
-// InfoCard
+// InfoPanel
 // ============================================
 
-interface InfoCardProps {
-  title: string;
-  fields: InfoFieldProps[];
-  highlighted?: boolean;
-}
-
-const InfoCard = memo(({ title, fields, highlighted = false }: InfoCardProps) => (
+const InfoPanel = memo(({ title, children, highlighted = false }: { title: string; children: React.ReactNode; highlighted?: boolean }) => (
   <div className="flex flex-1 flex-col gap-4 rounded-lg bg-[#F9F9F9] p-4">
     <h4 className="text-base font-bold text-[#263238]">{title}</h4>
     <div className={`flex flex-col gap-3.5 ${highlighted ? "rounded-lg bg-[#E6F2FF] p-4" : ""}`}>
-      {fields.map((f) => (
-        <InfoField key={f.label} label={f.label} value={f.value} />
-      ))}
+      {children}
     </div>
   </div>
 ));
-InfoCard.displayName = "InfoCard";
+InfoPanel.displayName = "InfoPanel";
 
 // ============================================
 // StarRating
 // ============================================
 
-interface StarRatingProps {
-  rating: number;
-  onRate: (value: number) => void;
-}
-
-const StarRating = memo(({ rating, onRate }: StarRatingProps) => (
+const StarRating = memo(({ rating, onRate }: { rating: number; onRate: (v: number) => void }) => (
   <div className="flex gap-2">
     {[1, 2, 3, 4, 5].map((star) => (
       <button
@@ -232,37 +199,10 @@ const StarRating = memo(({ rating, onRate }: StarRatingProps) => (
 StarRating.displayName = "StarRating";
 
 // ============================================
-// DocumentCard
-// ============================================
-
-const DocumentCard = memo(({ name }: { name: string }) => (
-  <div className="w-[160px] shrink-0 overflow-hidden rounded-lg border border-[#D8D8D8]">
-    <div className="relative flex h-[80px] items-center justify-center rounded-t-lg bg-[#F5F5F5]">
-      <span className="text-lg">📑</span>
-      <button
-        type="button"
-        className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center text-[#90A4AE] hover:text-[#263238]"
-      >
-        <X className="size-3" />
-      </button>
-    </div>
-    <div className="flex items-center justify-center p-2.5">
-      <span className="text-center text-[13px] text-black">{name}</span>
-    </div>
-  </div>
-));
-DocumentCard.displayName = "DocumentCard";
-
-// ============================================
 // ClaimedJobCard
 // ============================================
 
-interface ClaimedJobCardProps {
-  item: AppliedJobItem;
-  tab: ClaimedTab;
-}
-
-const ClaimedJobCard = memo(({ item, tab }: ClaimedJobCardProps) => {
+const ClaimedJobCard = memo(({ item, tab }: { item: AppliedJobItem; tab: ClaimedTab }) => {
   const { job } = item;
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
@@ -285,30 +225,9 @@ const ClaimedJobCard = memo(({ item, tab }: ClaimedJobCardProps) => {
     });
   }, [job.company?.user_id, createConversation, navigate]);
 
-  const title = getJobTitle(job);
+  const title = getJobCardTitle(job);
   const completedSteps = getCompletedSteps(job.status);
   const isDisputed = tab === "disputed";
-
-  const routeFields: InfoFieldProps[] = [
-    { label: "Origin:", value: toCityState(job.pickup_address) },
-    { label: "Destination:", value: toCityState(job.delivery_address) },
-    { label: "Distance:", value: "N/A" },
-    { label: "Est. Duration:", value: "N/A" },
-  ];
-
-  const scheduleFields: InfoFieldProps[] = [
-    { label: "Pickup:", value: formatDate(job.pickup_datetime) },
-    { label: "Delivery:", value: formatDate(job.delivery_datetime) },
-    { label: "Payout:", value: formatMoney(job.payout_amount) },
-    { label: "Claim Fee:", value: formatMoney(job.cut_amount) },
-  ];
-
-  const contactFields: InfoFieldProps[] = [
-    { label: "Company:", value: job.company?.name ?? "N/A" },
-    { label: "Contact:", value: job.company?.contact_person ?? "N/A" },
-    { label: "Phone:", value: job.company?.phone_number ?? "N/A" },
-    { label: "Email:", value: "N/A" },
-  ];
 
   return (
     <div className="flex flex-col gap-6 rounded-lg bg-white p-4">
@@ -324,43 +243,52 @@ const ClaimedJobCard = memo(({ item, tab }: ClaimedJobCardProps) => {
       {/* Progress Stepper */}
       <ProgressStepper completedSteps={completedSteps} isDisputed={isDisputed} />
 
-      {/* Info Columns */}
+      {/* Info Panels */}
       <div className="flex gap-4">
-        <InfoCard title="Route Details" fields={routeFields} />
-        <InfoCard title="Schedule" fields={scheduleFields} />
-        <InfoCard title="Contact Info" fields={contactFields} highlighted />
+        <InfoPanel title="Route Details">
+          <InfoRow label="Origin:" value={toCityState(job.pickup_address)} />
+          <InfoRow label="Destination:" value={toCityState(job.delivery_address)} />
+          <InfoRow label="Distance:" value={formatDistance(job.distance_meters)} />
+          <InfoRow label="Est. Duration:" value={formatDuration(job.duration_seconds)} />
+        </InfoPanel>
+
+        <InfoPanel title="Schedule">
+          <InfoRow label="Pickup:" value={formatDate(job.pickup_datetime)} />
+          <InfoRow label="Delivery:" value={formatDate(job.delivery_datetime)} />
+          <InfoRow label="Payout:" value={formatMoney(job.payout_amount)} />
+          <InfoRow label="Claim Fee:" value={formatMoney(job.cut_amount)} />
+        </InfoPanel>
+
+        <InfoPanel title="Contact Info" highlighted>
+          <InfoRow label="Company:" value={job.company?.name ?? "N/A"} />
+          <InfoRow label="Contact:" value={job.company?.contact_person ?? "N/A"} />
+          <InfoRow label="Phone:" value={job.company?.phone_number ?? "N/A"} />
+        </InfoPanel>
       </div>
 
-      {/* Documents Section (active tab only) */}
-      {tab === "active" && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2.5">
-            <span className="text-sm">📄</span>
-            <h4 className="text-xl font-bold text-[#263238]">Documents</h4>
-          </div>
-          <div className="flex gap-4">
-            <DocumentCard name="Bill of Lading.pdf" />
-            <DocumentCard name="Bill of Lading.pdf" />
-            <DocumentCard name="Bill of Lading.pdf" />
-            <div className="flex w-[160px] shrink-0 flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed border-[#D8D8D8] px-4 py-6">
-              <span className="text-center text-sm text-[#202224]">Upload Document</span>
-              <span className="text-center text-xs text-[#A6A6A6]">Click to upload or drag & drop</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Actions (active tab) */}
+      {/* Active: Actions */}
       {tab === "active" && (
         <div className="flex items-center justify-between">
           <Button variant="outline" onClick={handleOpenChat} disabled={createConversation.isPending}>
+            <MessageSquare className="mr-2 size-4" />
             {createConversation.isPending ? "Opening..." : "Open Chat"}
           </Button>
           <Button variant="primary">Mark as Delivered</Button>
         </div>
       )}
 
-      {/* Review Section (completed tab) */}
+      {/* In Transit: Actions */}
+      {tab === "in_transit" && (
+        <div className="flex items-center justify-between">
+          <Button variant="outline" onClick={handleOpenChat} disabled={createConversation.isPending}>
+            <MessageSquare className="mr-2 size-4" />
+            {createConversation.isPending ? "Opening..." : "Open Chat"}
+          </Button>
+          <Button variant="primary">Complete Delivery</Button>
+        </div>
+      )}
+
+      {/* Completed: Review */}
       {tab === "completed" && (
         <div className="flex flex-col gap-4 rounded-lg bg-[#F8F9FA] p-4">
           <div className="flex flex-col gap-2">
@@ -384,7 +312,7 @@ const ClaimedJobCard = memo(({ item, tab }: ClaimedJobCardProps) => {
         </div>
       )}
 
-      {/* Dispute Section (disputed tab) */}
+      {/* Disputed: Details */}
       {tab === "disputed" && (
         <div className="flex flex-col gap-6 rounded-lg bg-[#FFEBEE] p-4">
           <div className="flex flex-col gap-2">
@@ -404,39 +332,6 @@ const ClaimedJobCard = memo(({ item, tab }: ClaimedJobCardProps) => {
   );
 });
 ClaimedJobCard.displayName = "ClaimedJobCard";
-
-// ============================================
-// Tab Component
-// ============================================
-
-interface TabButtonProps {
-  label: string;
-  count: number;
-  isActive: boolean;
-  onClick: () => void;
-}
-
-const TabButton = memo(({ label, count, isActive, onClick }: TabButtonProps) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`flex h-10 items-center gap-1.5 border-b-2 px-4 transition-colors ${
-      isActive
-        ? "border-[#60A5FA] text-[#60A5FA] font-bold"
-        : "border-[#DDD] text-[#90A4AE] font-normal hover:text-[#263238]"
-    }`}
-  >
-    <span className="text-base">{label}</span>
-    <span
-      className={`flex h-[18px] min-w-[22px] items-center justify-center rounded-[10px] px-1.5 text-xs ${
-        isActive ? "bg-[#60A5FA] text-white" : "bg-[#E0E0E0] text-[#202224] font-medium"
-      }`}
-    >
-      {count}
-    </span>
-  </button>
-));
-TabButton.displayName = "TabButton";
 
 // ============================================
 // Page Component
@@ -462,7 +357,6 @@ function ClaimedJobsPage() {
 
   const items = data?.items ?? [];
 
-  // Count per tab
   const tabCounts = useMemo(() => {
     const counts: Record<ClaimedTab, number> = { active: 0, in_transit: 0, completed: 0, disputed: 0 };
     for (const item of items) {
@@ -472,59 +366,75 @@ function ClaimedJobsPage() {
     return counts;
   }, [items]);
 
-  // Filtered items for current tab
   const filteredItems = useMemo(() => {
     const statuses = TAB_STATUS_MAP[activeTab];
     return items.filter((item) => statuses.includes(item.job.status));
   }, [items, activeTab]);
 
-  const handleTabChange = useCallback((tab: ClaimedTab) => {
-    setActiveTab(tab);
-  }, []);
-
-  const content = useMemo(() => {
-    if (isLoading) {
-      return <div className="py-8 text-center text-base text-[#90A4AE]">Loading claimed jobs...</div>;
-    }
-
-    if (isError) {
-      return <div className="py-8 text-center text-base text-[#90A4AE]">Unable to load jobs</div>;
-    }
-
-    if (filteredItems.length === 0) {
-      return (
-        <div className="py-8 text-center text-base text-[#90A4AE]">
-          No {TABS.find((t) => t.key === activeTab)?.label.toLowerCase()} jobs
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex flex-col gap-6">
-        {filteredItems.map((item) => (
-          <ClaimedJobCard key={item.application.id} item={item} tab={activeTab} />
-        ))}
-      </div>
-    );
-  }, [isLoading, isError, filteredItems, activeTab]);
-
   return (
     <div>
-      {/* Tabs */}
-      <div className="flex border-b border-[#D8D8D8]">
-        {TABS.map((tab) => (
-          <TabButton
-            key={tab.key}
-            label={tab.label}
-            count={tabCounts[tab.key]}
-            isActive={activeTab === tab.key}
-            onClick={() => handleTabChange(tab.key)}
-          />
-        ))}
+      <PageHeader title="Claimed Jobs" />
+
+      {/* Status Tabs */}
+      <div className="mb-6">
+        <div className="flex gap-6 border-b border-gray-200">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`pb-3 px-2 text-sm font-medium transition-colors relative ${
+                activeTab === tab.key ? "text-blue-500" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {tab.label}{" "}
+              <span
+                className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
+                  activeTab === tab.key ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {tabCounts[tab.key]}
+              </span>
+              {activeTab === tab.key && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="mt-6">{content}</div>
+      {/* Loading */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-gray-500">Loading claimed jobs...</div>
+        </div>
+      )}
+
+      {/* Error */}
+      {isError && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-red-500">
+            Failed to load jobs: {error instanceof Error ? error.message : "Unknown error"}
+          </div>
+        </div>
+      )}
+
+      {/* Empty */}
+      {!isLoading && !isError && filteredItems.length === 0 && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-gray-500">
+            No {TABS.find((t) => t.key === activeTab)?.label.toLowerCase()} jobs
+          </div>
+        </div>
+      )}
+
+      {/* Cards */}
+      {!isLoading && !isError && filteredItems.length > 0 && (
+        <div className="flex flex-col gap-6">
+          {filteredItems.map((item) => (
+            <ClaimedJobCard key={item.application.id} item={item} tab={activeTab} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

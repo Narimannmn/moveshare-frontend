@@ -1,22 +1,8 @@
 import type { JobResponse } from "../schemas";
 import type { JobDetailsData } from "../ui/JobDetailsModal";
+import { JOB_TYPE_LABELS, TRUCK_SIZE_MAP, getJobTitle } from "./constants";
 
 const NA_VALUE = "N/A";
-
-const BEDROOM_LABELS: Record<NonNullable<JobResponse["bedroom_count"]>, string> = {
-  "1_bedroom": "1 Bedroom",
-  "2_bedroom": "2 Bedroom",
-  "3_bedroom": "3 Bedroom",
-  "4_bedroom": "4 Bedroom",
-  "5_bedroom": "5 Bedroom",
-  "6_plus_bedroom": "6 Bedroom",
-};
-
-const JOB_TYPE_LABELS: Record<JobResponse["job_type"], string> = {
-  residential: "Residential",
-  office: "Office",
-  storage: "Storage",
-};
 
 const ADDITIONAL_SERVICE_LABELS: Record<string, string> = {
   packing_boxes: "Packing Boxes",
@@ -112,12 +98,22 @@ const toCityState = (address?: string | null): string => {
   return `${city}, ${state}`;
 };
 
-const toTitle = (job: JobResponse): string => {
-  const typeLabel = JOB_TYPE_LABELS[job.job_type] ?? "Move";
-  const bedroomLabel = job.bedroom_count ? BEDROOM_LABELS[job.bedroom_count] : null;
-
-  return bedroomLabel ? `${bedroomLabel} ${typeLabel} move` : `${typeLabel} move`;
+const formatDistance = (meters: number | null | undefined): string => {
+  if (meters === null || meters === undefined) return NA_VALUE;
+  const miles = meters / 1609.34;
+  return `${miles.toFixed(1)} mi`;
 };
+
+const formatDuration = (seconds: number | null | undefined): string => {
+  if (seconds === null || seconds === undefined) return NA_VALUE;
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.round((seconds % 3600) / 60);
+  if (hours === 0) return `${minutes} min`;
+  return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+};
+
+const toTitle = (job: JobResponse): string =>
+  getJobTitle(job.bedroom_count, job.job_type);
 
 const toPublicJobId = (id: string): string => {
   const compact = id.replace(/-/g, "").slice(0, 8).toUpperCase();
@@ -194,10 +190,10 @@ export const transformJobToDetailsData = (job: JobResponse): JobDetailsData => (
   jobDetails: {
     jobId: toPublicJobId(job.id),
     posted: formatRelativeTime(job.created_at),
-    distance: NA_VALUE,
-    estimatedTime: NA_VALUE,
-    truckSize: NA_VALUE,
-    cargoType: NA_VALUE,
+    distance: formatDistance(job.distance_meters),
+    estimatedTime: formatDuration(job.duration_seconds),
+    truckSize: job.bedroom_count ? (TRUCK_SIZE_MAP[job.bedroom_count] ?? NA_VALUE) : NA_VALUE,
+    cargoType: JOB_TYPE_LABELS[job.job_type] ?? NA_VALUE,
     volume: NA_VALUE,
   },
   schedule: {
@@ -211,6 +207,6 @@ export const transformJobToDetailsData = (job: JobResponse): JobDetailsData => (
   payment: {
     payout: parseMoney(job.payout_amount),
     cut: parseMoney(job.cut_amount),
-    platformFee: null,
+    platformFee: 30,
   },
 });

@@ -21,8 +21,8 @@ import {
   type ExportJobsRequest,
   ExportJobsRequestSchema,
   type JobListParams,
-  type JobLocationsResponse,
-  JobLocationsResponseSchema,
+  type JobFilterOptionsResponse,
+  JobFilterOptionsResponseSchema,
   type JobListResponse,
   JobListResponseSchema,
   type JobResponse,
@@ -58,6 +58,12 @@ export const getAvailableJobs = async (params?: JobListParams): Promise<JobListR
     if (params?.destination) {
       queryParams.destination = params.destination;
     }
+    if (params?.pickup_date_from) {
+      queryParams.pickup_date_from = params.pickup_date_from;
+    }
+    if (params?.pickup_date_to) {
+      queryParams.pickup_date_to = params.pickup_date_to;
+    }
 
     const response = await apiClient.get("/api/v1/jobs", { params: queryParams });
     return JobListResponseSchema.parse(response.data);
@@ -68,16 +74,16 @@ export const getAvailableJobs = async (params?: JobListParams): Promise<JobListR
 };
 
 // ============================================
-// Get Available Job Locations for Filters
-// GET /api/v1/jobs/locations
+// Get Available Job Filter Options
+// GET /api/v1/jobs/filter-options
 // ============================================
 
-export const getAvailableJobLocations = async (): Promise<JobLocationsResponse> => {
+export const getJobFilterOptions = async (): Promise<JobFilterOptionsResponse> => {
   try {
-    const response = await apiClient.get("/api/v1/jobs/locations");
-    return JobLocationsResponseSchema.parse(response.data);
+    const response = await apiClient.get("/api/v1/jobs/filter-options");
+    return JobFilterOptionsResponseSchema.parse(response.data);
   } catch (error) {
-    console.error("Error getting available job locations:", error);
+    console.error("Error getting job filter options:", error);
     throw error;
   }
 };

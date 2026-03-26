@@ -20,7 +20,7 @@ import {
 
 import { useCreateDirectConversation } from "@/entities/Chat";
 import { ClaimJobModal, ClaimJobSuccessModal } from "@/features/claimJob";
-import { PostJobModal } from "@/features/postJob";
+import { PostJobButton } from "@/features/postJob";
 
 import { JobsFilter } from "@/widgets/JobsFilter";
 
@@ -65,7 +65,6 @@ const buildPageItems = (currentPage: number, totalPages: number): Array<number |
 };
 
 function JobsPage() {
-  const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [claimJobId, setClaimJobId] = useState<string | null>(null);
   const setPage = useJobFiltersStore((state) => state.actions.setPage);
@@ -82,6 +81,8 @@ function JobsPage() {
         bedroom_count: state.bedroomCount,
         origin: state.origin,
         destination: state.destination,
+        pickup_date_from: state.pickupDateFrom,
+        pickup_date_to: state.pickupDateTo,
         offset: state.offset,
         limit: state.limit,
       })
@@ -166,14 +167,11 @@ function JobsPage() {
     refetch();
   };
 
-  const handlePostNewJob = () => {
-    setIsPostJobModalOpen(true);
-  };
-
   const jobs = data?.jobs.map(transformJobToCardProps) ?? [];
   const selectedJobDetails = selectedJobData
     ? transformJobToDetailsData(selectedJobData)
     : createEmptyJobDetailsData();
+  const claimJobRaw = data?.jobs.find((job) => String(job.id) === claimJobId);
   const claimJobTitle =
     jobs.find((job) => String(job.id) === claimJobId)?.title ??
     (claimJobId && selectedJobId === claimJobId ? selectedJobDetails.title : undefined);
@@ -199,19 +197,8 @@ function JobsPage() {
     <div>
       <PageHeader
         title="Available Jobs"
-        actions={
-          <>
-            <Button variant="secondary" size="default" onClick={handleRefresh} disabled={isLoading}>
-              {isLoading ? "Loading..." : "Refresh Jobs"}
-            </Button>
-            <Button variant="primary" size="default" onClick={handlePostNewJob}>
-              Post New Job
-            </Button>
-          </>
-        }
+        actions={<PostJobButton />}
       />
-
-      <PostJobModal open={isPostJobModalOpen} onClose={() => setIsPostJobModalOpen(false)} />
 
       <JobDetailsModal
         open={selectedJobId !== null}
@@ -247,6 +234,8 @@ function JobsPage() {
         confirmLoading={createClaimCheckoutSessionMutation.isPending}
         jobId={claimJobId}
         jobTitle={claimJobTitle}
+        payoutAmount={claimJobRaw ? parseFloat(claimJobRaw.payout_amount) : 0}
+        cutAmount={claimJobRaw ? parseFloat(claimJobRaw.cut_amount) : 0}
       />
       <ClaimJobSuccessModal
         open={claimSuccessData !== null}

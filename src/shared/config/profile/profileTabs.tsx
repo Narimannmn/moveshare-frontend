@@ -1,4 +1,4 @@
-import { Bell, Building2, CreditCard, FileCheck, Shield, Truck } from "lucide-react";
+import { Bell, Building2, FileCheck, Shield } from "lucide-react";
 
 export interface TabNavigationItem {
   id: string;
@@ -14,6 +14,7 @@ export const profileTabs: TabNavigationItem[] = [
     icon: <Building2 size={20} />,
     route: "/profile/company",
   },
+  /* Hidden until feature is ready
   {
     id: "fleet",
     label: "Fleet Management",
@@ -26,6 +27,7 @@ export const profileTabs: TabNavigationItem[] = [
     icon: <CreditCard size={20} />,
     route: "/profile/payment",
   },
+  */
   {
     id: "notifications",
     label: "Notifications",

@@ -231,7 +231,7 @@ export const PostJobStep4 = ({ onCancel: _onCancel, onSuccess }: PostJobStep4Pro
   return (
     <div className="flex gap-6 items-stretch">
       {/* Left Column: Form */}
-      <div className="flex-1 self-stretch flex flex-col">
+      <div className="flex-1 self-stretch flex flex-col min-h-[500px]">
         <div className="space-y-6">
           {/* Progress */}
           <div className="space-y-2">

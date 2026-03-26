@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 
+import { getBedroomLabel, getTruckLabel, JOB_TYPE_LABELS } from "@/entities/Job";
+
 import type { PostJobFormData } from "../model/usePostJobStore";
 import { usePostJobStore } from "../model/usePostJobStore";
 
@@ -19,25 +21,12 @@ interface ChecklistItemView {
 
 const formatJobType = (jobType: string | null): string => {
   if (!jobType) return "Select";
-
-  return jobType.charAt(0).toUpperCase() + jobType.slice(1);
+  return JOB_TYPE_LABELS[jobType as keyof typeof JOB_TYPE_LABELS] ?? jobType;
 };
 
 const formatBedroomCount = (bedroomCount: string | null): string => {
   if (!bedroomCount) return "Select the number of rooms";
-
-  if (bedroomCount === "6_plus_bedroom") return "6+ bedroom";
-
-  return bedroomCount.replace("_bedroom", " bedroom").replace("_", " ");
-};
-
-const getTruckLabel = (bedroomCount: string | null): string => {
-  if (!bedroomCount) return "Select";
-
-  if (bedroomCount === "1_bedroom" || bedroomCount === "2_bedroom") return "Small Van";
-  if (bedroomCount === "3_bedroom" || bedroomCount === "4_bedroom") return "Medium (20+')";
-
-  return "Large (26+')";
+  return getBedroomLabel(bedroomCount as Parameters<typeof getBedroomLabel>[0]);
 };
 
 const formatDescription = (description: string): string => {

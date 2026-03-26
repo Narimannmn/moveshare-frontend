@@ -3,7 +3,7 @@ import { memo } from "react";
 import { cn } from "@/shared/lib/utils";
 
 import type { Message } from "../../schemas";
-import { UserAvatar } from "../UserAvatar/UserAvatar";
+import { Avatar } from "@/shared/ui";
 import styles from "./MessageBubble.module.scss";
 
 export interface MessageBubbleProps {
@@ -33,7 +33,7 @@ export const MessageBubble = memo(
       <div className={cn(styles.wrapper, isOwnMessage ? styles.own : styles.other, className)}>
         {!isOwnMessage && (
           <div className={styles.avatar}>
-            <UserAvatar
+            <Avatar
               name={senderName || "User"}
               avatar={senderAvatar}
               size="md"

@@ -49,6 +49,8 @@ export const JobResponseSchema = z.object({
   description: z.string(),
   pickup_address: z.string(),
   delivery_address: z.string(),
+  distance_meters: z.number().int().nullable().optional(),
+  duration_seconds: z.number().int().nullable().optional(),
   additional_services: z.array(AdditionalServiceSchema),
   loading_assistance_count: z.number().int(),
   item_images: z.array(z.string()),
@@ -108,6 +110,8 @@ export const JobListParamsSchema = z.object({
   bedroom_count: BedroomCountSchema.optional().nullable(),
   origin: z.string().min(1).max(255).optional().nullable(),
   destination: z.string().min(1).max(255).optional().nullable(),
+  pickup_date_from: z.string().datetime().optional().nullable(),
+  pickup_date_to: z.string().datetime().optional().nullable(),
   offset: z.number().int().min(0).default(0),
   limit: z.number().int().min(1).max(100).default(20),
 });
@@ -122,12 +126,15 @@ export const MyJobsParamsSchema = z.object({
 
 export type MyJobsParams = z.infer<typeof MyJobsParamsSchema>;
 
-export const JobLocationsResponseSchema = z.object({
+export const JobFilterOptionsResponseSchema = z.object({
+  bedroom_counts: z.array(BedroomCountSchema),
+  distance_min_meters: z.number().int().nullable(),
+  distance_max_meters: z.number().int().nullable(),
   origins: z.array(z.string()),
   destinations: z.array(z.string()),
 });
 
-export type JobLocationsResponse = z.infer<typeof JobLocationsResponseSchema>;
+export type JobFilterOptionsResponse = z.infer<typeof JobFilterOptionsResponseSchema>;
 
 export const ExportJobsRequestSchema = z.object({
   job_ids: z.array(z.string().uuid()).optional().nullable(),

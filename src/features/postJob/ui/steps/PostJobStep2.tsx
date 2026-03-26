@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+
+import { Clock, MapPin } from "lucide-react";
 
 import {
   type PlacePrediction,
@@ -8,15 +10,70 @@ import {
 import { usePostJobStore } from "../../model/usePostJobStore";
 import { MoveDetailsChecklist } from "../MoveDetailsChecklist";
 
+// Haversine formula for straight-line distance estimate
+const haversineDistance = (
+  lat1: number, lng1: number,
+  lat2: number, lng2: number
+): number => {
+  const R = 3958.8; // Earth radius in miles
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+const RouteEstimates = memo(({ pickupLat, pickupLng, deliveryLat, deliveryLng }: {
+  pickupLat: number; pickupLng: number;
+  deliveryLat: number; deliveryLng: number;
+}) => {
+  const { distance, duration } = useMemo(() => {
+    const miles = haversineDistance(pickupLat, pickupLng, deliveryLat, deliveryLng);
+    // Rough driving estimate: ~1.3x straight line, ~50mph average
+    const drivingMiles = Math.round(miles * 1.3);
+    const hours = Math.floor(drivingMiles / 50);
+    const minutes = Math.round((drivingMiles / 50 - hours) * 60);
+    const time = hours > 0
+      ? (minutes > 0 ? `~${hours}h ${minutes}m` : `~${hours}h`)
+      : `~${minutes}m`;
+    return { distance: `~${drivingMiles} miles`, duration: time };
+  }, [pickupLat, pickupLng, deliveryLat, deliveryLng]);
+
+  return (
+    <div className="mt-4 pt-4 border-t border-[#E5E7EB] flex gap-6">
+      <div className="flex items-center gap-2">
+        <MapPin className="size-4 text-[#60A5FA]" />
+        <span className="text-sm text-[#202224]">
+          <span className="font-semibold">{distance}</span>
+          <span className="text-[#90A4AE] ml-1">est. distance</span>
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Clock className="size-4 text-[#60A5FA]" />
+        <span className="text-sm text-[#202224]">
+          <span className="font-semibold">{duration}</span>
+          <span className="text-[#90A4AE] ml-1">est. drive time</span>
+        </span>
+      </div>
+    </div>
+  );
+});
+RouteEstimates.displayName = "RouteEstimates";
+
 interface PostJobStep2Props {
   onCancel: () => void;
 }
 
+/* LocationButtonProps — hidden until building type is re-enabled
 interface LocationButtonProps {
   label: string;
   selected: boolean;
   onClick: () => void;
 }
+*/
 
 interface AddressMeta {
   placeId: string | null;
@@ -52,6 +109,7 @@ const EMPTY_ADDRESS_META: AddressMeta = {
   lng: null,
 };
 
+/* selectChevronStyle — hidden until floor select is re-enabled
 const selectChevronStyle = {
   backgroundImage:
     "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23202224' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")",
@@ -59,6 +117,7 @@ const selectChevronStyle = {
   backgroundPosition: "right 16px center",
   backgroundSize: "14px",
 } as const;
+*/
 
 const createSessionToken = (): string => {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -67,6 +126,7 @@ const createSessionToken = (): string => {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 };
 
+/* LocationButton — hidden until building type is re-enabled
 const LocationButton = ({ label, selected, onClick }: LocationButtonProps) => (
   <button
     type="button"
@@ -80,6 +140,7 @@ const LocationButton = ({ label, selected, onClick }: LocationButtonProps) => (
     {label}
   </button>
 );
+*/
 
 const AddressAutocompleteField = ({
   label,
@@ -164,11 +225,10 @@ export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
     lat: formData.pickupLat,
     lng: formData.pickupLng,
   });
-  const [pickupBuildingType, setPickupBuildingType] = useState<"house" | "stairs" | "elevator">(
-    "house"
-  );
+  // TODO: re-enable when building type UI is restored
+  // const [pickupBuildingType, setPickupBuildingType] = useState<"house" | "stairs" | "elevator">("house");
   const [pickupFloor, setPickupFloor] = useState(formData.pickupFloor);
-  const [pickupDistance, setPickupDistance] = useState<"<50" | "50-100" | "100-200" | ">200">();
+  // const [pickupDistance, setPickupDistance] = useState<"<50" | "50-100" | "100-200" | ">200">();
   const [pickupPredictions, setPickupPredictions] = useState<PlacePrediction[]>([]);
   const [pickupLoading, setPickupLoading] = useState(false);
   const [showPickupDropdown, setShowPickupDropdown] = useState(false);
@@ -184,11 +244,10 @@ export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
     lat: formData.deliveryLat,
     lng: formData.deliveryLng,
   });
-  const [deliveryBuildingType, setDeliveryBuildingType] = useState<"house" | "stairs" | "elevator">(
-    "house"
-  );
+  // TODO: re-enable when building type UI is restored
+  // const [deliveryBuildingType, setDeliveryBuildingType] = useState<"house" | "stairs" | "elevator">("house");
   const [deliveryFloor, setDeliveryFloor] = useState(formData.deliveryFloor);
-  const [deliveryDistance, setDeliveryDistance] = useState<"<50" | "50-100" | "100-200" | ">200">();
+  // const [deliveryDistance, setDeliveryDistance] = useState<"<50" | "50-100" | "100-200" | ">200">();
   const [deliveryPredictions, setDeliveryPredictions] = useState<PlacePrediction[]>([]);
   const [deliveryLoading, setDeliveryLoading] = useState(false);
   const [showDeliveryDropdown, setShowDeliveryDropdown] = useState(false);
@@ -508,12 +567,13 @@ export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
     prevStep();
   };
 
-  const isValid = pickupAddress.trim() && deliveryAddress.trim() && pickupFloor && deliveryFloor;
+  const isValid = pickupAddress.trim() && deliveryAddress.trim();
 
   return (
     <div className="flex gap-6">
       {/* Left Column: Form */}
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 flex flex-col min-h-[500px]">
+        <div className="space-y-6 flex-1">
         {/* Progress */}
         <div className="space-y-2">
           <p className="text-sm font-normal text-[#202224]">Step 2/4</p>
@@ -553,6 +613,7 @@ export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
           }}
         />
 
+        {/* Building type, floor & distance — hidden until backend supports
         <div className="flex gap-4">
           <LocationButton
             label="House"
@@ -571,7 +632,6 @@ export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
           />
         </div>
 
-        {/* Pickup Floor */}
         <div className="space-y-2">
           <p className="text-base font-normal text-[#202224]">
             Floor <span className="text-red-600">*</span>
@@ -613,6 +673,7 @@ export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
             />
           </div>
         </div>
+        */}
 
         {/* Delivery Location */}
         <AddressAutocompleteField
@@ -645,6 +706,7 @@ export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
           }}
         />
 
+        {/* Building type, floor & distance — hidden until backend supports
         <div className="flex gap-4">
           <LocationButton
             label="House"
@@ -663,7 +725,6 @@ export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
           />
         </div>
 
-        {/* Delivery Floor */}
         <div className="space-y-2">
           <p className="text-base font-normal text-[#202224]">
             Floor <span className="text-red-600">*</span>
@@ -705,9 +766,56 @@ export const PostJobStep2 = ({ onCancel: _onCancel }: PostJobStep2Props) => {
             />
           </div>
         </div>
+        */}
+
+        {/* Route Preview */}
+        {pickupMeta.placeId && deliveryMeta.placeId && (
+          <div className="rounded-lg border border-[#D8D8D8] bg-[#F9FAFB] p-5">
+            <div className="flex items-stretch gap-4">
+              {/* Route visualization */}
+              <div className="flex flex-col items-center py-1">
+                <div className="size-3 rounded-full border-2 border-[#60A5FA] bg-white" />
+                <div className="w-px flex-1 border-l-2 border-dashed border-[#60A5FA]/40 my-1" />
+                <div className="size-3 rounded-full bg-[#60A5FA]" />
+              </div>
+
+              {/* Addresses */}
+              <div className="flex-1 flex flex-col justify-between gap-4">
+                <div>
+                  <p className="text-xs font-medium text-[#90A4AE] uppercase tracking-wide">Pickup</p>
+                  <p className="text-sm font-semibold text-[#202224] mt-0.5">
+                    {pickupMeta.city && pickupMeta.state
+                      ? `${pickupMeta.city}, ${pickupMeta.state}`
+                      : pickupAddress}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-[#90A4AE] uppercase tracking-wide">Delivery</p>
+                  <p className="text-sm font-semibold text-[#202224] mt-0.5">
+                    {deliveryMeta.city && deliveryMeta.state
+                      ? `${deliveryMeta.city}, ${deliveryMeta.state}`
+                      : deliveryAddress}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Distance & Time estimates */}
+            {pickupMeta.lat && pickupMeta.lng && deliveryMeta.lat && deliveryMeta.lng && (
+              <RouteEstimates
+                pickupLat={pickupMeta.lat}
+                pickupLng={pickupMeta.lng}
+                deliveryLat={deliveryMeta.lat}
+                deliveryLng={deliveryMeta.lng}
+              />
+            )}
+          </div>
+        )}
+
+        </div>
 
         {/* Actions */}
-        <div className="flex gap-4 justify-end pt-2">
+        <div className="flex gap-4 justify-end pt-6 mt-auto">
           <button
             type="button"
             onClick={handleBack}
