@@ -1,5 +1,7 @@
 import { memo } from "react";
 
+import { Check } from "lucide-react";
+
 import { cn } from "@/shared/lib/utils";
 
 import type { Message } from "../../schemas";
@@ -14,13 +16,14 @@ export interface MessageBubbleProps {
   className?: string;
 }
 
-const MoreVerticalIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="6" r="1.5" fill="currentColor" />
-    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-    <circle cx="12" cy="18" r="1.5" fill="currentColor" />
-  </svg>
-);
+const ReadReceipt = memo(({ isRead }: { isRead: boolean }) => (
+  <span className={styles.readReceipt}>
+    <Check className={cn("size-3.5", isRead ? "text-white" : "text-white/50")} strokeWidth={2.5} />
+    {isRead && (
+      <Check className="size-3.5 -ml-2 text-white" strokeWidth={2.5} />
+    )}
+  </span>
+));
 
 export const MessageBubble = memo(
   ({ message, isOwnMessage, senderName, senderAvatar, className }: MessageBubbleProps) => {
@@ -44,9 +47,7 @@ export const MessageBubble = memo(
           <div className={styles.content}>{message.content}</div>
           <div className={styles.footer}>
             <span className={styles.time}>{formatTime(message.createdAt)}</span>
-            <button className={styles.moreButton} aria-label="More options">
-              <MoreVerticalIcon />
-            </button>
+            {isOwnMessage && <ReadReceipt isRead={message.isRead} />}
           </div>
         </div>
       </div>

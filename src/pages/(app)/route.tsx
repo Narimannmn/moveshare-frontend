@@ -1,11 +1,13 @@
 import { Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 
 import { ProtectedRoute } from "@/shared/components";
+import { useWebSocket } from "@/shared/api/ws/useWebSocket";
 
 import { Header } from "@/widgets/Header";
 import { Sidebar } from "@/widgets/Sidebar";
 
 const AppShell = () => {
+  useWebSocket();
   const { pathname } = useLocation();
   const isAdminRoute = pathname.startsWith("/admin");
 

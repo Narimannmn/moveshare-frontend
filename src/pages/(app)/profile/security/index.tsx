@@ -90,7 +90,7 @@ function SecurityPage() {
         <div className="flex items-center justify-between py-5 border-b border-gray-200">
           <div className="flex-1">
             <h3 className="text-base font-semibold text-[#202224] mb-1">Password</h3>
-            <p className="text-sm text-gray-500">Last changed: 3 months ago</p>
+            <p className="text-sm text-gray-500">Update your account password</p>
           </div>
           <Button variant="secondary" onClick={handleChangePassword}>
             Change Password

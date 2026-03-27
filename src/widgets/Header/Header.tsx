@@ -1,9 +1,11 @@
 import { memo, useEffect, useRef, useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { Bell, CheckCircle2, Clock3, Settings } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Bell, CheckCircle2, AlertTriangle, CreditCard, Info, Clock3, Settings } from "lucide-react";
 
 import { useAuthStore } from "@/entities/Auth/model/store/authStore";
+import { apiClient } from "@/shared/api/client";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, Button } from "@/shared/ui";
 
@@ -12,47 +14,74 @@ export interface HeaderProps {
   onNotificationClick?: () => void;
 }
 
-interface HeaderNotificationItem {
+interface NotificationItem {
   id: string;
+  type: string;
   title: string;
-  description: string;
-  createdAtLabel: string;
-  unread: boolean;
+  message: string;
+  is_read: boolean;
+  metadata: Record<string, string> | null;
+  created_at: string;
 }
 
-const INITIAL_NOTIFICATIONS: HeaderNotificationItem[] = [
-  {
-    id: "n1",
-    title: "Job Claimed Successfully",
-    description:
-      'You\'ve successfully claimed the "Furniture Delivery" job from Chicago to Indianapolis. The company has been notified and will contact you shortly.',
-    createdAtLabel: "Just now",
-    unread: true,
+const formatRelativeTime = (iso: string): string => {
+  const date = new Date(iso);
+  const diffMs = Date.now() - date.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  if (diffMinutes < 1) return "Just now";
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays}d ago`;
+};
+
+const NOTIFICATION_STYLES: Record<string, { icon: React.ReactNode; borderColor: string; iconBg: string }> = {
+  job_claimed: {
+    icon: <CheckCircle2 className="size-4 text-[#4CAF50]" />,
+    borderColor: "border-[#4CAF50]",
+    iconBg: "bg-[#E8F5E9]",
   },
-  {
-    id: "n2",
-    title: "Job Claimed Successfully",
-    description:
-      'You\'ve successfully claimed the "Furniture Delivery" job from Chicago to Indianapolis. The company has been notified and will contact you shortly.',
-    createdAtLabel: "Just now",
-    unread: true,
+  job_cancelled: {
+    icon: <AlertTriangle className="size-4 text-[#EF4444]" />,
+    borderColor: "border-[#EF4444]",
+    iconBg: "bg-[#FEF2F2]",
   },
-  {
-    id: "n3",
-    title: "Job Claimed Successfully",
-    description:
-      'You\'ve successfully claimed the "Furniture Delivery" job from Chicago to Indianapolis. The company has been notified and will contact you shortly.',
-    createdAtLabel: "Just now",
-    unread: true,
+  payment: {
+    icon: <CreditCard className="size-4 text-[#60A5FA]" />,
+    borderColor: "border-[#60A5FA]",
+    iconBg: "bg-[#EFF6FF]",
   },
-];
+};
+
+const DEFAULT_STYLE = {
+  icon: <Info className="size-4 text-[#60A5FA]" />,
+  borderColor: "border-[#60A5FA]",
+  iconBg: "bg-[#EFF6FF]",
+};
+
+const useNotifications = () => {
+  return useQuery({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      const response = await apiClient.get("/api/v1/notifications?limit=20");
+      return response.data as { notifications: NotificationItem[]; unread_count: number };
+    },
+    staleTime: 30 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+};
 
 export const Header = memo(({ className, onNotificationClick }: HeaderProps) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const companyProfile = useAuthStore((s) => s.companyProfile);
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<HeaderNotificationItem[]>(INITIAL_NOTIFICATIONS);
+  const { data } = useNotifications();
+
+  const notifications = data?.notifications ?? [];
+  const unreadCount = data?.unread_count ?? 0;
 
   useEffect(() => {
     if (!isNotificationsOpen) return;
@@ -70,13 +99,14 @@ export const Header = memo(({ className, onNotificationClick }: HeaderProps) => 
     };
   }, [isNotificationsOpen]);
 
-  const handleMarkAsRead = (notificationId: string) => {
-    setNotifications((prev) =>
-      prev.map((notification) =>
-        notification.id === notificationId ? { ...notification, unread: false } : notification
-      )
-    );
-  };
+  // Mark all as read when dropdown opens
+  useEffect(() => {
+    if (isNotificationsOpen && unreadCount > 0) {
+      apiClient.patch("/api/v1/notifications/read-all").then(() => {
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      });
+    }
+  }, [isNotificationsOpen, unreadCount, queryClient]);
 
   const handleOpenNotifications = () => {
     onNotificationClick?.();
@@ -96,7 +126,7 @@ export const Header = memo(({ className, onNotificationClick }: HeaderProps) => 
         <span className="text-xl font-semibold text-[#60A5FA]">MoveShare</span>
       </div>
 
-      {/* Right Section - Notification & Avatar */}
+      {/* Right Section */}
       <div className="flex items-center gap-5">
         {/* Notification Bell */}
         <div className="relative" ref={popoverRef}>
@@ -107,97 +137,73 @@ export const Header = memo(({ className, onNotificationClick }: HeaderProps) => 
             aria-expanded={isNotificationsOpen}
           >
             <Bell className="size-6" strokeWidth={2} />
+            {unreadCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center rounded-full bg-[#EF4444] text-[11px] font-bold text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </button>
 
           {isNotificationsOpen ? (
-            <div className="absolute right-0 top-full z-50 mt-3 w-[min(680px,calc(100vw-32px))] rounded-[8px] bg-white p-4 shadow-[7px_7px_13.9px_0px_rgba(99,99,99,0.29)]">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-[20px] font-bold leading-none text-[#202224]">Notification</h3>
+            <div className="absolute right-0 top-full z-50 mt-3 w-[min(480px,calc(100vw-32px))] rounded-lg bg-white shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-3">
+                <h3 className="text-base font-bold text-[#202224]">Notifications</h3>
                 <button
                   type="button"
-                  className="flex items-center gap-2 text-[16px] leading-none text-[#60A5FA] hover:opacity-85 transition-opacity"
+                  className="flex items-center gap-1.5 text-sm text-[#60A5FA] hover:opacity-85 transition-opacity"
                   onClick={() => {
                     setIsNotificationsOpen(false);
                     navigate({ to: "/profile/notifications" });
                   }}
                 >
-                  <span>Setting</span>
-                  <Settings className="h-5 w-5" />
+                  <Settings className="size-4" />
+                  <span>Settings</span>
                 </button>
               </div>
 
-              <div className="flex max-h-[560px] flex-col gap-4 overflow-auto pr-1">
-                {notifications.map((notification) => (
-                  <article
-                    key={notification.id}
-                    className="rounded-[8px] border-l-[6px] border-[#2ECC71] bg-white shadow-[7px_7px_13.9px_0px_rgba(99,99,99,0.29)]"
-                  >
-                    <div className="flex flex-col gap-4 rounded-[8px] border-b border-[#D8D8D8] p-4">
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#E8F5E9]">
-                          <CheckCircle2 className="h-4 w-4 text-[#4CAF50]" />
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="flex min-w-0 items-center gap-2">
-                              <p className="truncate text-[16px] font-bold leading-none text-[#263238]">
+              <div className="max-h-[400px] overflow-auto">
+                {notifications.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Bell className="size-10 text-gray-200 mb-3" />
+                    <p className="text-sm text-gray-400">No notifications yet</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col">
+                    {notifications.map((notification) => {
+                      const style = NOTIFICATION_STYLES[notification.type] ?? DEFAULT_STYLE;
+                      return (
+                        <div
+                          key={notification.id}
+                          className={cn(
+                            "flex items-start gap-3 border-l-4 px-4 py-3 transition-colors hover:bg-gray-50",
+                            style.borderColor,
+                            !notification.is_read && "bg-[#F8FAFC]"
+                          )}
+                        >
+                          <div className={cn("flex size-9 shrink-0 items-center justify-center rounded-full mt-0.5", style.iconBg)}>
+                            {style.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-sm font-semibold text-[#202224] truncate">
                                 {notification.title}
                               </p>
-                              {notification.unread ? (
-                                <span className="h-2 w-2 shrink-0 rounded-full bg-[#4CAF50]" />
-                              ) : null}
-                            </div>
-
-                            <div className="flex shrink-0 items-center gap-1 text-[#A6A6A6]">
-                              <Clock3 className="h-4 w-4" />
-                              <span className="text-[16px] leading-none">
-                                {notification.createdAtLabel}
+                              <span className="text-xs text-[#90A4AE] shrink-0">
+                                {formatRelativeTime(notification.created_at)}
                               </span>
                             </div>
+                            <p className="text-sm text-[#666C72] mt-1 line-clamp-2">
+                              {notification.message}
+                            </p>
                           </div>
-
-                          <p className="mt-2 text-[14px] leading-[1.35] text-[#A6A6A6]">
-                            {notification.description}
-                          </p>
+                          {!notification.is_read && (
+                            <span className="size-2 shrink-0 rounded-full bg-[#60A5FA] mt-2" />
+                          )}
                         </div>
-                      </div>
-
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="default"
-                          className="h-11 rounded-[8px] bg-[#ECEFF1] px-4 text-base text-[#202224] hover:bg-[#E1E6EA]"
-                          onClick={() => handleMarkAsRead(notification.id)}
-                        >
-                          Mark as Read
-                        </Button>
-                        <Button
-                          variant="primary"
-                          size="default"
-                          className="h-11 rounded-[8px] px-5 text-base"
-                          onClick={() => {
-                            setIsNotificationsOpen(false);
-                            navigate({ to: "/jobs" });
-                          }}
-                        >
-                          View Job
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="default"
-                          className="h-11 rounded-[8px] bg-[#ECEFF1] px-4 text-base text-[#202224] hover:bg-[#E1E6EA]"
-                          onClick={() => {
-                            setIsNotificationsOpen(false);
-                            navigate({ to: "/chat" });
-                          }}
-                        >
-                          Message Company
-                        </Button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           ) : null}

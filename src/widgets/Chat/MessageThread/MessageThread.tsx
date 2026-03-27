@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo, useRef } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { CircleX, Loader2, MessageCircleOff, MessageSquare } from "lucide-react";
 
@@ -8,6 +9,7 @@ import { cn } from "@/shared/lib/utils";
 import { getJwtSubject } from "@/shared/utils/jwt/getJwtSubject";
 
 import { useAuthStore } from "@/entities/Auth/model/store/authStore";
+import { chatKeys } from "@/entities/Chat/api/keys";
 import { EmptyState, MessageBubble, useConversations, useMessages } from "@/entities/Chat";
 import { Avatar } from "@/shared/ui";
 
@@ -36,8 +38,16 @@ export const MessageThread = memo(({ conversationId, className }: MessageThreadP
   const accessToken = useAuthStore((state) => state.accessToken);
   const currentUserId = useMemo(() => getJwtSubject(accessToken) ?? "", [accessToken]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
   const { data: messages, isLoading, isError } = useMessages(conversationId);
   const { data: conversations } = useConversations();
+
+  // After messages load (which marks them as read on backend), refresh conversations to update unreadCount
+  useEffect(() => {
+    if (conversationId && messages && messages.length > 0) {
+      queryClient.invalidateQueries({ queryKey: chatKeys.conversations() });
+    }
+  }, [conversationId, messages, queryClient]);
 
   const conversation = useMemo(() => {
     return conversations?.find((c) => c.id === conversationId) ?? null;
