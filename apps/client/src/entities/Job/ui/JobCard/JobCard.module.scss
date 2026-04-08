@@ -1,0 +1,225 @@
+.card {
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 16px;
+  container-type: inline-size;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+  height: fit-content;
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+}
+
+// Header
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.headerLeft {
+  flex: 1;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #202224;
+  margin: 0 0 6px 0;
+}
+
+.metadata {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.distance {
+  font-size: 14px;
+  color: #666c72;
+}
+
+.hotDeal {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ff6b6b;
+  background-color: #ffe5e5;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.newListing {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #60a5fa;
+  padding: 6px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+// Route
+.route {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 29px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+}
+
+.location {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.locationText {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #333333;
+  line-height: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.arrow {
+  font-size: 16px;
+  color: #333333;
+  font-weight: 700;
+  line-height: normal;
+  flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+  .route {
+    gap: 12px;
+  }
+
+  .locationText {
+    max-width: 120px;
+    font-size: 14px;
+  }
+
+  .arrow {
+    font-size: 14px;
+  }
+}
+
+// Map
+.mapContainer {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.map {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mapImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mapFrame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+// Details Grid
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detailLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666c72;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detailValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: #202224;
+  line-height: 1.4;
+}
+
+// Footer
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.price {
+  font-size: 26px;
+  font-weight: 700;
+  color: #60a5fa;
+  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.viewDetailsButton {
+  min-width: 96px;
+}
+
+.claimButton {
+  min-width: 96px;
+}
+
+@container (max-width: 420px) {
+  .price {
+    font-size: 20px;
+  }
+
+  .viewDetailsButton,
+  .claimButton {
+    min-width: 86px;
+    padding-inline: 10px;
+    font-size: 14px;
+  }
+}

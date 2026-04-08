@@ -1,0 +1,19 @@
+{
+  "name": "@moveshare/auth",
+  "private": true,
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@moveshare/shared": "workspace:*",
+    "@tanstack/react-query": "^5.90.12",
+    "zod": "^4.2.1",
+    "zustand": "^5.0.9"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}
